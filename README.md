@@ -1,1 +1,3 @@
-# Repositorio-personal-Josefina-Aramburu
+# App-turismo
+App para guia turistica personalizada 
+
