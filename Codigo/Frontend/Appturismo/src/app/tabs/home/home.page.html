@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Hoy</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- 🔹 Tarjeta principal -->
+  <ion-card class="summary-card">
+    <ion-card-content>
+
+      <div class="circle-stats">
+        <div class="mini-circle">
+          <h3>{{ totalConsumed }}</h3>
+          <p>Consumidas</p>
+        </div>
+        <div class="mini-circle highlight">
+          <h3>{{ totalRemaining }}</h3>
+          <p>Restantes</p>
+        </div>
+        <div class="mini-circle">
+          <h3>{{ totalBurned }}</h3>
+          <p>Quemadas</p>
+        </div>
+      </div>
+      
+
+      <!-- 🔹 Macronutrientes en una sola línea -->
+      <div class="macros-inline">
+        <div>
+          <p>Carbohidratos</p>
+          <small>{{ carbs.consumed }}/{{ carbs.target }} g</small>
+          <ion-progress-bar [value]="carbs.consumed / carbs.target"></ion-progress-bar>
+        </div>
+        <div>
+          <p>Proteínas</p>
+          <small>{{ protein.consumed }}/{{ protein.target }} g</small>
+          <ion-progress-bar color="success" [value]="protein.consumed / protein.target"></ion-progress-bar>
+        </div>
+        <div>
+          <p>Grasas</p>
+          <small>{{ fat.consumed }}/{{ fat.target }} g</small>
+          <ion-progress-bar color="warning" [value]="fat.consumed / fat.target"></ion-progress-bar>
+        </div>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- 🔹 Lista de comidas -->
+  <ion-list>
+    <ion-item *ngFor="let meal of meals">
+      <ion-avatar slot="start">
+        <img [src]="'assets/img/' + meal.icon + '.png'" alt="{{ meal.type }}">
+      </ion-avatar>
+      <ion-label>
+        <h3>{{ meal.type }}</h3>
+        <p>{{ meal.consumed }} / {{ meal.target }} kcal</p>
+      </ion-label>
+      <ion-button fill="clear" slot="end" (click)="addMeal(meal.type)">
+        <ion-icon name="add-circle" color="primary"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
