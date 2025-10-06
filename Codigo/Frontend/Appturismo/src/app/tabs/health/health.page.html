@@ -12,14 +12,14 @@
 
   <!-- Lista de reseñas -->
   <ion-list>
-    <ion-item *ngFor="let reseña of reseñas">
+    <ion-item *ngFor="let resena of resenas">
       <ion-label>
-        <h3>{{ reseña.usuario }}</h3>
+        <h3>{{ resena.usuario }}</h3>
         <p class="puntuacion">
-          <ion-icon *ngFor="let estrella of getStars(reseña.puntuacion)" name="star" color="warning"></ion-icon>
+          <ion-icon *ngFor="let estrella of getStars(resena.puntuacion)" name="star" color="warning"></ion-icon>
         </p>
-        <p>{{ reseña.texto }}</p>
-        <small class="fecha">{{ reseña.fecha | date }}</small>
+        <p>{{ resena.texto }}</p>
+        <small class="fecha">{{ resena.fecha | date }}</small>
       </ion-label>
     </ion-item>
   </ion-list>
@@ -30,17 +30,17 @@
 
     <ion-item>
       <ion-label position="floating">Comentario</ion-label>
-      <ion-textarea [(ngModel)]="nuevaReseña.texto" placeholder="Escribí tu opinión..."></ion-textarea>
+      <ion-textarea [(ngModel)]="nuevaResena.texto" placeholder="Escribí tu opinión..."></ion-textarea>
     </ion-item>
 
     <ion-item>
       <ion-label>Puntuación</ion-label>
-      <ion-select [(ngModel)]="nuevaReseña.puntuacion" placeholder="Seleccioná">
+      <ion-select [(ngModel)]="nuevaResena.puntuacion" placeholder="Seleccioná">
         <ion-select-option *ngFor="let i of [1,2,3,4,5]" [value]="i">{{i}} ⭐</ion-select-option>
       </ion-select>
     </ion-item>
 
-    <ion-button expand="block" color="success" (click)="agregarReseña()">
+    <ion-button expand="block" color="success" (click)="agregarResena()">
       Enviar reseña
     </ion-button>
   </div>
