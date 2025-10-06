@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 
 interface Lugar {
   nombre: string;
@@ -13,6 +16,12 @@ interface Lugar {
   selector: 'app-capture',
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
+  standalone: true,      // hace que sea una página independiente
+  imports: [
+    CommonModule,        // necesario para *ngFor y *ngIf
+    FormsModule,         // si usás formularios
+    IonicModule          // necesario para <ion-*>
+  ]
 })
 export class CapturePage {
   lugares: Lugar[] = [
@@ -42,3 +51,4 @@ export class CapturePage {
     },
   ];
 }
+
