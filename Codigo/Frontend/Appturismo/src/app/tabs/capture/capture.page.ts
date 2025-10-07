@@ -16,11 +16,11 @@ interface Lugar {
   selector: 'app-capture',
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
-  standalone: true,      // hace que sea una página independiente
+  standalone: true,
   imports: [
-    CommonModule,        // necesario para *ngFor y *ngIf
-    FormsModule,         // si usás formularios
-    IonicModule          // necesario para <ion-*>
+    CommonModule,
+    FormsModule,
+    IonicModule
   ]
 })
 export class CapturePage {
@@ -51,4 +51,3 @@ export class CapturePage {
     },
   ];
 }
-

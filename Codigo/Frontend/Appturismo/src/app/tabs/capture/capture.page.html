@@ -1,22 +1,21 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Lugares de interés</ion-title>
+  <ion-toolbar color="light">
+    <ion-title class="titulo">Lugares Destacados</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-card *ngFor="let lugar of lugares">
+<ion-content class="fondo" fullscreen>
+  <ion-list class="lista-lugares">
+    <ion-card *ngFor="let lugar of lugares" class="tarjeta">
       <ion-card-header>
-        <ion-card-title>{{ lugar.nombre }}</ion-card-title>
-        <ion-card-subtitle>{{ lugar.categoria }}</ion-card-subtitle>
+        <ion-card-title class="nombre">{{ lugar.nombre }}</ion-card-title>
+        <ion-card-subtitle class="categoria">{{ lugar.categoria }}</ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
-        <p>{{ lugar.descripcion }}</p>
-        <p><strong>Horario:</strong> {{ lugar.horario }}</p>
-        <p *ngIf="lugar.direccion"><strong>Dirección:</strong> {{ lugar.direccion }}</p>
-        <p *ngIf="lugar.coordenadas"><strong>Coordenadas:</strong> {{ lugar.coordenadas }}</p>
+        <p class="descripcion">{{ lugar.descripcion }}</p>
+        <p class="detalle"><ion-icon name="time-outline"></ion-icon> {{ lugar.horario }}</p>
+        <p class="detalle"><ion-icon name="location-outline"></ion-icon> {{ lugar.direccion }}</p>
       </ion-card-content>
     </ion-card>
   </ion-list>

@@ -1,10 +1,55 @@
-ion-card {
-  margin: 12px;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+.fondo {
+  --background: #f9fafc;
+  padding: 16px;
 }
 
-ion-card-title {
-  font-weight: bold;
+.titulo {
+  font-weight: 600;
+  text-align: center;
   color: #222;
+  font-size: 1.2rem;
+}
+
+.lista-lugares {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tarjeta {
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding-bottom: 8px;
+}
+
+.nombre {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.categoria {
+  color: #7a7a7a;
+  font-size: 0.9rem;
+}
+
+.descripcion {
+  margin: 8px 0;
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.detalle {
+  display: flex;
+  align-items: center;
+  color: #555;
+  font-size: 0.9rem;
+  margin-top: 4px;
+
+  ion-icon {
+    margin-right: 6px;
+    color: #4a90e2;
+  }
 }
