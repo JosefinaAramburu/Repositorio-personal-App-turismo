@@ -1,67 +1,69 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Hoy</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Barcelona</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
+  <!-- Sección de Recomendaciones -->
+  <ion-card class="dashboard-card">
+    <ion-card-header>
+      <ion-card-title>Qué hacer en Barcelona</ion-card-title>
+      <ion-card-subtitle>Recomendaciones para tu viaje</ion-card-subtitle>
+    </ion-card-header>
 
-  <!-- 🔹 Tarjeta principal -->
-  <ion-card class="summary-card">
     <ion-card-content>
+      <!-- Eventos -->
+      <ion-item button (click)="navegarAEventos()" class="category-item">
+        <ion-icon name="calendar" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>Eventos</h3>
+          <p>Recitales, ferias, fiestas</p>
+        </ion-label>
+        <ion-badge slot="end" color="primary">{{contadores.eventos}}</ion-badge>
+      </ion-item>
 
-      <div class="circle-stats">
-        <div class="mini-circle">
-          <h3>{{ totalConsumed }}</h3>
-          <p>Consumidas</p>
-        </div>
-        <div class="mini-circle highlight">
-          <h3>{{ totalRemaining }}</h3>
-          <p>Restantes</p>
-        </div>
-        <div class="mini-circle">
-          <h3>{{ totalBurned }}</h3>
-          <p>Quemadas</p>
-        </div>
-      </div>
-      
+      <!-- Lugares -->
+      <ion-item button (click)="navegarALugares()" class="category-item">
+        <ion-icon name="location" slot="start" color="secondary"></ion-icon>
+        <ion-label>
+          <h3>Lugares</h3>
+          <p>Atracciones, paisajes, museos</p>
+        </ion-label>
+        <ion-badge slot="end" color="secondary">{{contadores.lugares}}</ion-badge>
+      </ion-item>
 
-      <!-- 🔹 Macronutrientes en una sola línea -->
-      <div class="macros-inline">
-        <div>
-          <p>Carbohidratos</p>
-          <small>{{ carbs.consumed }}/{{ carbs.target }} g</small>
-          <ion-progress-bar [value]="carbs.consumed / carbs.target"></ion-progress-bar>
-        </div>
-        <div>
-          <p>Proteínas</p>
-          <small>{{ protein.consumed }}/{{ protein.target }} g</small>
-          <ion-progress-bar color="success" [value]="protein.consumed / protein.target"></ion-progress-bar>
-        </div>
-        <div>
-          <p>Grasas</p>
-          <small>{{ fat.consumed }}/{{ fat.target }} g</small>
-          <ion-progress-bar color="warning" [value]="fat.consumed / fat.target"></ion-progress-bar>
-        </div>
-      </div>
+      <!-- Gastronomía -->
+      <ion-item button (click)="navegarAGastronomia()" class="category-item">
+        <ion-icon name="restaurant" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h3>Gastronomía</h3>
+          <p>Restaurantes, bares</p>
+        </ion-label>
+        <ion-badge slot="end" color="tertiary">{{contadores.gastronomia}}</ion-badge>
+      </ion-item>
 
+      <!-- Recorridos -->
+      <ion-item button (click)="navegarARecorridos()" class="category-item">
+        <ion-icon name="map" slot="start" color="success"></ion-icon>
+        <ion-label>
+          <h3>Recorridos</h3>
+          <p>Sugerencias de recorridos</p>
+        </ion-label>
+        <ion-badge slot="end" color="success">{{contadores.recorridos}}</ion-badge>
+      </ion-item>
     </ion-card-content>
   </ion-card>
 
-  <!-- 🔹 Lista de comidas -->
-  <ion-list>
-    <ion-item *ngFor="let meal of meals">
-      <ion-avatar slot="start">
-        <img [src]="'assets/img/' + meal.icon + '.png'" alt="{{ meal.type }}">
-      </ion-avatar>
-      <ion-label>
-        <h3>{{ meal.type }}</h3>
-        <p>{{ meal.consumed }} / {{ meal.target }} kcal</p>
-      </ion-label>
-      <ion-button fill="clear" slot="end" (click)="addMeal(meal.type)">
-        <ion-icon name="add-circle" color="primary"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-list>
-
+  <!-- Destino destacado -->
+  <ion-card class="featured-card">
+    <img src="assets/barcelona-header.jpg" alt="Barcelona">
+    <ion-card-header>
+      <ion-card-title>Barcelona</ion-card-title>
+      <ion-card-subtitle>Ciudad vibrante y cultural</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p>Descubre la magia de Barcelona con sus playas, arquitectura moderna y tradición catalana.</p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
