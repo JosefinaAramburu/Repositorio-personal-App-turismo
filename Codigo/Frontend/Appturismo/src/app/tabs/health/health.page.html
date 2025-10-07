@@ -1,44 +1,33 @@
 <ion-header>
-  <ion-toolbar color="light">
+  <ion-toolbar color="secondary">
     <ion-title>Reseñas de {{ lugarSeleccionado }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding fondo">
+<ion-content class="ion-padding">
+  <h2 class="titulo-opiniones">Opiniones de los usuarios</h2>
+  <p class="texto-descriptivo">
+    Leé lo que otros viajeros opinan sobre {{ lugarSeleccionado }}.
+  </p>
 
-  <h2 class="titulo">Opiniones de los usuarios</h2>
-  <p class="subtitulo">Leé lo que otros viajeros opinan sobre {{ lugarSeleccionado }}.</p>
+  <ion-card *ngFor="let resena of resenas">
+    <ion-card-content>
+      <p>{{ resena.texto }}</p>
+      <p class="fecha">{{ resena.fecha }}</p>
+    </ion-card-content>
+  </ion-card>
 
-  <ion-list>
-    <ion-item *ngFor="let resena of resenas">
-      <ion-label>
-        <h3>{{ resena.usuario }}</h3>
-        <p class="puntuacion">
-          <ion-icon *ngFor="let estrella of getStars(resena.puntuacion)" name="star" color="warning"></ion-icon>
-        </p>
-        <p>{{ resena.texto }}</p>
-        <small class="fecha">{{ resena.fecha | date:'dd/MM/yyyy' }}</small>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-
-  <div class="formulario">
-    <h3>Dejá tu reseña sobre {{ lugarSeleccionado }}</h3>
-
-    <ion-item>
-      <ion-label position="floating">Comentario</ion-label>
-      <ion-textarea [(ngModel)]="nuevaResena.texto" placeholder="Escribí tu opinión..."></ion-textarea>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Puntuación</ion-label>
-      <ion-select [(ngModel)]="nuevaResena.puntuacion" placeholder="Seleccioná">
-        <ion-select-option *ngFor="let i of [1,2,3,4,5]" [value]="i">{{i}} ⭐</ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-button expand="block" color="success" (click)="agregarResena()">
-      Enviar reseña
-    </ion-button>
-  </div>
+  <ion-card class="card-resena">
+    <ion-card-content>
+      <h3>Dejá tu reseña sobre {{ lugarSeleccionado }}</h3>
+      <ion-textarea
+        [(ngModel)]="nuevaResena"
+        placeholder="Escribí tu reseña..."
+        auto-grow="true"
+      ></ion-textarea>
+      <ion-button expand="block" color="success" (click)="agregarResena()">
+        Enviar reseña
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

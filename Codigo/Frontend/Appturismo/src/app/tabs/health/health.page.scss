@@ -1,55 +1,26 @@
-.fondo {
-  --background: #f9fafc;
-}
-
-.titulo {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 4px;
+.titulo-opiniones {
   text-align: center;
-  color: #222;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 1rem;
 }
 
-.subtitulo {
+.texto-descriptivo {
   text-align: center;
   color: #666;
-  margin-bottom: 20px;
-  font-size: 0.95rem;
-}
-
-ion-item {
-  --background: #fff;
-  margin-bottom: 12px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.puntuacion ion-icon {
-  font-size: 1.1rem;
-  margin-right: 2px;
+  margin-bottom: 1rem;
 }
 
 .fecha {
   color: #999;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
 }
 
-.formulario {
-  margin-top: 30px;
-  padding: 16px;
-  background: #f3f5f7;
-  border-radius: 16px;
-  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
-
-  h3 {
-    text-align: center;
-    margin-bottom: 12px;
-    font-weight: 600;
-    color: #333;
-  }
+.card-resena {
+  margin-top: 1.5rem;
 }
 
 ion-button {
-  margin-top: 15px;
-  border-radius: 10px;
+  margin-top: 0.5rem;
+  font-weight: 500;
 }
