@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonSelect, IonSelectOption, IonButton, IonItem, IonLabel, IonTextarea, IonList, IonIcon } from '@ionic/angular/standalone';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonSelect, IonSelectOption,
+  IonButton, IonItem, IonLabel, IonTextarea, IonList, IonIcon
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-health',
@@ -16,18 +20,23 @@ import { IonContent, IonHeader, IonTitle, IonToolbar, IonSelect, IonSelectOption
   ]
 })
 export class HealthPage implements OnInit {
-
-  resenas = [
-    { usuario: 'María López', puntuacion: 5, texto: 'Hermoso lugar, muy limpio y con buena atención.', fecha: new Date('2025-09-15') },
-    { usuario: 'Juan Pérez', puntuacion: 4, texto: 'El evento fue genial, pero el acceso era un poco complicado.', fecha: new Date('2025-09-22') },
-    { usuario: 'Lucía Fernández', puntuacion: 3, texto: 'Buena comida, aunque tardaron en atendernos.', fecha: new Date('2025-09-28') }
-  ];
-
+  lugarSeleccionado = '';
+  resenas: any[] = [];
   nuevaResena = { texto: '', puntuacion: 0 };
 
-  constructor() {}
+  constructor(private route: ActivatedRoute) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.lugarSeleccionado = params['lugar'] || 'Lugar no especificado';
+    });
+
+    // Ejemplo: reseñas iniciales
+    this.resenas = [
+      { usuario: 'María López', puntuacion: 5, texto: 'Hermoso lugar, muy limpio.', fecha: new Date('2025-09-15') },
+      { usuario: 'Juan Pérez', puntuacion: 4, texto: 'Muy interesante, pero algo lleno.', fecha: new Date('2025-09-22') }
+    ];
+  }
 
   getStars(puntuacion: number) {
     return Array(puntuacion).fill(0);

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 
 interface Lugar {
   nombre: string;
@@ -17,11 +17,7 @@ interface Lugar {
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule
-  ]
+  imports: [CommonModule, FormsModule, IonicModule],
 })
 export class CapturePage {
   lugares: Lugar[] = [
@@ -50,4 +46,10 @@ export class CapturePage {
       coordenadas: '-34.603, -58.381',
     },
   ];
+
+  constructor(private navCtrl: NavController) {}
+
+  irAResenas(lugar: Lugar) {
+    this.navCtrl.navigateForward(`/tabs/health?lugar=${encodeURIComponent(lugar.nombre)}`);
+  }
 }

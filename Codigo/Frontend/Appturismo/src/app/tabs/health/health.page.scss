@@ -1,25 +1,31 @@
+.fondo {
+  --background: #f9fafc;
+}
+
 .titulo {
-  font-size: 1.6rem;
-  font-weight: bold;
+  font-size: 1.4rem;
+  font-weight: 600;
   margin-bottom: 4px;
   text-align: center;
+  color: #222;
 }
 
 .subtitulo {
   text-align: center;
   color: #666;
   margin-bottom: 20px;
+  font-size: 0.95rem;
 }
 
 ion-item {
   --background: #fff;
-  margin-bottom: 8px;
-  border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .puntuacion ion-icon {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-right: 2px;
 }
 
@@ -30,9 +36,17 @@ ion-item {
 
 .formulario {
   margin-top: 30px;
-  padding: 10px;
-  background: #f6f6f6;
-  border-radius: 12px;
+  padding: 16px;
+  background: #f3f5f7;
+  border-radius: 16px;
+  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    text-align: center;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #333;
+  }
 }
 
 ion-button {

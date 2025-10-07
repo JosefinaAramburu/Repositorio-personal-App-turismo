@@ -6,7 +6,7 @@
 
 <ion-content class="fondo" fullscreen>
   <ion-list class="lista-lugares">
-    <ion-card *ngFor="let lugar of lugares" class="tarjeta">
+    <ion-card *ngFor="let lugar of lugares" class="tarjeta" (click)="irAResenas(lugar)">
       <ion-card-header>
         <ion-card-title class="nombre">{{ lugar.nombre }}</ion-card-title>
         <ion-card-subtitle class="categoria">{{ lugar.categoria }}</ion-card-subtitle>

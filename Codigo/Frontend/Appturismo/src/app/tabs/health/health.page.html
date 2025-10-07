@@ -1,16 +1,14 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Reseñas</ion-title>
+  <ion-toolbar color="light">
+    <ion-title>Reseñas de {{ lugarSeleccionado }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding fondo">
 
-  <!-- Título principal -->
   <h2 class="titulo">Opiniones de los usuarios</h2>
-  <p class="subtitulo">Leé lo que otros viajeros opinan sobre los lugares, eventos y restaurantes.</p>
+  <p class="subtitulo">Leé lo que otros viajeros opinan sobre {{ lugarSeleccionado }}.</p>
 
-  <!-- Lista de reseñas -->
   <ion-list>
     <ion-item *ngFor="let resena of resenas">
       <ion-label>
@@ -19,14 +17,13 @@
           <ion-icon *ngFor="let estrella of getStars(resena.puntuacion)" name="star" color="warning"></ion-icon>
         </p>
         <p>{{ resena.texto }}</p>
-        <small class="fecha">{{ resena.fecha | date }}</small>
+        <small class="fecha">{{ resena.fecha | date:'dd/MM/yyyy' }}</small>
       </ion-label>
     </ion-item>
   </ion-list>
 
-  <!-- Formulario para agregar reseña -->
   <div class="formulario">
-    <h3>Dejá tu reseña</h3>
+    <h3>Dejá tu reseña sobre {{ lugarSeleccionado }}</h3>
 
     <ion-item>
       <ion-label position="floating">Comentario</ion-label>
