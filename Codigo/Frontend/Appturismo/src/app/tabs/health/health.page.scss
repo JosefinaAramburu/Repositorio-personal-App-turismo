@@ -78,7 +78,8 @@
   padding: 24px 20px;
   
   .summary-card {
-    background: var(--surface); // UNIFICADO
+    background: white; // UNIFICADO
+    color: black;
     border-radius: 20px;
     padding: 24px;
     box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
@@ -88,7 +89,7 @@
       margin: 0 0 20px 0;
       font-size: 1.3rem;
       font-weight: 700;
-      color: var(--text-primary);
+      color: black;
       letter-spacing: -0.3px;
     }
   }
@@ -186,7 +187,7 @@
   border-radius: 20px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   margin: 0;
-  background: slategray; // UNIFICADO
+  background: white; // UNIFICADO
   border: 1px solid var(--border-light);
   transition: all 0.3s ease;
   animation: slideUp 0.5s ease;
@@ -329,7 +330,7 @@
 
 .add-review-section {
   padding: 24px 20px;
-  background: slategray; 
+  background: white; 
   margin-top: 8px;
   border-top: 1px solid var(--border-light);
 }
