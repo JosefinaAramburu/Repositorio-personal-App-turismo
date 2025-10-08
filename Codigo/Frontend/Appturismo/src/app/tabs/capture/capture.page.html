@@ -1,27 +1,66 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>Explorar lugares</ion-title>
+    <ion-title>Explorar Lugares</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <!-- Buscador de destinos -->
+  <ion-searchbar 
+    [(ngModel)]="terminoBusqueda"
+    (ionInput)="filtrarLugares()"
+    placeholder="Buscar ciudad o país... Ej: Barcelona, Madrid"
+    animated
+    class="custom-searchbar">
+  </ion-searchbar>
+
+  <!-- Mensaje cuando no hay resultados -->
+  <div *ngIf="lugaresFiltrados.length === 0 && terminoBusqueda" class="no-results">
+    <ion-icon name="location-outline" size="large"></ion-icon>
+    <p>No se encontraron lugares para "{{terminoBusqueda}}"</p>
+  </div>
+
+  <!-- Lista de lugares filtrados -->
   <ion-list>
-    <ion-card
-      *ngFor="let lugar of lugares"
+    <ion-card 
+      *ngFor="let lugar of lugaresFiltrados"
       (click)="irAResenas(lugar)"
       button
       class="lugar-card"
     >
       <ion-card-header>
         <ion-card-title>{{ lugar.nombre }}</ion-card-title>
-        <ion-card-subtitle>{{ lugar.categoria }}</ion-card-subtitle>
+        <ion-card-subtitle>{{ lugar.ciudad }}, {{ lugar.pais }}</ion-card-subtitle>
+        <ion-badge color="medium">{{ lugar.categoria }}</ion-badge>
       </ion-card-header>
 
       <ion-card-content>
         <p>{{ lugar.descripcion }}</p>
-        <p><strong>Horario:</strong> {{ lugar.horario }}</p>
-        <p *ngIf="lugar.direccion"><strong>Dirección:</strong> {{ lugar.direccion }}</p>
+        <div class="lugar-detalles">
+          <p><strong>Horario:</strong> {{ lugar.horario }}</p>
+          <p *ngIf="lugar.direccion"><strong>Dirección:</strong> {{ lugar.direccion }}</p>
+          <p *ngIf="lugar.precio"><strong>Precio:</strong> {{ lugar.precio }}</p>
+        </div>
       </ion-card-content>
     </ion-card>
   </ion-list>
+
+  <!-- Lugares populares (cuando no hay búsqueda) -->
+  <div *ngIf="!terminoBusqueda" class="lugares-populares">
+    <ion-card-header>
+      <ion-card-title>Lugares Populares</ion-card-title>
+      <ion-card-subtitle>Destinos más visitados</ion-card-subtitle>
+    </ion-card-header>
+    
+    <ion-list>
+      <ion-item *ngFor="let lugar of lugaresPopulares" button (click)="seleccionarLugar(lugar.nombre)">
+        <ion-icon name="location" slot="start" color="primary"></ion-icon>
+        <ion-label>
+          <h3>{{lugar.nombre}}</h3>
+          <p>{{lugar.ciudad}}, {{lugar.pais}}</p>
+        </ion-label>
+        <ion-badge slot="end" color="primary">{{lugar.categoria}}</ion-badge>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>
