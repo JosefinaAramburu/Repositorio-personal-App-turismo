@@ -16,12 +16,8 @@
         <div class="place-stats">
           <div class="stat">
             <ion-icon name="star" color="warning"></ion-icon>
-            <span class="rating">4.5</span>
+            <span class="rating">{{obtenerPromedioRating()}}</span>
             <span class="reviews-count">({{resenas.length}} reseñas)</span>
-          </div>
-          <div class="stat" *ngIf="obtenerPromedioRating()">
-            <ion-icon name="time-outline"></ion-icon>
-            <span>Promedio: {{obtenerPromedioRating()}}/5</span>
           </div>
         </div>
       </div>
@@ -77,7 +73,7 @@
 
           <p class="review-text">{{resena.texto}}</p>
 
-          <div class="review-actions" *ngIf="resena.likes !== undefined">
+          <div class="review-actions">
             <div class="action-buttons">
               <ion-button fill="clear" size="small" (click)="likeResena(resena)">
                 <ion-icon 
@@ -85,10 +81,6 @@
                   [color]="resena.liked ? 'danger' : 'medium'">
                 </ion-icon>
                 <span>{{resena.likes}}</span>
-              </ion-button>
-              <ion-button fill="clear" size="small">
-                <ion-icon name="chatbubble-outline" color="medium"></ion-icon>
-                <span>Responder</span>
               </ion-button>
             </div>
           </div>
@@ -117,7 +109,7 @@
       <ion-card-content>
         <!-- Rating -->
         <div class="rating-input">
-          <label>Tu Calificación</label>
+          <label>Tu Calificación (opcional)</label>
           <div class="stars-selector">
             <ion-icon 
               *ngFor="let star of [1,2,3,4,5]" 
@@ -150,7 +142,7 @@
           expand="block" 
           color="primary" 
           (click)="agregarResena()"
-          [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0"
+          [disabled]="!nuevaResenaTexto.trim()"
           class="submit-button">
           <ion-icon name="send-outline" slot="start"></ion-icon>
           Publicar Reseña

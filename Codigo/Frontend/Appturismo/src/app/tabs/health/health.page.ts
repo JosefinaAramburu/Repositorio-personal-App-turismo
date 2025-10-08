@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, NavController } from '@ionic/angular';
+import { IonicModule, NavController, ToastController } from '@ionic/angular';
 
 interface Resena {
   texto: string;
@@ -65,7 +65,11 @@ export class HealthPage implements OnInit {
     }
   ];
 
-  constructor(private route: ActivatedRoute, private navCtrl: NavController) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private navCtrl: NavController,
+    private toastController: ToastController
+  ) {}
 
   ngOnInit() {
     this.route.queryParams.subscribe((params) => {
@@ -75,34 +79,42 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * Agregar una nueva reseña
+   * Agregar una nueva reseña - CORREGIDO
    */
-  agregarResena() {
-    if (this.nuevaResenaTexto.trim() && this.nuevaResenaRating > 0) {
-      const nuevaResena: Resena = {
-        texto: this.nuevaResenaTexto.trim(),
-        fecha: new Date().toLocaleDateString('es-AR'),
-        usuario: 'Tú', // En una app real sería el usuario logueado
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        rating: this.nuevaResenaRating,
-        likes: 0,
-        liked: false
-      };
-
-      this.resenas.unshift(nuevaResena); // Agregar al inicio
-      
-      // Limpiar formulario
-      this.nuevaResenaTexto = '';
-      this.nuevaResenaRating = 0;
-
-      // Scroll to top para ver la nueva reseña
-      setTimeout(() => {
-        const content = document.querySelector('ion-content');
-        if (content) {
-          content.scrollToTop(500);
-        }
-      }, 300);
+  async agregarResena() {
+    // Solo validamos que haya texto
+    if (!this.nuevaResenaTexto.trim()) {
+      await this.mostrarToast('Por favor, escribí tu reseña antes de publicar', 'warning');
+      return;
     }
+
+    const nuevaResena: Resena = {
+      texto: this.nuevaResenaTexto.trim(),
+      fecha: new Date().toLocaleDateString('es-AR'),
+      usuario: 'Tú',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      rating: this.nuevaResenaRating || 5, // Si no selecciona rating, por defecto 5
+      likes: 0,
+      liked: false
+    };
+
+    // Agregar la nueva reseña al inicio del array
+    this.resenas.unshift(nuevaResena);
+    
+    // Limpiar formulario
+    this.nuevaResenaTexto = '';
+    this.nuevaResenaRating = 0;
+
+    // Mostrar mensaje de éxito
+    await this.mostrarToast('¡Reseña publicada con éxito!', 'success');
+
+    // Scroll to top para ver la nueva reseña
+    setTimeout(() => {
+      const content = document.querySelector('ion-content');
+      if (content) {
+        content.scrollToTop(500);
+      }
+    }, 300);
   }
 
   /**
@@ -141,14 +153,36 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * Obtener distribución de ratings
+   * Mostrar toast de notificación
    */
-  obtenerDistribucionRatings(): { rating: number, count: number, percentage: number }[] {
-    return [5,4,3,2,1].map(rating => ({
-      rating,
-      count: this.resenas.filter(r => r.rating === rating).length,
-      percentage: this.calcularPorcentajeRating(rating)
-    }));
+  async mostrarToast(mensaje: string, tipo: string = 'warning') {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      position: 'bottom',
+      color: tipo === 'success' ? 'success' : 'warning',
+      buttons: [
+        {
+          text: 'OK',
+          role: 'cancel'
+        }
+      ]
+    });
+    await toast.present();
+  }
+
+  /**
+   * Lifecycle hook - cuando la página entra
+   */
+  ionViewDidEnter() {
+    console.log('Página de reseñas cargada para:', this.lugarSeleccionado);
+  }
+
+  /**
+   * Lifecycle hook - cuando la página sale
+   */
+  ionViewWillLeave() {
+    console.log('Saliendo de la página de reseñas');
   }
 
   /**
@@ -159,9 +193,27 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * Lifecycle hook
+   * Obtener distribución de ratings para gráfico
    */
-  ionViewDidEnter() {
-    console.log('Página de reseñas cargada para:', this.lugarSeleccionado);
+  obtenerDistribucionRatings(): { rating: number, count: number, percentage: number }[] {
+    return [5,4,3,2,1].map(rating => ({
+      rating,
+      count: this.resenas.filter(r => r.rating === rating).length,
+      percentage: this.calcularPorcentajeRating(rating)
+    }));
+  }
+
+  /**
+   * Obtener el color según el rating
+   */
+  obtenerColorRating(rating: number): string {
+    switch(rating) {
+      case 5: return '#22c55e'; // Verde
+      case 4: return '#84cc16'; // Verde claro
+      case 3: return '#eab308'; // Amarillo
+      case 2: return '#f97316'; // Naranja
+      case 1: return '#ef4444'; // Rojo
+      default: return '#6b7280'; // Gris
+    }
   }
 }
