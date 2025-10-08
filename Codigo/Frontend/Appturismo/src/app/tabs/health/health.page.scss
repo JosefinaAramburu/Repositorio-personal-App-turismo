@@ -5,6 +5,7 @@
   --secondary: #64748b;
   --accent: #f59e0b;
   --accent-light: #fbbf24;
+  --accent-very-light: #fef3c7; /* NUEVO: Amarillo muy claro */
   --background: #f8fafc;
   --surface: #ffffff;
   --text-primary: #1e293b;
@@ -12,7 +13,6 @@
   --text-muted: #64748b;
   --border: #e2e8f0;
   --border-light: #f1f5f9;
-  --star-inactive: #e2e8f0; /* NUEVO: Color para estrellas no seleccionadas */
 }
 
 .reviews-content {
@@ -235,7 +235,7 @@
       
       .review-meta {
         display: flex;
-                        align-items: center;
+        align-items: center;
         gap: 16px;
         
         .rating-stars {
@@ -245,7 +245,7 @@
           ion-icon {
             font-size: 1rem;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-            color: var(--accent); /* Amarillo para estrellas en reseñas existentes */
+            color: var(--accent); /* Amarillo fuerte para reseñas existentes */
           }
         }
         
@@ -301,7 +301,7 @@
   }
 }
 
-// Nueva Reseña - SECCIÓN CORREGIDA
+// Nueva Reseña - SECCIÓN CORREGIDA CON AMARILLO CLARO/FUERTE
 .add-review-section {
   padding: 24px 20px;
   background: white;
@@ -358,21 +358,19 @@
     ion-icon {
       font-size: 2.2rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-      color: var(--star-inactive); /* COLOR GRIS PARA NO SELECCIONADAS */
+      color: var(--accent-very-light); /* AMARILLO MUY CLARO por defecto */
       
       &.active {
-        color: var(--accent); /* Amarillo cuando están seleccionadas */
+        color: var(--accent); /* AMARILLO FUERTE cuando están seleccionadas */
+        transform: scale(1.1);
+        filter: drop-shadow(0 3px 6px rgba(245, 158, 11, 0.3));
       }
       
       &:hover {
-        transform: scale(1.1);
-        color: var(--accent-light); /* Color al hacer hover */
-      }
-      
-      &:active {
-        transform: scale(0.95);
+        transform: scale(1.15);
+        color: var(--accent-light); /* Amarillo medio al hacer hover */
       }
     }
   }
@@ -437,7 +435,7 @@
   }
   
   &[disabled] {
-    --background: #cbd5e0;
+    --background: #cbd5e1;
     --box-shadow: none;
   }
 }
