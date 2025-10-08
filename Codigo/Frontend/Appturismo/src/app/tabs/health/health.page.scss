@@ -49,7 +49,7 @@
   }
 }
 
-// Resumen de Ratings
+// Resumen de Ratings (DEJADO COMO ESTABA ORIGINALMENTE)
 .ratings-summary {
   padding: 20px;
   
@@ -150,8 +150,10 @@
 
 .review-card {
   border-radius: 16px;
-  box-shadow: 0 2px 12px #ffe4e1;
+  box-shadow: 0 2px 12px rgba(255, 228, 225, 0.3);
   margin: 0;
+  background: #ffe4e1; // COLOR #ffe4e1 APLICADO
+  border: 1px solid rgba(255, 228, 225, 0.5);
   
   ion-card-content {
     padding: 20px;
@@ -171,7 +173,7 @@
       height: 44px;
       
       img {
-        border: 2px solid #e2e8f0;
+        border: 2px solid rgba(255, 228, 225, 0.5);
       }
     }
     
@@ -181,7 +183,7 @@
       .user-name {
         font-size: 1rem;
         font-weight: 600;
-        color: white;
+        color: #1a202c; // Cambiado a color oscuro para mejor contraste
         margin: 0 0 6px 0;
       }
       
@@ -201,7 +203,7 @@
         
         .review-date {
           font-size: 0.8rem;
-          color: white;
+          color: #4a5568; // Cambiado a color más oscuro
         }
       }
     }
@@ -209,7 +211,7 @@
 }
 
 .review-text {
-  color: white;
+  color: #1a202c; // Cambiado a color oscuro para mejor legibilidad
   line-height: 1.5;
   margin: 0 0 16px 0;
   font-size: 0.95rem;
@@ -268,8 +270,10 @@
 
 .add-review-card {
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(255, 228, 225, 0.3);
   margin: 0;
+  background: #ffe4e1; // COLOR #ffe4e1 APLICADO
+  border: 1px solid rgba(255, 228, 225, 0.5);
   
   ion-card-header {
     padding-bottom: 0;
@@ -277,11 +281,11 @@
     ion-card-title {
       font-size: 1.3rem;
       font-weight: 700;
-      color: white;
+      color: #1a202c; // Cambiado a color oscuro
     }
     
     ion-card-subtitle {
-      color: white;
+      color: #4a5568; // Cambiado a color más oscuro
     }
   }
 }
@@ -323,13 +327,14 @@
   margin-bottom: 20px;
   
   .custom-textarea {
-    --background: #f7fafc;
+    --background: #ffffff;
     --border-radius: 12px;
     --padding-start: 16px;
     --padding-end: 16px;
     --padding-top: 12px;
     --padding-bottom: 12px;
     font-size: 0.95rem;
+    border: 1px solid rgba(255, 228, 225, 0.5);
   }
   
   .char-counter {
