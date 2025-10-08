@@ -48,7 +48,7 @@
           align-items: center;
           gap: 8px;
           font-size: 1rem;
-          background: rgba(255,255,255,0.15);
+          background: slategray;
           backdrop-filter: blur(10px);
           padding: 8px 16px;
           border-radius: 20px;
@@ -132,7 +132,7 @@
         background: linear-gradient(90deg, var(--accent), var(--accent-light));
         border-radius: 6px;
         transition: width 1s ease-out;
-        box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 1px 3px rgba(14, 9, 0, 0.3);
       }
     }
     
@@ -186,7 +186,7 @@
   border-radius: 20px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   margin: 0;
-  background: var(--surface); // UNIFICADO
+  background: slategray; // UNIFICADO
   border: 1px solid var(--border-light);
   transition: all 0.3s ease;
   animation: slideUp 0.5s ease;
@@ -257,7 +257,7 @@
 }
 
 .review-text {
-  color: var(--text-secondary);
+  color: black;
   line-height: 1.6;
   margin: 0 0 20px 0;
   font-size: 0.95rem;
@@ -326,19 +326,19 @@
   }
 }
 
-// Nueva Reseña - CORREGIDO
+
 .add-review-section {
   padding: 24px 20px;
-  background: var(--surface); // UNIFICADO
+  background: slategray; 
   margin-top: 8px;
   border-top: 1px solid var(--border-light);
 }
 
 .add-review-card {
   border-radius: 20px;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08); 
   margin: 0;
-  background: var(--surface); // UNIFICADO
+  background: var(--surface); 
   border: 1px solid var(--border-light);
   animation: fadeIn 0.6s ease;
   
