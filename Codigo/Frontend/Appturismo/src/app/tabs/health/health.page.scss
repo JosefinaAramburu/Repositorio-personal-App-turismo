@@ -1,137 +1,543 @@
-/* === Estilo general de la página de reseñas === */
-ion-content {
-  --background: #f5f6fa;
-  padding: 16px;
-  font-family: 'Inter', 'Roboto', sans-serif;
+// PALETA DE COLORES PROFESIONAL
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --secondary: #64748b;
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
+  --background: #f8fafc;
+  --surface: #ffffff;  // BLANCO PRINCIPAL
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
 }
 
-/* === Encabezado === */
-ion-header {
-  --background: #3b82f6; /* Azul moderno */
+.reviews-content {
+  --background: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+// Header del Lugar - MEJORADO
+.place-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
-  font-weight: 600;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 0;
+  
+  .place-hero {
+    padding: 40px 20px 30px;
+    position: relative;
+    
+    .place-info {
+      .place-name {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 0 12px 0;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        letter-spacing: -0.5px;
+      }
+      
+      .place-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 1rem;
+          background: rgba(255,255,255,0.15);
+          backdrop-filter: blur(10px);
+          padding: 8px 16px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.2);
+          
+          .rating {
+            font-weight: 800;
+            font-size: 1.3rem;
+          }
+          
+          .reviews-count {
+            opacity: 0.9;
+            font-weight: 500;
+          }
+          
+          ion-icon {
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+  }
 }
 
-ion-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.2rem;
+// Resumen de Ratings - CORREGIDO
+.ratings-summary {
+  padding: 24px 20px;
+  
+  .summary-card {
+    background: var(--surface); // UNIFICADO
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
+    border: 1px solid var(--border-light);
+    
+    h3 {
+      margin: 0 0 20px 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+  }
 }
 
-ion-title ion-icon {
-  font-size: 1.4rem;
-}
-
-/* === Contenedor principal === */
-.reviews-container {
+.rating-bars {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-/* === Tarjeta de reseña === */
-.review-card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.review-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 20px rgba(0,0,0,0.12);
-}
-
-/* === Cabecera del usuario === */
-.review-header {
-  display: flex;
-  align-items: center;
   gap: 12px;
-  margin-bottom: 10px;
+  
+  .rating-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    
+    .star-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 70px;
+      
+      ion-icon {
+        font-size: 0.9rem;
+        color: var(--accent);
+      }
+    }
+    
+    .bar-container {
+      flex: 1;
+      height: 10px;
+      background: var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+      
+      .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        border-radius: 6px;
+        transition: width 1s ease-out;
+        box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
+      }
+    }
+    
+    .percentage {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      min-width: 45px;
+      text-align: right;
+      font-weight: 600;
+    }
+  }
 }
 
-.review-header img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #3b82f6;
+// Lista de Reseñas - CORREGIDO
+.reviews-section {
+  padding: 0 20px 24px 20px;
 }
 
-.review-header .user-info {
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  
+  .reviews-count {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: var(--surface); // UNIFICADO
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+  }
+}
+
+.reviews-list {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
-.user-info .name {
-  font-weight: 600;
-  font-size: 1rem;
-  color: #111827;
+.review-card {
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  margin: 0;
+  background: var(--surface); // UNIFICADO
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
+  
+  ion-card-content {
+    padding: 24px;
+    background: var(--surface); // UNIFICADO
+  }
 }
 
-.user-info .date {
-  font-size: 0.85rem;
-  color: #6b7280;
+.review-header {
+  margin-bottom: 16px;
+  
+  .user-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    
+    .user-avatar {
+      width: 52px;
+      height: 52px;
+      
+      img {
+        border: 3px solid var(--border-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+    }
+    
+    .user-details {
+      flex: 1;
+      
+      .user-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 8px 0;
+        letter-spacing: -0.2px;
+      }
+      
+      .review-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        
+        .rating-stars {
+          display: flex;
+          gap: 2px;
+          
+          ion-icon {
+            font-size: 1rem;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+          }
+        }
+        
+        .review-date {
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          font-weight: 500;
+        }
+      }
+    }
+  }
 }
 
-/* === Texto de la reseña === */
 .review-text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
   font-size: 0.95rem;
-  color: #374151;
-  line-height: 1.5;
-  margin-top: 8px;
+  font-family: 'Inter', sans-serif;
 }
 
-/* === Indicador de likes o votos === */
-.review-likes {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
+.review-actions {
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    
+    .like-button {
+      --background: var(--border-light);
+      --color: var(--text-muted);
+      --border-radius: 20px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      
+      &.liked {
+        --background: #fef2f2;
+        --color: #dc2626;
+      }
+      
+      ion-icon {
+        font-size: 1.1rem;
+        margin-right: 6px;
+      }
+    }
+  }
 }
 
-.review-likes .like-bar {
-  background: #22c55e;
-  color: white;
-  border-radius: 10px;
-  padding: 4px 16px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 5px rgba(34,197,94,0.4);
-}
-
-/* === Título central === */
-.section-title {
+// Sin Reseñas - CORREGIDO
+.empty-reviews {
+  padding: 80px 20px;
   text-align: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin: 20px 0 8px;
-  color: #111827;
+  
+  .empty-content {
+    ion-icon {
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+    
+    h3 {
+      color: var(--text-primary);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.3px;
+    }
+    
+    p {
+      color: var(--text-muted);
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
 }
 
-/* === Botón de reseña === */
-ion-button.submit-btn {
-  --background: linear-gradient(90deg, #22c55e, #16a34a);
-  color: white;
-  border-radius: 12px;
-  margin-top: 16px;
+// Nueva Reseña - CORREGIDO
+.add-review-section {
+  padding: 24px 20px;
+  background: var(--surface); // UNIFICADO
+  margin-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+.add-review-card {
+  border-radius: 20px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
+  margin: 0;
+  background: var(--surface); // UNIFICADO
+  border: 1px solid var(--border-light);
+  animation: fadeIn 0.6s ease;
+  
+  ion-card-header {
+    padding: 24px 24px 0;
+    background: var(--surface); // UNIFICADO
+    
+    ion-card-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    
+    ion-card-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+  }
+  
+  ion-card-content {
+    background: var(--surface); // UNIFICADO
+  }
+}
+
+.rating-input {
+  margin-bottom: 24px;
+  
+  label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+  
+  .stars-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    
+    ion-icon {
+      font-size: 2.2rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      
+      &:hover {
+        transform: scale(1.1);
+      }
+      
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+  
+  .rating-text {
+    font-size: 0.95rem;
+    color: var(--primary);
+    font-weight: 600;
+  }
+}
+
+.review-input {
+  margin-bottom: 24px;
+  
+  .custom-textarea {
+    --background: var(--surface); // UNIFICADO
+    --border-radius: 16px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+    
+    &:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+  }
+  
+  .char-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-weight: 500;
+    
+    &.warning {
+      color: var(--accent);
+    }
+    
+    &.danger {
+      color: #dc2626;
+    }
+  }
+}
+
+.submit-button {
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   font-weight: 600;
-  text-transform: none;
+  margin-top: 8px;
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  
+  &:hover:not([disabled]) {
+    --box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+  }
+  
+  &[disabled] {
+    --background: #cbd5e0;
+    --box-shadow: none;
+  }
 }
 
-ion-button.submit-btn:hover {
-  filter: brightness(1.1);
+// Back Button
+ion-back-button {
+  --color: white;
+  --icon-font-size: 1.4rem;
 }
 
-/* === Ajustes responsivos === */
-@media (max-width: 768px) {
+// Animaciones
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive Design Mejorado
+@media (min-width: 768px) {
+  .reviews-section {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  
+  .add-review-section {
+    max-width: 720px;
+    margin: 24px auto 0;
+  }
+  
+  .ratings-summary {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  
   .review-card {
-    padding: 14px;
+    margin: 0;
   }
-  ion-title {
-    font-size: 1.1rem;
+}
+
+@media (min-width: 1024px) {
+  .reviews-section {
+    max-width: 800px;
   }
+  
+  .add-review-section {
+    max-width: 800px;
+  }
+  
+  .ratings-summary {
+    max-width: 800px;
+  }
+}
+
+// Mejoras de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Estados de enfoque para accesibilidad
+ion-button:focus,
+ion-icon:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
