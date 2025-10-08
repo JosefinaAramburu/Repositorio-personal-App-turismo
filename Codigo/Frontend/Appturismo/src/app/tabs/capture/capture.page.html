@@ -60,7 +60,7 @@
             [src]="lugar.imagen" 
             [alt]="lugar.nombre" 
             class="card-image"
-            (error)="lugar.imagen = null">
+            (error)="manejarErrorImagen(lugar)"> <!-- CORREGIDO -->
           <div class="card-overlay">
             <div class="card-badge">{{lugar.categoria}}</div>
             <div class="rating-badge" *ngIf="lugar.rating">
@@ -123,7 +123,7 @@
             [src]="lugar.imagen" 
             [alt]="lugar.nombre" 
             class="popular-image"
-            (error)="lugar.imagen = null">
+            (error)="manejarErrorImagen(lugar)"> <!-- CORREGIDO -->
           <div class="popular-overlay">
             <ion-badge color="light">{{lugar.categoria}}</ion-badge>
           </div>

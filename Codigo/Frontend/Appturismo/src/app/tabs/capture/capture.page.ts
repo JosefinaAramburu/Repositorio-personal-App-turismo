@@ -13,7 +13,7 @@ interface Lugar {
   direccion?: string;
   precio?: string;
   rating?: number;
-  imagen: string;
+  imagen: string | null; // CAMBIADO A string | null
   coordenadas?: string;
 }
 
@@ -239,11 +239,11 @@ export class CapturePage {
   }
 
   /**
-   * Manejar error de carga de imagen
+   * Manejar error de carga de imagen - CORREGIDO
    */
   manejarErrorImagen(lugar: Lugar): void {
     console.log('Error cargando imagen para:', lugar.nombre);
-    lugar.imagen = ''; // Remover la imagen si hay error
+    lugar.imagen = ''; // Asignar string vacío en lugar de null
   }
 
   /**
