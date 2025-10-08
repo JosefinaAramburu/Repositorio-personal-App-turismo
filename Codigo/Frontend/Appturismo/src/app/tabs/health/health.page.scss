@@ -1,26 +1,358 @@
-.titulo-opiniones {
+.reviews-content {
+  --background: #f8fafc;
+}
+
+// Header del Lugar
+.place-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0;
+  
+  .place-hero {
+    padding: 30px 20px;
+    position: relative;
+    
+    .place-info {
+      .place-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 0 12px 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+      
+      .place-stats {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        
+        .stat {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.95rem;
+          
+          .rating {
+            font-weight: 700;
+            font-size: 1.1rem;
+          }
+          
+          .reviews-count {
+            opacity: 0.9;
+          }
+          
+          ion-icon {
+            font-size: 1.1rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Resumen de Ratings
+.ratings-summary {
+  padding: 20px;
+  
+  .summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1a202c;
+    }
+  }
+}
+
+.rating-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+  .rating-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .star-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #4a5568;
+      min-width: 50px;
+      
+      ion-icon {
+        font-size: 0.8rem;
+        color: #ffc107;
+      }
+    }
+    
+    .bar-container {
+      flex: 1;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      
+      .bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ffc107, #ffb300);
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+    }
+    
+    .percentage {
+      font-size: 0.8rem;
+      color: #718096;
+      min-width: 40px;
+      text-align: right;
+    }
+  }
+}
+
+// Lista de Reseñas
+.reviews-section {
+  padding: 0 20px 20px 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0;
+  }
+  
+  .reviews-count {
+    color: var(--ion-color-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-card {
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  margin: 0;
+  
+  ion-card-content {
+    padding: 20px;
+  }
+}
+
+.review-header {
+  margin-bottom: 16px;
+  
+  .user-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    
+    .user-avatar {
+      width: 44px;
+      height: 44px;
+      
+      img {
+        border: 2px solid #e2e8f0;
+      }
+    }
+    
+    .user-details {
+      flex: 1;
+      
+      .user-name {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a202c;
+        margin: 0 0 6px 0;
+      }
+      
+      .review-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .rating-stars {
+          display: flex;
+          gap: 2px;
+          
+          ion-icon {
+            font-size: 0.9rem;
+          }
+        }
+        
+        .review-date {
+          font-size: 0.8rem;
+          color: #718096;
+        }
+      }
+    }
+  }
+}
+
+.review-text {
+  color: #4a5568;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  font-size: 0.95rem;
+}
+
+.review-actions {
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    
+    ion-button {
+      --padding-start: 8px;
+      --padding-end: 8px;
+      margin: 0;
+      font-size: 0.8rem;
+      
+      ion-icon {
+        font-size: 1rem;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+// Sin Reseñas
+.empty-reviews {
+  padding: 60px 20px;
   text-align: center;
-  font-size: 1.3rem;
+  
+  .empty-content {
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    h3 {
+      color: #4a5568;
+      font-size: 1.3rem;
+      margin: 0 0 8px 0;
+    }
+    
+    p {
+      color: #718096;
+      margin: 0;
+    }
+  }
+}
+
+// Nueva Reseña
+.add-review-section {
+  padding: 20px;
+  background: white;
+  margin-top: 8px;
+}
+
+.add-review-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  margin: 0;
+  
+  ion-card-header {
+    padding-bottom: 0;
+    
+    ion-card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a202c;
+    }
+    
+    ion-card-subtitle {
+      color: #718096;
+    }
+  }
+}
+
+.rating-input {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 8px;
+  }
+  
+  .stars-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    
+    ion-icon {
+      font-size: 2rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      
+      &:active {
+        transform: scale(0.9);
+      }
+    }
+  }
+  
+  .rating-text {
+    font-size: 0.9rem;
+    color: var(--ion-color-primary);
+    font-weight: 600;
+  }
+}
+
+.review-input {
+  margin-bottom: 20px;
+  
+  .custom-textarea {
+    --background: #f7fafc;
+    --border-radius: 12px;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --padding-top: 12px;
+    --padding-bottom: 12px;
+    font-size: 0.95rem;
+  }
+  
+  .char-counter {
+    text-align: right;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 4px;
+  }
+}
+
+.submit-button {
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(59, 183, 143, 0.3);
   font-weight: 600;
-  margin-top: 1rem;
+  margin-top: 8px;
+  
+  &[disabled] {
+    --background: #cbd5e0;
+    --box-shadow: none;
+  }
 }
 
-.texto-descriptivo {
-  text-align: center;
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.fecha {
-  color: #999;
-  font-size: 0.85rem;
-}
-
-.card-resena {
-  margin-top: 1.5rem;
-}
-
-ion-button {
-  margin-top: 0.5rem;
-  font-weight: 500;
+// Back Button
+ion-back-button {
+  --color: white;
 }
