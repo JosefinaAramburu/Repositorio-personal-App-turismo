@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/home" text="Atrás"></ion-back-button>
     </ion-buttons>
-    <ion-title>📍 Explorar Lugares</ion-title>
+    <ion-title>Explorar Lugares</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -23,7 +23,7 @@
       <ion-searchbar 
         [(ngModel)]="terminoBusqueda"
         (ionInput)="filtrarLugares()"
-        placeholder="🌍 Buscar ciudad, país o categoría..."
+        placeholder=" Buscar ciudad, país o categoría..."
         animated
         clearInput
         class="modern-searchbar">
@@ -51,7 +51,16 @@
         class="place-card"
       >
         <div class="card-image-container">
-          <img [src]="lugar.imagen" [alt]="lugar.nombre" class="card-image">
+          <div class="image-placeholder" *ngIf="!lugar.imagen || lugar.imagen.includes('undefined')">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{lugar.nombre}}</span>
+          </div>
+          <img 
+            *ngIf="lugar.imagen && !lugar.imagen.includes('undefined')"
+            [src]="lugar.imagen" 
+            [alt]="lugar.nombre" 
+            class="card-image"
+            (error)="lugar.imagen = null">
           <div class="card-overlay">
             <div class="card-badge">{{lugar.categoria}}</div>
             <div class="rating-badge" *ngIf="lugar.rating">
@@ -95,7 +104,7 @@
   <!-- Popular Places -->
   <div *ngIf="!terminoBusqueda" class="popular-section">
     <div class="section-header">
-      <h2>🎯 Lugares Populares en Barcelona</h2>
+      <h2> Lugares Populares en Barcelona</h2>
       <p class="section-subtitle">Basado en tu ubicación actual</p>
     </div>
 
@@ -106,7 +115,15 @@
         class="popular-card"
       >
         <div class="popular-image-container">
-          <img [src]="lugar.imagen" [alt]="lugar.nombre" class="popular-image">
+          <div class="image-placeholder small" *ngIf="!lugar.imagen || lugar.imagen.includes('undefined')">
+            <ion-icon name="location-outline"></ion-icon>
+          </div>
+          <img 
+            *ngIf="lugar.imagen && !lugar.imagen.includes('undefined')"
+            [src]="lugar.imagen" 
+            [alt]="lugar.nombre" 
+            class="popular-image"
+            (error)="lugar.imagen = null">
           <div class="popular-overlay">
             <ion-badge color="light">{{lugar.categoria}}</ion-badge>
           </div>
