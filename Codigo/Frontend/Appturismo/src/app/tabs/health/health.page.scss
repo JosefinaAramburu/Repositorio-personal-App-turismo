@@ -117,7 +117,7 @@
       
       ion-icon {
         font-size: 0.9rem;
-        color: var(--accent);
+        color: #f59e0b; /* AMARILLO DIRECTO */
       }
     }
     
@@ -131,7 +131,7 @@
       
       .bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        background: linear-gradient(90deg, #f59e0b, #fbbf24); /* AMARILLO DIRECTO */
         border-radius: 6px;
         transition: width 1s ease-out;
         box-shadow: 0 1px 3px rgba(14, 9, 0, 0.3);
@@ -245,7 +245,7 @@
           ion-icon {
             font-size: 1rem;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
-            color: var(--accent);
+            color: #f59e0b; /* AMARILLO DIRECTO */
           }
         }
         
@@ -301,7 +301,7 @@
   }
 }
 
-// Nueva Reseña - SECCIÓN CORREGIDA
+// Nueva Reseña - SECCIÓN CORREGIDA CON COLORES DIRECTOS
 .add-review-section {
   padding: 24px 20px;
   background: white;
@@ -356,22 +356,22 @@
     margin-bottom: 16px;
     justify-content: center;
     
-    .star-icon {
+    ion-icon {
       font-size: 2.8rem;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-      color: var(--accent-very-light); /* Amarillo claro por defecto */
+      color: lightslategray !important; /* AMARILLO CLARO DIRECTO - SIEMPRE VISIBLE */
       
       &.active {
-        color: var(--accent); /* Amarillo fuerte cuando está seleccionada */
+        color: #f59e0b !important; /* AMARILLO FUERTE DIRECTO - CUANDO ESTÁ SELECCIONADA */
         transform: scale(1.1);
         filter: drop-shadow(0 3px 6px rgba(245, 158, 11, 0.3));
       }
       
       &:hover {
         transform: scale(1.15);
-        color: var(--accent-light);
+        color: #fbbf24 !important; /* AMARILLO MEDIO AL HOVER */
       }
     }
   }
