@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/capture" text="Atrás"></ion-back-button>
     </ion-buttons>
-    <ion-title>💬 Reseñas</ion-title>
+    <ion-title> Reseñas</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -15,7 +15,7 @@
         <h1 class="place-name">{{lugarSeleccionado}}</h1>
         <div class="place-stats">
           <div class="stat">
-            <ion-icon name="star" color="warning"></ion-icon>
+            <span class="star-symbol">★</span>
             <span class="rating">{{obtenerPromedioRating()}}</span>
             <span class="reviews-count">({{resenas.length}} reseñas)</span>
           </div>
@@ -30,7 +30,7 @@
       <h3>Resumen de Opiniones</h3>
       <div class="rating-bars">
         <div class="rating-bar" *ngFor="let star of [5,4,3,2,1]; let i = index">
-          <span class="star-label">{{star}} <ion-icon name="star"></ion-icon></span>
+          <span class="star-label">{{star}} <span class="star-symbol-small">★</span></span>
           <div class="bar-container">
             <div class="bar-fill" [style.width.%]="calcularPorcentajeRating(star)"></div>
           </div>
@@ -59,11 +59,12 @@
                 <h4 class="user-name">{{resena.usuario}}</h4>
                 <div class="review-meta">
                   <div class="rating-stars">
-                    <ion-icon 
+                    <span 
                       *ngFor="let star of [1,2,3,4,5]" 
-                      [name]="star <= resena.rating ? 'star' : 'star-outline'" 
-                      color="warning">
-                    </ion-icon>
+                      class="star-symbol-small"
+                      [class.active]="star <= resena.rating">
+                      ★
+                    </span>
                   </div>
                   <span class="review-date">{{resena.fecha}}</span>
                 </div>
@@ -80,7 +81,7 @@
   <!-- Sin Reseñas Mejorado -->
   <div *ngIf="resenas.length === 0" class="empty-reviews">
     <div class="empty-content">
-      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      <span class="empty-icon">💬</span>
       <h3>No hay reseñas aún</h3>
       <p>Sé el primero en compartir tu experiencia en {{lugarSeleccionado}}</p>
     </div>
@@ -100,17 +101,20 @@
           <label>Tu Calificación</label>
           
           <div class="stars-selector">
-            <ion-icon 
+            <span 
               *ngFor="let star of [1,2,3,4,5]; let i = index"
-              [name]="i < nuevaResenaRating ? 'star' : 'star-outline'"
               [class.active]="i < nuevaResenaRating"
               (click)="selectRating(i + 1)"
-              class="star-icon">
-            </ion-icon>
+              class="star-symbol-large">
+              ★
+            </span>
           </div>
           
           <span class="rating-text" *ngIf="nuevaResenaRating > 0">
             {{nuevaResenaRating}} estrella{{nuevaResenaRating > 1 ? 's' : ''}}
+          </span>
+          <span class="rating-text" *ngIf="nuevaResenaRating === 0">
+            Toca las estrellas para calificar
           </span>
         </div>
 
@@ -138,7 +142,7 @@
           (click)="agregarResena()"
           [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0"
           class="submit-button">
-          <ion-icon name="send-outline" slot="start"></ion-icon>
+          <span slot="start">📝</span>
           Publicar Reseña
         </ion-button>
       </ion-card-content>
