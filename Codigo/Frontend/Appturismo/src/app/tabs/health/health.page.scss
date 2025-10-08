@@ -169,7 +169,7 @@
     color: var(--primary);
     font-weight: 600;
     font-size: 0.95rem;
-    background: rgba(37, 99, 235, 0.1);
+    background: white;
     padding: 6px 12px;
     border-radius: 12px;
   }
@@ -338,7 +338,7 @@
 
 .add-review-card {
   border-radius: 20px;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 25px white;
   margin: 0;
   background: var(--surface);
   border: 1px solid var(--border-light);
