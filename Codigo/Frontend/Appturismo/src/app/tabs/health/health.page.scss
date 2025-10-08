@@ -6,7 +6,7 @@
   --accent: #f59e0b;
   --accent-light: #fbbf24;
   --background: #f8fafc;
-  --surface: #ffffff;
+  --surface: #ffffff;  // BLANCO PRINCIPAL
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
@@ -73,15 +73,15 @@
   }
 }
 
-// Resumen de Ratings - MEJORADO Y BLANCO
+// Resumen de Ratings - CORREGIDO
 .ratings-summary {
   padding: 24px 20px;
   
   .summary-card {
-    background: #ffffff !important;
+    background: var(--surface); // UNIFICADO
     border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
     border: 1px solid var(--border-light);
     
     h3 {
@@ -146,7 +146,7 @@
   }
 }
 
-// Lista de Reseñas - MEJORADO Y BLANCO
+// Lista de Reseñas - CORREGIDO
 .reviews-section {
   padding: 0 20px 24px 20px;
 }
@@ -169,9 +169,10 @@
     color: var(--primary);
     font-weight: 600;
     font-size: 0.95rem;
-    background: rgba(37, 99, 235, 0.1);
+    background: var(--surface); // UNIFICADO
     padding: 6px 12px;
     border-radius: 12px;
+    border: 1px solid var(--border-light);
   }
 }
 
@@ -185,7 +186,7 @@
   border-radius: 20px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   margin: 0;
-  background: #ffffff !important;
+  background: var(--surface); // UNIFICADO
   border: 1px solid var(--border-light);
   transition: all 0.3s ease;
   animation: slideUp 0.5s ease;
@@ -197,7 +198,7 @@
   
   ion-card-content {
     padding: 24px;
-    background: #ffffff !important;
+    background: var(--surface); // UNIFICADO
   }
 }
 
@@ -287,15 +288,11 @@
         font-size: 1.1rem;
         margin-right: 6px;
       }
-      
-      &:hover {
-        --background: #f1f5f9;
-      }
     }
   }
 }
 
-// Sin Reseñas - MEJORADO Y CORREGIDO
+// Sin Reseñas - CORREGIDO
 .empty-reviews {
   padding: 80px 20px;
   text-align: center;
@@ -329,25 +326,25 @@
   }
 }
 
-// Nueva Reseña - MEJORADO Y BLANCO
+// Nueva Reseña - CORREGIDO
 .add-review-section {
   padding: 24px 20px;
-  background: var(--surface);
+  background: var(--surface); // UNIFICADO
   margin-top: 8px;
   border-top: 1px solid var(--border-light);
 }
 
 .add-review-card {
   border-radius: 20px;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
   margin: 0;
-  background: #ffffff !important;
+  background: var(--surface); // UNIFICADO
   border: 1px solid var(--border-light);
   animation: fadeIn 0.6s ease;
   
   ion-card-header {
     padding: 24px 24px 0;
-    background: #ffffff !important;
+    background: var(--surface); // UNIFICADO
     
     ion-card-title {
       font-size: 1.4rem;
@@ -363,7 +360,7 @@
   }
   
   ion-card-content {
-    background: #ffffff !important;
+    background: var(--surface); // UNIFICADO
   }
 }
 
@@ -410,7 +407,7 @@
   margin-bottom: 24px;
   
   .custom-textarea {
-    --background: #ffffff;
+    --background: var(--surface); // UNIFICADO
     --border-radius: 16px;
     --padding-start: 16px;
     --padding-end: 16px;
@@ -527,4 +524,20 @@ ion-back-button {
   .ratings-summary {
     max-width: 800px;
   }
+}
+
+// Mejoras de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Estados de enfoque para accesibilidad
+ion-button:focus,
+ion-icon:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
