@@ -72,8 +72,6 @@
           </div>
 
           <p class="review-text">{{resena.texto}}</p>
-
-          <!-- ELIMINADA LA SECCIÓN DE LIKES -->
         </ion-card-content>
       </ion-card>
     </div>
@@ -100,15 +98,17 @@
         <!-- Rating Mejorado -->
         <div class="rating-input">
           <label>Tu Calificación</label>
-        
-           <div class="stars-selector">
-     <ion-icon 
-      *ngFor="let star of [1,2,3,4,5]; let i = index"
-      [class.active]="i < selectedRating"
-     (click)="selectRating(i + 1)"
-      name="star">
-      </ion-icon>
-      </div>
+          
+          <div class="stars-selector">
+            <ion-icon 
+              *ngFor="let star of [1,2,3,4,5]; let i = index"
+              [name]="i < nuevaResenaRating ? 'star' : 'star-outline'"
+              [class.active]="i < nuevaResenaRating"
+              (click)="selectRating(i + 1)"
+              class="star-icon">
+            </ion-icon>
+          </div>
+          
           <span class="rating-text" *ngIf="nuevaResenaRating > 0">
             {{nuevaResenaRating}} estrella{{nuevaResenaRating > 1 ? 's' : ''}}
           </span>
@@ -136,7 +136,7 @@
           expand="block" 
           color="primary" 
           (click)="agregarResena()"
-          [disabled]="!nuevaResenaTexto.trim()"
+          [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0"
           class="submit-button">
           <ion-icon name="send-outline" slot="start"></ion-icon>
           Publicar Reseña
