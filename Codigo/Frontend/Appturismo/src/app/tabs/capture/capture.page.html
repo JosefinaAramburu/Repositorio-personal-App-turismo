@@ -1,94 +1,103 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-title>🌍 Explorar Lugares</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home" text="Atrás"></ion-back-button>
+    </ion-buttons>
+    <ion-title>📍 Explorar Lugares</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="explore-content">
-  <!-- Hero Section con buscador -->
+  <!-- Hero Section -->
   <div class="hero-section">
-    <div class="hero-overlay">
-      <h1>Descubrí el Mundo</h1>
-      <p>Encontrá los mejores lugares para visitar</p>
+    <div class="hero-content">
+      <h1 class="hero-title">Descubre Lugares Increíbles</h1>
+      <p class="hero-subtitle">Encuentra los mejores destinos alrededor del mundo</p>
+    </div>
+    <div class="hero-gradient"></div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-container">
+      <ion-searchbar 
+        [(ngModel)]="terminoBusqueda"
+        (ionInput)="filtrarLugares()"
+        placeholder="🌍 Buscar ciudad, país o categoría..."
+        animated
+        clearInput
+        class="modern-searchbar">
+      </ion-searchbar>
+    </div>
+
+    <!-- Location Badge -->
+    <div class="location-badge" *ngIf="!terminoBusqueda">
+      <ion-icon name="navigate" color="primary"></ion-icon>
+      <span>Ubicación actual: <strong>Barcelona, España</strong></span>
     </div>
   </div>
 
-  <!-- Buscador destacado -->
-  <div class="search-container">
-    <ion-searchbar 
-      [(ngModel)]="terminoBusqueda"
-      (ionInput)="filtrarLugares()"
-      placeholder="🔍 Buscar ciudad, país o lugar... Ej: Barcelona, París, Tokio"
-      animated
-      class="hero-searchbar">
-    </ion-searchbar>
-  </div>
-
-  <!-- Mensaje de ubicación actual -->
-  <div *ngIf="!terminoBusqueda" class="location-banner">
-    <ion-icon name="location" color="primary"></ion-icon>
-    <span>Mostrando lugares cerca de tu ubicación actual: <strong>Barcelona</strong></span>
-  </div>
-
-  <!-- Lugares filtrados -->
+  <!-- Search Results -->
   <div *ngIf="lugaresFiltrados.length > 0" class="results-section">
-    <ion-card-header>
-      <ion-card-title>Resultados para "{{terminoBusqueda}}"</ion-card-title>
-      <ion-card-subtitle>{{lugaresFiltrados.length}} lugares encontrados</ion-card-subtitle>
-    </ion-card-header>
+    <div class="section-header">
+      <h2>Resultados para "{{terminoBusqueda}}"</h2>
+      <span class="results-count">{{lugaresFiltrados.length}} lugar{{lugaresFiltrados.length > 1 ? 'es' : ''}} encontrado{{lugaresFiltrados.length > 1 ? 's' : ''}}</span>
+    </div>
 
-    <ion-list lines="none">
+    <div class="results-grid">
       <ion-card 
         *ngFor="let lugar of lugaresFiltrados"
         (click)="irAResenas(lugar)"
-        class="lugar-card featured-card"
+        class="place-card"
       >
-        <div class="card-image" [style.backgroundImage]="'url(' + lugar.imagen + ')'">
-          <div class="card-badge">{{lugar.categoria}}</div>
-          <div class="card-overlay"></div>
+        <div class="card-image-container">
+          <img [src]="lugar.imagen" [alt]="lugar.nombre" class="card-image">
+          <div class="card-overlay">
+            <div class="card-badge">{{lugar.categoria}}</div>
+            <div class="rating-badge" *ngIf="lugar.rating">
+              <ion-icon name="star" color="warning"></ion-icon>
+              <span>{{lugar.rating}}</span>
+            </div>
+          </div>
         </div>
-        
-        <ion-card-header>
-          <ion-card-title>{{ lugar.nombre }}</ion-card-title>
-          <ion-card-subtitle>
+
+        <ion-card-header class="card-header">
+          <ion-card-title class="place-name">{{lugar.nombre}}</ion-card-title>
+          <ion-card-subtitle class="place-location">
             <ion-icon name="location-outline"></ion-icon>
-            {{ lugar.ciudad }}, {{ lugar.pais }}
+            {{lugar.ciudad}}, {{lugar.pais}}
           </ion-card-subtitle>
         </ion-card-header>
 
-        <ion-card-content>
-          <p class="descripcion">{{ lugar.descripcion }}</p>
+        <ion-card-content class="card-content">
+          <p class="place-description">{{lugar.descripcion}}</p>
           
-          <div class="lugar-info">
-            <div class="info-item">
-              <ion-icon name="time-outline"></ion-icon>
-              <span>{{ lugar.horario }}</span>
+          <div class="place-details">
+            <div class="detail-item">
+              <ion-icon name="time-outline" color="medium"></ion-icon>
+              <span>{{lugar.horario}}</span>
             </div>
-            <div class="info-item" *ngIf="lugar.precio">
-              <ion-icon name="pricetag-outline"></ion-icon>
-              <span>{{ lugar.precio }}</span>
-            </div>
-            <div class="info-item" *ngIf="lugar.rating">
-              <ion-icon name="star" color="warning"></ion-icon>
-              <span>{{ lugar.rating }}/5</span>
+            <div class="detail-item" *ngIf="lugar.precio">
+              <ion-icon name="card-outline" color="medium"></ion-icon>
+              <span>{{lugar.precio}}</span>
             </div>
           </div>
 
-          <ion-button expand="block" color="primary" class="ver-resenas-btn">
+          <ion-button expand="block" color="primary" class="action-button">
             <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
             Ver Reseñas
           </ion-button>
         </ion-card-content>
       </ion-card>
-    </ion-list>
+    </div>
   </div>
 
-  <!-- Lugares populares (solo sin búsqueda) -->
+  <!-- Popular Places -->
   <div *ngIf="!terminoBusqueda" class="popular-section">
-    <ion-card-header>
-      <ion-card-title>🏆 Lugares Populares en Barcelona</ion-card-title>
-      <ion-card-subtitle>Basado en tu ubicación actual</ion-card-subtitle>
-    </ion-card-header>
+    <div class="section-header">
+      <h2>🎯 Lugares Populares en Barcelona</h2>
+      <p class="section-subtitle">Basado en tu ubicación actual</p>
+    </div>
 
     <div class="popular-grid">
       <ion-card 
@@ -96,23 +105,35 @@
         (click)="seleccionarLugar(lugar.nombre)"
         class="popular-card"
       >
-        <div class="popular-image" [style.backgroundImage]="'url(' + lugar.imagen + ')'"></div>
-        <ion-card-content>
-          <h3>{{lugar.nombre}}</h3>
-          <p>{{lugar.ciudad}}</p>
-          <ion-badge color="primary">{{lugar.categoria}}</ion-badge>
+        <div class="popular-image-container">
+          <img [src]="lugar.imagen" [alt]="lugar.nombre" class="popular-image">
+          <div class="popular-overlay">
+            <ion-badge color="light">{{lugar.categoria}}</ion-badge>
+          </div>
+        </div>
+        
+        <ion-card-content class="popular-content">
+          <h3 class="popular-name">{{lugar.nombre}}</h3>
+          <p class="popular-location">{{lugar.ciudad}}</p>
+          <div class="popular-rating" *ngIf="lugar.rating">
+            <ion-icon name="star" color="warning"></ion-icon>
+            <span>{{lugar.rating}}</span>
+          </div>
         </ion-card-content>
       </ion-card>
     </div>
   </div>
 
-  <!-- Sin resultados -->
-  <div *ngIf="lugaresFiltrados.length === 0 && terminoBusqueda" class="no-results">
-    <div class="no-results-content">
-      <ion-icon name="search-outline" color="medium"></ion-icon>
-      <h3>No encontramos lugares para "{{terminoBusqueda}}"</h3>
-      <p>Probá con otro destino o explorá los lugares populares</p>
-      <ion-button fill="outline" (click)="terminoBusqueda = ''; lugaresFiltrados = []">
+  <!-- No Results -->
+  <div *ngIf="lugaresFiltrados.length === 0 && terminoBusqueda" class="empty-state">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <ion-icon name="search-outline" color="medium"></ion-icon>
+      </div>
+      <h3>No encontramos resultados</h3>
+      <p>No hay lugares que coincidan con "{{terminoBusqueda}}"</p>
+      <ion-button fill="outline" color="medium" (click)="terminoBusqueda = ''">
+        <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
         Ver todos los lugares
       </ion-button>
     </div>

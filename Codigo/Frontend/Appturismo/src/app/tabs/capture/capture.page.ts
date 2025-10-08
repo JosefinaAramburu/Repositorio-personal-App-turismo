@@ -251,30 +251,129 @@ export class CapturePage {
 
   constructor(private navCtrl: NavController) {}
 
-  // Filtrar lugares según la búsqueda
-  filtrarLugares() {
+  /**
+   * Filtrar lugares según el término de búsqueda
+   */
+  filtrarLugares(): void {
     if (!this.terminoBusqueda.trim()) {
       this.lugaresFiltrados = [];
       return;
     }
 
     const termino = this.terminoBusqueda.toLowerCase().trim();
+    
     this.lugaresFiltrados = this.todosLosLugares.filter(lugar =>
       lugar.ciudad.toLowerCase().includes(termino) ||
       lugar.pais.toLowerCase().includes(termino) ||
       lugar.nombre.toLowerCase().includes(termino) ||
-      lugar.categoria.toLowerCase().includes(termino)
+      lugar.categoria.toLowerCase().includes(termino) ||
+      lugar.descripcion.toLowerCase().includes(termino)
+    );
+
+    // Ordenar por rating (opcional)
+    this.lugaresFiltrados.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  }
+
+  /**
+   * Seleccionar lugar de la lista popular
+   */
+  seleccionarLugar(nombreLugar: string): void {
+    this.terminoBusqueda = nombreLugar;
+    this.filtrarLugares();
+    
+    // Scroll suave a los resultados después de un breve delay
+    setTimeout(() => {
+      const element = document.querySelector('.results-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+
+  /**
+   * Navegar a la página de reseñas del lugar seleccionado
+   */
+  irAResenas(lugar: Lugar): void {
+    console.log('Navegando a reseñas de:', lugar.nombre);
+    
+    this.navCtrl.navigateForward(`/tabs/health?lugar=${encodeURIComponent(lugar.nombre)}`, {
+      state: {
+        lugar: lugar
+      }
+    });
+  }
+
+  /**
+   * Limpiar búsqueda y mostrar lugares populares
+   */
+  limpiarBusqueda(): void {
+    this.terminoBusqueda = '';
+    this.lugaresFiltrados = [];
+  }
+
+  /**
+   * Obtener lugares por ciudad
+   */
+  obtenerLugaresPorCiudad(ciudad: string): Lugar[] {
+    return this.todosLosLugares.filter(lugar => 
+      lugar.ciudad.toLowerCase() === ciudad.toLowerCase()
     );
   }
 
-  // Seleccionar lugar de la lista popular
-  seleccionarLugar(nombreLugar: string) {
-    this.terminoBusqueda = nombreLugar;
-    this.filtrarLugares();
+  /**
+   * Obtener lugares por categoría
+   */
+  obtenerLugaresPorCategoria(categoria: string): Lugar[] {
+    return this.todosLosLugares.filter(lugar => 
+      lugar.categoria.toLowerCase() === categoria.toLowerCase()
+    );
   }
 
-  // Navegar a reseñas
-  irAResenas(lugar: Lugar) {
-    this.navCtrl.navigateForward(`/tabs/health?lugar=${encodeURIComponent(lugar.nombre)}`);
+  /**
+   * Obtener lugares destacados (mejor rating)
+   */
+  obtenerLugaresDestacados(limite: number = 5): Lugar[] {
+    return this.todosLosLugares
+      .filter(lugar => lugar.rating && lugar.rating >= 4.5)
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, limite);
+  }
+
+  /**
+   * Lifecycle hook - Se ejecuta cuando la página carga
+   */
+  ionViewDidEnter(): void {
+    console.log('Página de lugares cargada');
+    
+    // Opcional: Cargar ubicación real del usuario aquí
+    // this.cargarUbicacionUsuario();
+  }
+
+  /**
+   * Método para futura integración con GPS
+   */
+  private cargarUbicacionUsuario(): void {
+    // Aquí iría la integración con la API de geolocalización
+    console.log('Cargando ubicación del usuario...');
+    
+    // Ejemplo de cómo se implementaría:
+    /*
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          console.log('Ubicación obtenida:', lat, lng);
+          // Aquí llamarías a tu API para obtener lugares cercanos
+        },
+        (error) => {
+          console.error('Error obteniendo ubicación:', error);
+          // Fallback a Barcelona como ubicación por defecto
+          this.terminoBusqueda = 'Barcelona';
+          this.filtrarLugares();
+        }
+      );
+    }
+    */
   }
 }
