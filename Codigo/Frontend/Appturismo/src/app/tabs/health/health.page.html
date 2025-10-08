@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content class="reviews-content">
-  <!-- Header del Lugar -->
+  <!-- Header del Lugar Mejorado -->
   <div class="place-header" *ngIf="lugarSeleccionado">
     <div class="place-hero">
       <div class="place-info">
@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <!-- Resumen de Ratings -->
+  <!-- Resumen de Ratings Mejorado -->
   <div class="ratings-summary" *ngIf="resenas.length > 0">
     <div class="summary-card">
       <h3>Resumen de Opiniones</h3>
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <!-- Lista de Reseñas -->
+  <!-- Lista de Reseñas Mejorada -->
   <div class="reviews-section" *ngIf="resenas.length > 0">
     <div class="section-header">
       <h2>Opiniones de Viajeros</h2>
@@ -75,10 +75,15 @@
 
           <div class="review-actions">
             <div class="action-buttons">
-              <ion-button fill="clear" size="small" (click)="likeResena(resena)">
+              <ion-button 
+                fill="clear" 
+                size="small" 
+                class="like-button" 
+                [class.liked]="resena.liked"
+                (click)="likeResena(resena)">
                 <ion-icon 
                   [name]="resena.liked ? 'heart' : 'heart-outline'" 
-                  [color]="resena.liked ? 'danger' : 'medium'">
+                  slot="start">
                 </ion-icon>
                 <span>{{resena.likes}}</span>
               </ion-button>
@@ -89,16 +94,16 @@
     </div>
   </div>
 
-  <!-- Sin Reseñas -->
+  <!-- Sin Reseñas Mejorado -->
   <div *ngIf="resenas.length === 0" class="empty-reviews">
     <div class="empty-content">
-      <ion-icon name="chatbubble-ellipses-outline" color="medium"></ion-icon>
+      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
       <h3>No hay reseñas aún</h3>
-      <p>Sé el primero en compartir tu experiencia</p>
+      <p>Sé el primero en compartir tu experiencia en {{lugarSeleccionado}}</p>
     </div>
   </div>
 
-  <!-- Formulario de Nueva Reseña -->
+  <!-- Formulario de Nueva Reseña Mejorado -->
   <div class="add-review-section">
     <ion-card class="add-review-card">
       <ion-card-header>
@@ -107,9 +112,9 @@
       </ion-card-header>
 
       <ion-card-content>
-        <!-- Rating -->
+        <!-- Rating Mejorado -->
         <div class="rating-input">
-          <label>Tu Calificación (opcional)</label>
+          <label>Tu Calificación</label>
           <div class="stars-selector">
             <ion-icon 
               *ngFor="let star of [1,2,3,4,5]" 
@@ -123,21 +128,24 @@
           </span>
         </div>
 
-        <!-- Texto de la reseña -->
+        <!-- Texto de la reseña Mejorado -->
         <div class="review-input">
           <ion-textarea
             [(ngModel)]="nuevaResenaTexto"
             placeholder="Contanos sobre tu experiencia... ¿Qué te gustó? ¿Qué mejorarías?"
             rows="4"
             autoGrow
+            maxlength="500"
             class="custom-textarea">
           </ion-textarea>
-          <div class="char-counter">
+          <div class="char-counter" 
+               [class.warning]="nuevaResenaTexto.length > 400"
+               [class.danger]="nuevaResenaTexto.length > 480">
             {{nuevaResenaTexto.length}}/500 caracteres
           </div>
         </div>
 
-        <!-- Botón enviar -->
+        <!-- Botón enviar Mejorado -->
         <ion-button 
           expand="block" 
           color="primary" 

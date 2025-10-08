@@ -1,23 +1,41 @@
-.reviews-content {
+// PALETA DE COLORES PROFESIONAL
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --secondary: #64748b;
+  --accent: #f59e0b;
+  --accent-light: #fbbf24;
   --background: #f8fafc;
+  --surface: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --border-light: #f1f5f9;
 }
 
-// Header del Lugar
+.reviews-content {
+  --background: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+// Header del Lugar - MEJORADO
 .place-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
   padding: 0;
   
   .place-hero {
-    padding: 30px 20px;
+    padding: 40px 20px 30px;
     position: relative;
     
     .place-info {
       .place-name {
-        font-size: 1.8rem;
-        font-weight: 700;
+        font-size: 2rem;
+        font-weight: 800;
         margin: 0 0 12px 0;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        letter-spacing: -0.5px;
       }
       
       .place-stats {
@@ -28,20 +46,26 @@
         .stat {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 0.95rem;
+          gap: 8px;
+          font-size: 1rem;
+          background: rgba(255,255,255,0.15);
+          backdrop-filter: blur(10px);
+          padding: 8px 16px;
+          border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.2);
           
           .rating {
-            font-weight: 700;
-            font-size: 1.1rem;
+            font-weight: 800;
+            font-size: 1.3rem;
           }
           
           .reviews-count {
             opacity: 0.9;
+            font-weight: 500;
           }
           
           ion-icon {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
           }
         }
       }
@@ -49,21 +73,23 @@
   }
 }
 
-// Resumen de Ratings (DEJADO COMO ESTABA ORIGINALMENTE)
+// Resumen de Ratings - MEJORADO
 .ratings-summary {
-  padding: 20px;
+  padding: 24px 20px;
   
   .summary-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+    border: 1px solid var(--border-light);
     
     h3 {
-      margin: 0 0 16px 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #1a202c;
+      margin: 0 0 20px 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
     }
   }
 }
@@ -71,92 +97,106 @@
 .rating-bars {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   
   .rating-bar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     
     .star-label {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 0.9rem;
+      gap: 6px;
+      font-size: 0.95rem;
       font-weight: 600;
-      color: #4a5568;
-      min-width: 50px;
+      color: var(--text-primary);
+      min-width: 70px;
       
       ion-icon {
-        font-size: 0.8rem;
-        color: #ffc107;
+        font-size: 0.9rem;
+        color: var(--accent);
       }
     }
     
     .bar-container {
       flex: 1;
-      height: 8px;
-      background: #e2e8f0;
-      border-radius: 4px;
+      height: 10px;
+      background: var(--border);
+      border-radius: 6px;
       overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
       
       .bar-fill {
         height: 100%;
-        background: linear-gradient(90deg, #ffc107, #ffb300);
-        border-radius: 4px;
-        transition: width 0.5s ease;
+        background: linear-gradient(90deg, var(--accent), var(--accent-light));
+        border-radius: 6px;
+        transition: width 1s ease-out;
+        box-shadow: 0 1px 3px rgba(245, 158, 11, 0.3);
       }
     }
     
     .percentage {
-      font-size: 0.8rem;
-      color: #718096;
-      min-width: 40px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      min-width: 45px;
       text-align: right;
+      font-weight: 600;
     }
   }
 }
 
-// Lista de Reseñas
+// Lista de Reseñas - MEJORADO
 .reviews-section {
-  padding: 0 20px 20px 20px;
+  padding: 0 20px 24px 20px;
 }
 
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   
   h2 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: #1a202c;
+    color: var(--text-primary);
     margin: 0;
+    letter-spacing: -0.3px;
   }
   
   .reviews-count {
-    color: var(--ion-color-primary);
+    color: var(--primary);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    background: rgba(37, 99, 235, 0.1);
+    padding: 6px 12px;
+    border-radius: 12px;
   }
 }
 
 .reviews-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .review-card {
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(255, 228, 225, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   margin: 0;
-  background: #ffe4e1; // COLOR #ffe4e1 APLICADO
-  border: 1px solid rgba(255, 228, 225, 0.5);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  transition: all 0.3s ease;
+  animation: slideUp 0.5s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  }
   
   ion-card-content {
-    padding: 20px;
+    padding: 24px;
   }
 }
 
@@ -166,14 +206,15 @@
   .user-info {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 16px;
     
     .user-avatar {
-      width: 44px;
-      height: 44px;
+      width: 52px;
+      height: 52px;
       
       img {
-        border: 2px solid rgba(255, 228, 225, 0.5);
+        border: 3px solid var(--border-light);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
     }
     
@@ -181,29 +222,32 @@
       flex: 1;
       
       .user-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1a202c; // Cambiado a color oscuro para mejor contraste
-        margin: 0 0 6px 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0 0 8px 0;
+        letter-spacing: -0.2px;
       }
       
       .review-meta {
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 16px;
         
         .rating-stars {
           display: flex;
           gap: 2px;
           
           ion-icon {
-            font-size: 0.9rem;
+            font-size: 1rem;
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
           }
         }
         
         .review-date {
-          font-size: 0.8rem;
-          color: #4a5568; // Cambiado a color más oscuro
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          font-weight: 500;
         }
       }
     }
@@ -211,10 +255,11 @@
 }
 
 .review-text {
-  color: #1a202c; // Cambiado a color oscuro para mejor legibilidad
-  line-height: 1.5;
-  margin: 0 0 16px 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 20px 0;
   font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
 }
 
 .review-actions {
@@ -222,134 +267,190 @@
     display: flex;
     gap: 8px;
     
-    ion-button {
-      --padding-start: 8px;
-      --padding-end: 8px;
-      margin: 0;
-      font-size: 0.8rem;
+    .like-button {
+      --background: var(--border-light);
+      --color: var(--text-muted);
+      --border-radius: 20px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+      
+      &.liked {
+        --background: #fef2f2;
+        --color: #dc2626;
+      }
       
       ion-icon {
-        font-size: 1rem;
-        margin-right: 4px;
+        font-size: 1.1rem;
+        margin-right: 6px;
+      }
+      
+      &:hover {
+        --background: #f1f5f9;
       }
     }
   }
 }
 
-// Sin Reseñas
+// Sin Reseñas - MEJORADO Y CORREGIDO
 .empty-reviews {
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
   
   .empty-content {
     ion-icon {
-      font-size: 4rem;
-      margin-bottom: 16px;
-      opacity: 0.5;
+      font-size: 4.5rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      background-clip: text; // PROPIEDAD ESTÁNDAR AÑADIDA
+      -webkit-text-fill-color: transparent;
+      color: transparent; // PROPIEDAD ESTÁNDAR AÑADIDA
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
     }
     
     h3 {
-      color: #4a5568;
-      font-size: 1.3rem;
-      margin: 0 0 8px 0;
+      color: var(--text-primary);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+      letter-spacing: -0.3px;
     }
     
     p {
-      color: #718096;
+      color: var(--text-muted);
       margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
     }
   }
 }
 
-// Nueva Reseña
+// Nueva Reseña - MEJORADO
 .add-review-section {
-  padding: 20px;
-  background: white;
+  padding: 24px 20px;
+  background: var(--surface);
   margin-top: 8px;
+  border-top: 1px solid var(--border-light);
 }
 
 .add-review-card {
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(255, 228, 225, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
   margin: 0;
-  background: #ffe4e1; // COLOR #ffe4e1 APLICADO
-  border: 1px solid rgba(255, 228, 225, 0.5);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  animation: fadeIn 0.6s ease;
   
   ion-card-header {
-    padding-bottom: 0;
+    padding: 24px 24px 0;
     
     ion-card-title {
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 700;
-      color: #1a202c; // Cambiado a color oscuro
+      color: var(--text-primary);
+      margin-bottom: 4px;
     }
     
     ion-card-subtitle {
-      color: #4a5568; // Cambiado a color más oscuro
+      color: var(--text-muted);
+      font-size: 0.95rem;
     }
   }
 }
 
 .rating-input {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   
   label {
     display: block;
     font-weight: 600;
-    color: #4a5568;
-    margin-bottom: 8px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 1rem;
   }
   
   .stars-selector {
     display: flex;
     gap: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     
     ion-icon {
-      font-size: 2rem;
+      font-size: 2.2rem;
       cursor: pointer;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      
+      &:hover {
+        transform: scale(1.1);
+      }
       
       &:active {
-        transform: scale(0.9);
+        transform: scale(0.95);
       }
     }
   }
   
   .rating-text {
-    font-size: 0.9rem;
-    color: var(--ion-color-primary);
+    font-size: 0.95rem;
+    color: var(--primary);
     font-weight: 600;
   }
 }
 
 .review-input {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   
   .custom-textarea {
     --background: #ffffff;
-    --border-radius: 12px;
+    --border-radius: 16px;
     --padding-start: 16px;
     --padding-end: 16px;
-    --padding-top: 12px;
-    --padding-bottom: 12px;
+    --padding-top: 16px;
+    --padding-bottom: 16px;
     font-size: 0.95rem;
-    border: 1px solid rgba(255, 228, 225, 0.5);
+    border: 1px solid var(--border);
+    transition: all 0.2s ease;
+    
+    &:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
   }
   
   .char-counter {
     text-align: right;
     font-size: 0.8rem;
-    color: #718096;
-    margin-top: 4px;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-weight: 500;
+    
+    &.warning {
+      color: var(--accent);
+    }
+    
+    &.danger {
+      color: #dc2626;
+    }
   }
 }
 
 .submit-button {
-  --border-radius: 12px;
-  --box-shadow: 0 4px 12px rgba(59, 183, 143, 0.3);
+  --border-radius: 16px;
+  --box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
   font-weight: 600;
   margin-top: 8px;
+  --padding-top: 20px;
+  --padding-bottom: 20px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  
+  &:hover:not([disabled]) {
+    --box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    transform: translateY(-1px);
+  }
   
   &[disabled] {
     --background: #cbd5e0;
@@ -360,4 +461,112 @@
 // Back Button
 ion-back-button {
   --color: white;
+  --icon-font-size: 1.4rem;
+}
+
+// Animaciones
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estados de carga
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// Responsive Design Mejorado
+@media (min-width: 768px) {
+  .reviews-section {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  
+  .add-review-section {
+    max-width: 720px;
+    margin: 24px auto 0;
+  }
+  
+  .ratings-summary {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  
+  .review-card {
+    margin: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .reviews-section {
+    max-width: 800px;
+  }
+  
+  .add-review-section {
+    max-width: 800px;
+  }
+  
+  .ratings-summary {
+    max-width: 800px;
+  }
+}
+
+// Mejoras de accesibilidad
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Estados de enfoque para accesibilidad
+ion-button:focus,
+ion-icon:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+// Asegurar compatibilidad con line-clamp
+.place-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 3;
+  box-orient: vertical;
+}
+
+.popular-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 2;
+  box-orient: vertical;
 }

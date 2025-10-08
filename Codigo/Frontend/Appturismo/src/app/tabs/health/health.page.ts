@@ -79,10 +79,9 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * Agregar una nueva reseña - CORREGIDO
+   * Agregar una nueva reseña
    */
   async agregarResena() {
-    // Solo validamos que haya texto
     if (!this.nuevaResenaTexto.trim()) {
       await this.mostrarToast('Por favor, escribí tu reseña antes de publicar', 'warning');
       return;
@@ -93,7 +92,7 @@ export class HealthPage implements OnInit {
       fecha: new Date().toLocaleDateString('es-AR'),
       usuario: 'Tú',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-      rating: this.nuevaResenaRating || 5, // Si no selecciona rating, por defecto 5
+      rating: this.nuevaResenaRating || 5,
       likes: 0,
       liked: false
     };
@@ -208,12 +207,12 @@ export class HealthPage implements OnInit {
    */
   obtenerColorRating(rating: number): string {
     switch(rating) {
-      case 5: return '#22c55e'; // Verde
-      case 4: return '#84cc16'; // Verde claro
-      case 3: return '#eab308'; // Amarillo
-      case 2: return '#f97316'; // Naranja
-      case 1: return '#ef4444'; // Rojo
-      default: return '#6b7280'; // Gris
+      case 5: return '#22c55e';
+      case 4: return '#84cc16';
+      case 3: return '#eab308';
+      case 2: return '#f97316';
+      case 1: return '#ef4444';
+      default: return '#6b7280';
     }
   }
 }
