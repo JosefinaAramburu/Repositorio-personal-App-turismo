@@ -1,150 +1,137 @@
-/* ======= Fondo general ======= */
+/* === Estilo general de la página de reseñas === */
 ion-content {
-  --background: #f8f9fa;
-  font-family: 'Inter', sans-serif;
-  color: #222;
+  --background: #f5f6fa;
+  padding: 16px;
+  font-family: 'Inter', 'Roboto', sans-serif;
 }
 
-/* ======= Header (barra superior) ======= */
+/* === Encabezado === */
 ion-header {
-  --background: #ffffff;
-  --color: #222;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-}
-
-ion-toolbar {
-  --background: #ffffff;
-  --color: #222;
+  --background: #3b82f6; /* Azul moderno */
+  color: white;
   font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 ion-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1.2rem;
-  text-align: center;
 }
 
-/* ======= Título del lugar ======= */
-.lugar-titulo {
-  text-align: center;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #222;
-  margin: 1.5rem 0 0.3rem;
+ion-title ion-icon {
+  font-size: 1.4rem;
 }
 
-/* ======= Subtítulo (cantidad de reseñas) ======= */
-.lugar-subtitulo {
-  text-align: center;
-  color: #777;
-  font-size: 0.9rem;
-  margin-bottom: 1.2rem;
-}
-
-/* ======= Contenedor principal ======= */
-.reseñas-container {
-  padding: 0 1rem 3rem;
+/* === Contenedor principal === */
+.reviews-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+  gap: 16px;
+  margin-top: 20px;
 }
 
-/* ======= Título de la sección ======= */
-h2 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  text-align: center;
-  color: #222;
-  margin-top: 1.2rem;
-}
-
-/* ======= Tarjeta de reseña ======= */
-.reseña {
+/* === Tarjeta de reseña === */
+.review-card {
   background: #ffffff;
-  width: 100%;
-  max-width: 700px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-  padding: 1rem 1.2rem;
-  transition: 0.2s ease;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.reseña:hover {
-  transform: translateY(-2px);
+.review-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.12);
 }
 
-.reseña p {
-  color: #333;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  margin-bottom: 0.3rem;
+/* === Cabecera del usuario === */
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-.reseña small {
-  display: block;
-  color: #888;
-  font-size: 0.8rem;
+.review-header img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #3b82f6;
 }
 
-/* ======= Formulario de nueva reseña ======= */
-.formulario-container {
-  background: #f1f3f5;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 700px;
+.review-header .user-info {
+  display: flex;
+  flex-direction: column;
 }
 
-.formulario-container h3 {
-  text-align: center;
+.user-info .name {
   font-weight: 600;
-  color: #222;
-  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #111827;
 }
 
-ion-input,
-ion-textarea {
-  --background: #ffffff;
-  --color: #222;
+.user-info .date {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* === Texto de la reseña === */
+.review-text {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* === Indicador de likes o votos === */
+.review-likes {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.review-likes .like-bar {
+  background: #22c55e;
+  color: white;
   border-radius: 10px;
-  margin-bottom: 1rem;
-  font-size: 0.95rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-/* ======= Botón ======= */
-ion-button {
-  --background: #00e85a;
-  --background-hover: #00cf50;
-  --border-radius: 10px;
+  padding: 4px 16px;
   font-weight: 600;
-  width: 100%;
-  max-width: 250px;
-  margin: 1rem auto 0;
-  display: block;
-  color: #000;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(34,197,94,0.4);
 }
 
-ion-button:hover {
-  transform: scale(1.03);
+/* === Título central === */
+.section-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 20px 0 8px;
+  color: #111827;
 }
 
-/* ======= Responsivo ======= */
-@media (max-width: 600px) {
-  .lugar-titulo {
-    font-size: 1.15rem;
+/* === Botón de reseña === */
+ion-button.submit-btn {
+  --background: linear-gradient(90deg, #22c55e, #16a34a);
+  color: white;
+  border-radius: 12px;
+  margin-top: 16px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+ion-button.submit-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* === Ajustes responsivos === */
+@media (max-width: 768px) {
+  .review-card {
+    padding: 14px;
   }
-
-  h2 {
+  ion-title {
     font-size: 1.1rem;
-  }
-
-  .reseña {
-    padding: 0.9rem 1rem;
-  }
-
-  ion-button {
-    font-size: 0.9rem;
   }
 }
