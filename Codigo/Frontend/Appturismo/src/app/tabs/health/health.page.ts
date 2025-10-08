@@ -10,8 +10,6 @@ interface Resena {
   usuario: string;
   avatar?: string;
   rating: number;
-  likes: number;
-  liked?: boolean;
 }
 
 @Component({
@@ -32,36 +30,28 @@ export class HealthPage implements OnInit {
       fecha: '14/09/2025', 
       usuario: 'María González',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-      rating: 5,
-      likes: 12,
-      liked: false
+      rating: 5
     },
     { 
       texto: 'Muy interesante, pero algo lleno. La experiencia fue buena aunque había mucha gente. Los guías son muy conocedores y las explicaciones muy completas.', 
       fecha: '21/09/2025', 
       usuario: 'Carlos Rodríguez',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      rating: 4,
-      likes: 8,
-      liked: true
+      rating: 4
     },
     { 
       texto: 'Increíble experiencia cultural. La historia del lugar es fascinante y la preservación es excelente. Perfecto para visitar en familia.', 
       fecha: '05/10/2025', 
       usuario: 'Ana Martínez',
       avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-      rating: 5,
-      likes: 15,
-      liked: false
+      rating: 5
     },
     { 
       texto: 'Buen lugar pero un poco caro. La entrada podría tener mejor precio considerando lo que ofrece. Aún así, recomiendo la visita.', 
       fecha: '08/10/2025', 
       usuario: 'Javier López',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-      rating: 3,
-      likes: 3,
-      liked: false
+      rating: 3
     }
   ];
 
@@ -92,9 +82,7 @@ export class HealthPage implements OnInit {
       fecha: new Date().toLocaleDateString('es-AR'),
       usuario: 'Tú',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-      rating: this.nuevaResenaRating || 5,
-      likes: 0,
-      liked: false
+      rating: this.nuevaResenaRating || 5
     };
 
     // Agregar la nueva reseña al inicio del array
@@ -121,14 +109,6 @@ export class HealthPage implements OnInit {
    */
   seleccionarRating(rating: number) {
     this.nuevaResenaRating = rating;
-  }
-
-  /**
-   * Like/Unlike una reseña
-   */
-  likeResena(resena: Resena) {
-    resena.liked = !resena.liked;
-    resena.likes += resena.liked ? 1 : -1;
   }
 
   /**
@@ -189,30 +169,5 @@ export class HealthPage implements OnInit {
    */
   volverALugares() {
     this.navCtrl.navigateBack('/tabs/capture');
-  }
-
-  /**
-   * Obtener distribución de ratings para gráfico
-   */
-  obtenerDistribucionRatings(): { rating: number, count: number, percentage: number }[] {
-    return [5,4,3,2,1].map(rating => ({
-      rating,
-      count: this.resenas.filter(r => r.rating === rating).length,
-      percentage: this.calcularPorcentajeRating(rating)
-    }));
-  }
-
-  /**
-   * Obtener el color según el rating
-   */
-  obtenerColorRating(rating: number): string {
-    switch(rating) {
-      case 5: return '#22c55e';
-      case 4: return '#84cc16';
-      case 3: return '#eab308';
-      case 2: return '#f97316';
-      case 1: return '#ef4444';
-      default: return '#6b7280';
-    }
   }
 }

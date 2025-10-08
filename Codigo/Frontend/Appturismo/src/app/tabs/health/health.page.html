@@ -73,22 +73,7 @@
 
           <p class="review-text">{{resena.texto}}</p>
 
-          <div class="review-actions">
-            <div class="action-buttons">
-              <ion-button 
-                fill="clear" 
-                size="small" 
-                class="like-button" 
-                [class.liked]="resena.liked"
-                (click)="likeResena(resena)">
-                <ion-icon 
-                  [name]="resena.liked ? 'heart' : 'heart-outline'" 
-                  slot="start">
-                </ion-icon>
-                <span>{{resena.likes}}</span>
-              </ion-button>
-            </div>
-          </div>
+          <!-- ELIMINADA LA SECCIÓN DE LIKES -->
         </ion-card-content>
       </ion-card>
     </div>

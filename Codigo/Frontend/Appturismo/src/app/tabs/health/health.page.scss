@@ -6,7 +6,7 @@
   --accent: #f59e0b;
   --accent-light: #fbbf24;
   --background: #f8fafc;
-  --surface: #ffffff;  // BLANCO PRINCIPAL
+  --surface: #ffffff;
   --text-primary: #1e293b;
   --text-secondary: #475569;
   --text-muted: #64748b;
@@ -19,7 +19,7 @@
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-// Header del Lugar - MEJORADO
+// Header del Lugar
 .place-header {
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
@@ -73,16 +73,16 @@
   }
 }
 
-// Resumen de Ratings - CORREGIDO
+// Resumen de Ratings
 .ratings-summary {
   padding: 24px 20px;
   
   .summary-card {
-    background: white; // UNIFICADO
+    background: white;
     color: black;
     border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 4px 25px rgba(0,0,0,0.08); // SOMBRA CORREGIDA
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
     border: 1px solid var(--border-light);
     
     h3 {
@@ -147,7 +147,7 @@
   }
 }
 
-// Lista de Reseñas - CORREGIDO
+// Lista de Reseñas
 .reviews-section {
   padding: 0 20px 24px 20px;
 }
@@ -170,7 +170,7 @@
     color: var(--primary);
     font-weight: 600;
     font-size: 0.95rem;
-    background: var(--surface); // UNIFICADO
+    background: var(--surface);
     padding: 6px 12px;
     border-radius: 12px;
     border: 1px solid var(--border-light);
@@ -187,7 +187,7 @@
   border-radius: 20px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
   margin: 0;
-  background: white; // UNIFICADO
+  background: white;
   border: 1px solid var(--border-light);
   transition: all 0.3s ease;
   animation: slideUp 0.5s ease;
@@ -199,7 +199,7 @@
   
   ion-card-content {
     padding: 24px;
-    background: var(--surface); // UNIFICADO
+    background: var(--surface);
   }
 }
 
@@ -265,35 +265,9 @@
   font-family: 'Inter', sans-serif;
 }
 
-.review-actions {
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-    
-    .like-button {
-      --background: var(--border-light);
-      --color: var(--text-muted);
-      --border-radius: 20px;
-      --padding-start: 12px;
-      --padding-end: 12px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: all 0.2s ease;
-      
-      &.liked {
-        --background: #fef2f2;
-        --color: #dc2626;
-      }
-      
-      ion-icon {
-        font-size: 1.1rem;
-        margin-right: 6px;
-      }
-    }
-  }
-}
+// ELIMINADA LA SECCIÓN DE REVIEW-ACTIONS (LIKES)
 
-// Sin Reseñas - CORREGIDO
+// Sin Reseñas
 .empty-reviews {
   padding: 80px 20px;
   text-align: center;
@@ -327,25 +301,25 @@
   }
 }
 
-
+// Nueva Reseña
 .add-review-section {
   padding: 24px 20px;
-  background: white; 
+  background: white;
   margin-top: 8px;
   border-top: 1px solid var(--border-light);
 }
 
 .add-review-card {
   border-radius: 20px;
-  box-shadow: 0 4px 25px rgba(0,0,0,0.08); 
+  box-shadow: 0 4px 25px rgba(0,0,0,0.08);
   margin: 0;
-  background: var(--surface); 
+  background: var(--surface);
   border: 1px solid var(--border-light);
   animation: fadeIn 0.6s ease;
   
   ion-card-header {
     padding: 24px 24px 0;
-    background: var(--surface); // UNIFICADO
+    background: var(--surface);
     
     ion-card-title {
       font-size: 1.4rem;
@@ -361,7 +335,7 @@
   }
   
   ion-card-content {
-    background: var(--surface); // UNIFICADO
+    background: var(--surface);
   }
 }
 
@@ -408,7 +382,7 @@
   margin-bottom: 24px;
   
   .custom-textarea {
-    --background: var(--surface); // UNIFICADO
+    --background: var(--surface);
     --border-radius: 16px;
     --padding-start: 16px;
     --padding-end: 16px;
@@ -491,7 +465,7 @@ ion-back-button {
   }
 }
 
-// Responsive Design Mejorado
+// Responsive Design
 @media (min-width: 768px) {
   .reviews-section {
     max-width: 720px;
@@ -525,20 +499,4 @@ ion-back-button {
   .ratings-summary {
     max-width: 800px;
   }
-}
-
-// Mejoras de accesibilidad
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-// Estados de enfoque para accesibilidad
-ion-button:focus,
-ion-icon:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
 }
