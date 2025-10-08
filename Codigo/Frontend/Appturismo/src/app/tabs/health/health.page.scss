@@ -12,6 +12,7 @@
   --text-muted: #64748b;
   --border: #e2e8f0;
   --border-light: #f1f5f9;
+  --star-inactive: #e2e8f0; /* NUEVO: Color para estrellas no seleccionadas */
 }
 
 .reviews-content {
@@ -234,7 +235,7 @@
       
       .review-meta {
         display: flex;
-        align-items: center;
+                        align-items: center;
         gap: 16px;
         
         .rating-stars {
@@ -244,6 +245,7 @@
           ion-icon {
             font-size: 1rem;
             filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));
+            color: var(--accent); /* Amarillo para estrellas en reseñas existentes */
           }
         }
         
@@ -264,8 +266,6 @@
   font-size: 0.95rem;
   font-family: 'Inter', sans-serif;
 }
-
-// ELIMINADA LA SECCIÓN DE REVIEW-ACTIONS (LIKES)
 
 // Sin Reseñas
 .empty-reviews {
@@ -301,7 +301,7 @@
   }
 }
 
-// Nueva Reseña
+// Nueva Reseña - SECCIÓN CORREGIDA
 .add-review-section {
   padding: 24px 20px;
   background: white;
@@ -360,9 +360,15 @@
       cursor: pointer;
       transition: all 0.2s ease;
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      color: var(--star-inactive); /* COLOR GRIS PARA NO SELECCIONADAS */
+      
+      &.active {
+        color: var(--accent); /* Amarillo cuando están seleccionadas */
+      }
       
       &:hover {
         transform: scale(1.1);
+        color: var(--accent-light); /* Color al hacer hover */
       }
       
       &:active {
