@@ -41,21 +41,9 @@ export class CapturePage {
   direccion: 'Carrer de Mallorca, 401',
   precio: 'Desde €20',
   rating: 4.8,
-  imagen: "https://cdn-imgix.headout.com/mircobrands-content/image/0cdbae4b3e7ca1bfdcc811483dbd26e3-Sagrada%20Familia%20-%20Gaudi's%20Barcelona.jpeg?auto=format&w=1069.6000000000001&h=687.6&q=90&ar=14%3A9&crop=faces&fit=crop"
+    imagen: 'https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=400,height=265,dpr=2/tour_img/c43b221a90cd509f672389b8c0c44f9e6c1e682e45576614244679f35b336e67.jpg'
 }, 
 {
-      nombre: 'Parque Güell',
-      ciudad: 'Barcelona', 
-      pais: 'España',
-      categoria: 'Parque',
-      descripcion: 'Parque público con jardines y elementos arquitectónicos diseñados por Gaudí. Vistas panorámicas de la ciudad.',
-      horario: '9:30 - 19:30',
-      direccion: '08024 Barcelona',
-      precio: '€10',
-      rating: 4.6,
-      imagen: 'https://images.unsplash.com/photo-1592478411180-3d7b9c80e04f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'
-    },
-    {
       nombre: 'La Rambla',
       ciudad: 'Barcelona',
       pais: 'España', 
