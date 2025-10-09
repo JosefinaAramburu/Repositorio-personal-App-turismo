@@ -32,18 +32,18 @@ export class CapturePage {
   todosLosLugares: Lugar[] = [
     // ESPAÑA - Barcelona
     {
-      nombre: 'Sagrada Familia',
-      ciudad: 'Barcelona',
-      pais: 'España',
-      categoria: 'Monumento',
-      descripcion: 'Basílica diseñada por Antoni Gaudí, obra maestra del modernismo catalán. Una experiencia arquitectónica única en el mundo.',
-      horario: '9:00 - 18:00',
-      direccion: 'Carrer de Mallorca, 401',
-      precio: 'Desde €20',
-      rating: 4.8,
-      imagen: 'https://images.unsplash.com/photo-1583422409516-289917ce5991?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'
-    },
-    {
+       nombre: 'Sagrada Familia',
+  ciudad: 'Barcelona',
+  pais: 'España',
+  categoria: 'Monumento',
+  descripcion: 'Basílica diseñada por Antoni Gaudí, obra maestra del modernismo catalán. Una experiencia arquitectónica única en el mundo.',
+  horario: '9:00 - 18:00',
+  direccion: 'Carrer de Mallorca, 401',
+  precio: 'Desde €20',
+  rating: 4.8,
+  imagen: "https://cdn-imgix.headout.com/mircobrands-content/image/0cdbae4b3e7ca1bfdcc811483dbd26e3-Sagrada%20Familia%20-%20Gaudi's%20Barcelona.jpeg?auto=format&w=1069.6000000000001&h=687.6&q=90&ar=14%3A9&crop=faces&fit=crop"
+}, 
+{
       nombre: 'Parque Güell',
       ciudad: 'Barcelona', 
       pais: 'España',
