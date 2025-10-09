@@ -64,7 +64,7 @@ export class CapturePage {
       direccion: 'Passeig de Gràcia, 43',
       precio: '€35',
       rating: 4.7,
-      imagen: 'https://images.unsplash.com/photo-1558626296-97e6c0c73f8a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'
+      imagen: "https://barcelonapaseodegracia.com/wp-content/uploads/2018/07/ximg-fachada-rosas.jpg.pagespeed.ic_.fu4kMb7Cjf-1920x1120.jpg"
     },
 
     // ESPAÑA - Madrid
