@@ -233,6 +233,18 @@
                     <ion-icon name="time-outline"></ion-icon>
                     <span>{{ lugar.horario }}</span>
                   </div>
+                  
+                  <!-- CONTADOR DE RESEÑAS -->
+                  <div class="detail-item" *ngIf="lugar.totalResenas > 0">
+                    <ion-icon name="chatbubble-outline" color="primary"></ion-icon>
+                    <span>{{ lugar.totalResenas }} reseña{{ lugar.totalResenas !== 1 ? 's' : '' }}</span>
+                  </div>
+                  
+                  <!-- PUNTAJE PROMEDIO -->
+                  <div class="detail-item" *ngIf="lugar.promedioRating > 0">
+                    <ion-icon name="star" color="warning"></ion-icon>
+                    <span>{{ lugar.promedioRating.toFixed(1) }}</span>
+                  </div>
                 </div>
               </div>
               
@@ -240,6 +252,12 @@
             </ion-label>
             
             <div class="action-buttons" slot="end">
+              <!-- BOTÓN PARA VER RESEÑAS -->
+              <ion-button fill="clear" color="primary" (click)="verResenas(lugar)" size="small" class="action-btn" 
+                         [disabled]="!lugar.id_lugares">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+              </ion-button>
+              
               <ion-button fill="clear" color="warning" (click)="editarLugar(lugar)" size="small" class="action-btn">
                 <ion-icon name="create-outline"></ion-icon>
               </ion-button>

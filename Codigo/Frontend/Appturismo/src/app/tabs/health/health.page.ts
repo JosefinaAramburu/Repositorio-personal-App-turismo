@@ -28,7 +28,7 @@ import { supabase } from '../../supabase';
 
 // Agregar estos iconos
 import { addIcons } from 'ionicons';
-import { refreshOutline, createOutline } from 'ionicons/icons';
+import { refreshOutline, createOutline, star } from 'ionicons/icons';
 
 interface Resena {
   id_resenas?: number;
@@ -76,6 +76,7 @@ export class HealthPage implements OnInit {
 
   lugarSeleccionado: string = 'Lugar no especificado';
   idLugarSeleccionado: number = 0;
+  categoriaLugar: string = '';
   nuevaResenaTexto: string = '';
   nuevaResenaRating: number = 0;
   isLoading: boolean = false;
@@ -85,7 +86,8 @@ export class HealthPage implements OnInit {
   constructor() {
     addIcons({
       refreshOutline,
-      createOutline
+      createOutline,
+      star
     });
   }
 
@@ -93,7 +95,11 @@ export class HealthPage implements OnInit {
     this.route.queryParams.subscribe(async (params) => {
       this.lugarSeleccionado = params['lugar'] || 'Lugar no especificado';
       this.idLugarSeleccionado = params['id'] ? parseInt(params['id']) : 0;
-      console.log('Lugar seleccionado:', this.lugarSeleccionado, 'ID:', this.idLugarSeleccionado);
+      this.categoriaLugar = params['categoria'] || '';
+      
+      console.log('Lugar seleccionado:', this.lugarSeleccionado, 
+                  'ID:', this.idLugarSeleccionado, 
+                  'Categoría:', this.categoriaLugar);
       
       await this.cargarResenas();
     });
@@ -113,12 +119,12 @@ export class HealthPage implements OnInit {
     await loading.present();
 
     try {
-      // Usar el nombre exacto de tu tabla "Reseñas" (con ñ)
+      // USAR EL NOMBRE EXACTO DE TU TABLA
       const { data, error } = await supabase
-        .from('Reseñas')  // ← CON Ñ
+        .from('Lugares_resenas')  // ← Cambiar por el nombre exacto de tu tabla
         .select('*')
-        .eq('id_lugar', this.idLugarSeleccionado)
-        .order('fecha', { ascending: false });
+        .eq('id_lugares', this.idLugarSeleccionado)
+        .order('fecha_creacion', { ascending: false });
 
       if (error) {
         console.error('Error cargando reseñas:', error);
@@ -129,14 +135,14 @@ export class HealthPage implements OnInit {
 
       // Transformar datos de Supabase a nuestro formato
       this.resenas = (data || []).map(resena => ({
-        id_resenas: resena.id_reseñas,  // Mapear id_reseñas → id_resenas
+        id_resenas: resena.id_resenas,  
         id_usuario: resena.id_usuario,
-        id_lugar: resena.id_lugar,
-        texto: resena.texto,
-        fecha: new Date(resena.fecha).toLocaleDateString('es-AR'),
+        id_lugar: resena.id_lugares,
+        texto: resena.comentario,
+        fecha: this.formatearFecha(resena.fecha_creacion),
         usuario: this.getNombreUsuario(resena.id_usuario),
         avatar: this.getRandomAvatar(resena.id_usuario),
-        rating: resena.puntuacion
+        rating: resena.calificacion
       }));
 
       console.log('Reseñas transformadas:', this.resenas);
@@ -171,16 +177,16 @@ export class HealthPage implements OnInit {
     await loading.present();
 
     try {
-      // Insertar en Supabase - usar nombre exacto "Reseñas"
+      // Insertar en Supabase
       const { data, error } = await supabase
-        .from('Reseñas')  // ← CON Ñ
+        .from('Lugares_resenas')
         .insert([
           {
             id_usuario: 1, // Por ahora usuario fijo
-            id_lugar: this.idLugarSeleccionado,
-            texto: this.nuevaResenaTexto.trim(),
-            puntuacion: this.nuevaResenaRating,
-            fecha: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+            id_lugares: this.idLugarSeleccionado,
+            comentario: this.nuevaResenaTexto.trim(),
+            calificacion: this.nuevaResenaRating,
+            fecha_creacion: new Date().toISOString()
           }
         ])
         .select()
@@ -195,14 +201,14 @@ export class HealthPage implements OnInit {
 
       // Agregar la nueva reseña localmente
       const nuevaResena: Resena = {
-        id_resenas: data.id_reseñas,  // Mapear id_reseñas → id_resenas
+        id_resenas: data.id_resenas,
         id_usuario: data.id_usuario,
-        id_lugar: data.id_lugar,
-        texto: data.texto,
-        fecha: new Date(data.fecha).toLocaleDateString('es-AR'),
-        usuario: 'Tú', // Por ahora fijo
+        id_lugar: data.id_lugares,
+        texto: data.comentario,
+        fecha: this.formatearFecha(data.fecha_creacion),
+        usuario: 'Tú',
         avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        rating: data.puntuacion
+        rating: data.calificacion
       };
 
       this.resenas.unshift(nuevaResena);
@@ -226,6 +232,22 @@ export class HealthPage implements OnInit {
       await this.mostrarToast('Error al publicar reseña: ' + error.message, 'danger');
     } finally {
       await loading.dismiss();
+    }
+  }
+
+  /**
+   * Formatear fecha de manera más robusta
+   */
+  private formatearFecha(fechaString: string): string {
+    try {
+      const fecha = new Date(fechaString);
+      return fecha.toLocaleDateString('es-AR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Fecha no disponible';
     }
   }
 
@@ -264,7 +286,8 @@ export class HealthPage implements OnInit {
       1: 'María González',
       2: 'Carlos Rodríguez', 
       3: 'Ana Martínez',
-      4: 'Javier López'
+      4: 'Javier López',
+      5: 'Tú'
     };
     return usuarios[idUsuario] || `Usuario ${idUsuario}`;
   }
@@ -277,7 +300,8 @@ export class HealthPage implements OnInit {
       1: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
       2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
       3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-      4: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+      4: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      5: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'
     };
     return avatars[idUsuario] || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
   }
@@ -313,12 +337,5 @@ export class HealthPage implements OnInit {
    */
   ionViewDidEnter() {
     console.log('Página de reseñas cargada para:', this.lugarSeleccionado);
-  }
-
-  /**
-   * Navegar de vuelta
-   */
-  volverALugares() {
-    this.navCtrl.navigateBack('/tabs/capture');
   }
 }

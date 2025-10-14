@@ -27,7 +27,8 @@ import {
   IonLoading,
   AlertController, 
   LoadingController,
-  ToastController
+  ToastController,
+  NavController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
@@ -43,13 +44,15 @@ import {
   trashOutline,
   refreshOutline,
   addOutline,
-  closeCircleOutline
+  closeCircleOutline,
+  chatbubbleOutline,
+  star
 } from 'ionicons/icons';
 
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// INTERFAZ
+// INTERFAZ MEJORADA CON DATOS DE RESEÑAS
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -57,6 +60,8 @@ export interface Lugar {
   categoria: string;
   descripcion: string;
   horario: string;
+  totalResenas?: number;
+  promedioRating?: number;
 }
 
 @Injectable({
@@ -95,7 +100,47 @@ export class CaptureService {
       throw new Error(`Error al obtener lugares: ${error.message}`);
     }
     
-    return data || [];
+    // Obtener estadísticas de reseñas para cada lugar
+    const lugaresConResenas = await Promise.all(
+      (data || []).map(async (lugar) => {
+        const estadisticas = await this.obtenerEstadisticasResenas(lugar.id_lugares!);
+        return {
+          ...lugar,
+          totalResenas: estadisticas.totalResenas,
+          promedioRating: estadisticas.promedioRating
+        };
+      })
+    );
+    
+    return lugaresConResenas;
+  }
+
+  async obtenerEstadisticasResenas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
+    try {
+      const { data, error } = await supabase
+        .from('Lugares_resenas')
+        .select('calificacion')
+        .eq('id_lugares', idLugar);
+
+      if (error) {
+        console.error('Error obteniendo estadísticas:', error);
+        return { totalResenas: 0, promedioRating: 0 };
+      }
+
+      const totalResenas = data?.length || 0;
+      
+      if (totalResenas === 0) {
+        return { totalResenas: 0, promedioRating: 0 };
+      }
+
+      const sumaRatings = data?.reduce((sum, resena) => sum + (resena.calificacion || 0), 0) || 0;
+      const promedioRating = sumaRatings / totalResenas;
+
+      return { totalResenas, promedioRating };
+    } catch (error) {
+      console.error('Error calculando estadísticas:', error);
+      return { totalResenas: 0, promedioRating: 0 };
+    }
   }
 
   async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
@@ -119,6 +164,17 @@ export class CaptureService {
   async eliminarLugar(id: number): Promise<void> {
     console.log('🔄 Eliminando lugar', id);
     
+    // Primero eliminar las reseñas asociadas
+    const { error: errorResenas } = await supabase
+      .from('Lugares_resenas')
+      .delete()
+      .eq('id_lugares', id);
+    
+    if (errorResenas) {
+      console.error('❌ Error eliminando reseñas del lugar:', errorResenas);
+    }
+    
+    // Luego eliminar el lugar
     const { error } = await supabase
       .from('Lugares')
       .delete()
@@ -170,6 +226,7 @@ export class CapturePage implements OnInit {
   private alertController = inject(AlertController);
   private loadingController = inject(LoadingController);
   private toastController = inject(ToastController);
+  private navCtrl = inject(NavController);
 
   lugares: Lugar[] = [];
   nuevoLugar: Lugar = {
@@ -196,7 +253,9 @@ export class CapturePage implements OnInit {
       trashOutline,
       refreshOutline,
       addOutline,
-      closeCircleOutline
+      closeCircleOutline,
+      chatbubbleOutline,
+      star
     });
   }
 
@@ -215,6 +274,22 @@ export class CapturePage implements OnInit {
     this.mostrarFormulario = false;
     this.lugarEditando = null;
     this.limpiarFormulario();
+  }
+
+  // 🎯 NAVEGACIÓN A RESEÑAS
+  verResenas(lugar: Lugar) {
+    if (!lugar.id_lugares) {
+      this.mostrarError('No se puede acceder a las reseñas de este lugar');
+      return;
+    }
+
+    this.navCtrl.navigateForward('/tabs/health', {
+      queryParams: {
+        id: lugar.id_lugares,
+        lugar: lugar.nombre,
+        categoria: lugar.categoria
+      }
+    });
   }
 
   // 🎯 FUNCIONES PRINCIPALES
@@ -297,7 +372,7 @@ export class CapturePage implements OnInit {
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
       header: '¿Eliminar lugar?',
-      message: 'Esta acción no se puede deshacer. El lugar será eliminado permanentemente.',
+      message: 'Esta acción eliminará el lugar y todas sus reseñas. No se puede deshacer.',
       buttons: [
         {
           text: 'Cancelar',
