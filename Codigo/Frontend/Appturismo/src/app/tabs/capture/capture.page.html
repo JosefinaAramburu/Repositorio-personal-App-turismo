@@ -1,48 +1,124 @@
 <ion-content>
-  <div class="login-container">
-    <ion-card class="login-card">
-      <ion-card-header>
-        <ion-card-title>Iniciar sesión</ion-card-title>
-      </ion-card-header>
+  <!-- Formulario para agregar/editar lugar -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        {{ lugarEditando ? 'Editar Lugar' : 'Agregar Nuevo Lugar' }}
+      </ion-card-title>
+    </ion-card-header>
 
-      <ion-card-content>
-        <form (ngSubmit)="login()">
-          <ion-item>
-            <ion-label position="floating">Correo electrónico</ion-label>
-            <ion-input 
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              required
-              autocomplete="email"
-            ></ion-input>
-          </ion-item>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="stacked">Nombre *</ion-label>
+        <ion-input 
+          [ngModel]="lugarEditando ? lugarEditando.nombre : nuevoLugar.nombre"
+          (ngModelChange)="lugarEditando ? lugarEditando.nombre = $event : nuevoLugar.nombre = $event"
+          placeholder="Nombre del lugar">
+        </ion-input>
+      </ion-item>
 
-          <ion-item>
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input 
-              type="password"
-              [(ngModel)]="password"
-              name="password"
-              required
-              autocomplete="current-password"
-            ></ion-input>
-          </ion-item>
+      <ion-item>
+        <ion-label position="stacked">Categoría *</ion-label>
+        <ion-input 
+          [ngModel]="lugarEditando ? lugarEditando.categoria : nuevoLugar.categoria"
+          (ngModelChange)="lugarEditando ? lugarEditando.categoria = $event : nuevoLugar.categoria = $event"
+          placeholder="Ej: Restaurante, Hotel, etc.">
+        </ion-input>
+      </ion-item>
 
-          <ion-button 
-            expand="block" 
-            type="submit" 
-            class="login-btn" 
-            [disabled]="!email || !password">
-            Ingresar
+      <ion-item>
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-textarea 
+          [ngModel]="lugarEditando ? lugarEditando.descripcion : nuevoLugar.descripcion"
+          (ngModelChange)="lugarEditando ? lugarEditando.descripcion = $event : nuevoLugar.descripcion = $event"
+          placeholder="Descripción del lugar">
+        </ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Horario</ion-label>
+        <ion-input 
+          [ngModel]="lugarEditando ? lugarEditando.horario : nuevoLugar.horario"
+          (ngModelChange)="lugarEditando ? lugarEditando.horario = $event : nuevoLugar.horario = $event"
+          placeholder="Ej: 9:00 - 18:00">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Precio</ion-label>
+        <ion-input 
+          [ngModel]="lugarEditando ? lugarEditando.precio : nuevoLugar.precio"
+          (ngModelChange)="lugarEditando ? lugarEditando.precio = $event : nuevoLugar.precio = $event"
+          placeholder="Ej: $, $$, $$$">
+        </ion-input>
+      </ion-item>
+
+      <div class="buttons-container">
+        <ion-button *ngIf="!lugarEditando" expand="block" (click)="crearLugar()" 
+                   [disabled]="!nuevoLugar.nombre || !nuevoLugar.categoria">
+          Agregar Lugar
+        </ion-button>
+        
+        <div *ngIf="lugarEditando" class="edit-buttons">
+          <ion-button expand="block" (click)="guardarEdicion()">
+            Guardar Cambios
           </ion-button>
+          <ion-button expand="block" fill="outline" (click)="cancelarEdicion()">
+            Cancelar
+          </ion-button>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
-          <div class="register-link">
-            <p>¿No tienes cuenta?</p>
-            <ion-button fill="clear" (click)="goToRegister()">Registrarme</ion-button>
+  <!-- Búsqueda -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Buscar Lugares</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item>
+        <ion-input 
+          [(ngModel)]="terminoBusqueda" 
+          placeholder="Buscar por nombre, categoría..."
+          (ionInput)="buscarLugares()">
+        </ion-input>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Lista de lugares -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Lugares ({{ lugares.length }})</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list>
+        <ion-item *ngFor="let lugar of lugares">
+          <ion-label>
+            <h2>{{ lugar.nombre }}</h2>
+            <ion-badge color="primary">{{ lugar.categoria }}</ion-badge>
+            <p>{{ lugar.descripcion }}</p>
+            <p><strong>Horario:</strong> {{ lugar.horario }}</p>
+            <p><strong>Precio:</strong> {{ lugar.precio }}</p>
+            <p><strong>Rating:</strong> {{ lugar.rating }}/5</p>
+          </ion-label>
+          <div class="action-buttons">
+            <ion-button fill="clear" color="warning" (click)="editarLugar(lugar)">
+              Editar
+            </ion-button>
+            <ion-button fill="clear" color="danger" (click)="eliminarLugar(lugar.id_lugares!)">
+              Eliminar
+            </ion-button>
           </div>
-        </form>
-      </ion-card-content>
-    </ion-card>
-  </div>
+        </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" (click)="cargarLugares()">
+        Actualizar Lista
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

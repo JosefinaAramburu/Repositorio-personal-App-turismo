@@ -1,8 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { CaptureService, Lugar } from './capture.service';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
+import { 
+  IonContent, 
+  IonCard, 
+  IonCardHeader, 
+  IonCardTitle, 
+  IonCardContent, 
+  IonItem, 
+  IonLabel, 
+  IonInput, 
+  IonButton,
+  IonList,
+  IonTextarea,
+  IonBadge
+} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-capture',
@@ -19,68 +32,170 @@ import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonIt
     IonItem,
     IonLabel,
     IonInput,
-    IonButton
+    IonButton,
+    IonList,
+    IonTextarea,
+    IonBadge
   ]
 })
 export class CapturePage implements OnInit {
-  email: string = '';
-  password: string = '';
+  lugares: Lugar[] = [];
+  nuevoLugar: any = {
+    id_destino: 1,
+    nombre: '',
+    categoria: '',
+    descripcion: '',
+    horario: '',
+    precio: '',
+    rating: 0,
+    ciudad: '',
+    pais: ''
+  };
+  lugarEditando: any = null;
+  terminoBusqueda: string = '';
 
   constructor(
-    private router: Router,
+    private captureService: CaptureService,
     private alertController: AlertController,
     private loadingController: LoadingController
   ) {}
 
   ngOnInit() {
-    // ✅ Verificar si ya está logueado al cargar la página
-    this.checkIfLoggedIn();
+    this.cargarLugares();
   }
 
-  checkIfLoggedIn() {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (isLoggedIn) {
-      this.router.navigate(['/home']);
+  async cargarLugares() {
+    try {
+      const loading = await this.loadingController.create({
+        message: 'Cargando lugares...',
+      });
+      await loading.present();
+
+      this.lugares = await this.captureService.obtenerLugares();
+      await loading.dismiss();
+    } catch (error: any) {
+      await this.loadingController.dismiss();
+      this.mostrarError('Error al cargar lugares: ' + error.message);
     }
   }
 
-  async login() {
-    if (!this.email || !this.password) {
-      this.showAlert('Error', 'Por favor completa todos los campos.');
+  async crearLugar() {
+    if (!this.nuevoLugar.nombre || !this.nuevoLugar.categoria) {
+      this.mostrarError('Nombre y categoría son obligatorios');
       return;
     }
 
-    const loading = await this.loadingController.create({
-      message: 'Iniciando sesión...',
-      spinner: 'crescent',
-      duration: 1500,
-    });
-    await loading.present();
+    try {
+      const loading = await this.loadingController.create({
+        message: 'Creando lugar...',
+      });
+      await loading.present();
 
-    // Simulación de autenticación
-    setTimeout(() => {
-      loading.dismiss();
-      if (this.email === 'usuario@test.com' && this.password === '1234') {
-        // ✅ Guardar estado de login
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', this.email);
-        
-        this.router.navigate(['/home']);
-      } else {
-        this.showAlert('Credenciales inválidas', 'El correo o la contraseña son incorrectos.');
-      }
-    }, 1500);
+      await this.captureService.crearLugar(this.nuevoLugar);
+      
+      this.nuevoLugar = {
+        id_destino: 1,
+        nombre: '',
+        categoria: '',
+        descripcion: '',
+        horario: '',
+        precio: '',
+        rating: 0,
+        ciudad: '',
+        pais: ''
+      };
+
+      await this.cargarLugares();
+      await loading.dismiss();
+      this.mostrarExito('Lugar creado exitosamente');
+    } catch (error: any) {
+      await this.loadingController.dismiss();
+      this.mostrarError('Error al crear lugar: ' + error.message);
+    }
   }
 
-  goToRegister() {
-    this.router.navigate(['/register']);
+  editarLugar(lugar: Lugar) {
+    this.lugarEditando = { ...lugar };
   }
 
-  async showAlert(header: string, message: string) {
+  async guardarEdicion() {
+    if (!this.lugarEditando) return;
+
+    try {
+      const loading = await this.loadingController.create({
+        message: 'Actualizando lugar...',
+      });
+      await loading.present();
+
+      await this.captureService.actualizarLugar(this.lugarEditando.id_lugares, this.lugarEditando);
+      
+      this.lugarEditando = null;
+      await this.cargarLugares();
+      await loading.dismiss();
+      this.mostrarExito('Lugar actualizado exitosamente');
+    } catch (error: any) {
+      await this.loadingController.dismiss();
+      this.mostrarError('Error al actualizar lugar: ' + error.message);
+    }
+  }
+
+  cancelarEdicion() {
+    this.lugarEditando = null;
+  }
+
+  async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
-      header,
-      message,
-      buttons: ['Aceptar'],
+      header: 'Confirmar',
+      message: '¿Estás seguro de que quieres eliminar este lugar?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: async () => {
+            try {
+              await this.captureService.eliminarLugar(id);
+              this.mostrarExito('Lugar eliminado exitosamente');
+              await this.cargarLugares();
+            } catch (error: any) {
+              this.mostrarError('Error al eliminar lugar: ' + error.message);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async buscarLugares() {
+    if (!this.terminoBusqueda.trim()) {
+      this.cargarLugares();
+      return;
+    }
+
+    try {
+      this.lugares = await this.captureService.buscarLugares(this.terminoBusqueda);
+    } catch (error: any) {
+      this.mostrarError('Error al buscar lugares: ' + error.message);
+    }
+  }
+
+  async mostrarError(mensaje: string) {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: mensaje,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
+
+  async mostrarExito(mensaje: string) {
+    const alert = await this.alertController.create({
+      header: 'Éxito',
+      message: mensaje,
+      buttons: ['OK']
     });
     await alert.present();
   }
