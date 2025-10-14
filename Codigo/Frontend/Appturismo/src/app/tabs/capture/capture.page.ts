@@ -12,8 +12,7 @@ import {
   IonInput, 
   IonButton,
   IonList,
-  IonTextarea,
-  IonBadge
+  IonTextarea
 } from '@ionic/angular/standalone';
 
 import { Injectable } from '@angular/core';
@@ -93,22 +92,7 @@ class CaptureService {
     }
     return { success: true };
   }
-
-  // BUSCAR lugares
-  async buscarLugares(termino: string): Promise<Lugar[]> {
-    const { data, error } = await supabase
-      .from('Lugares')
-      .select('*')
-      .or(`nombre.ilike.%${termino}%,categoria.ilike.%${termino}%,descripcion.ilike.%${termino}%`);
-    
-    if (error) {
-      console.error('Error buscando lugares:', error);
-      throw error;
-    }
-    return data || [];
-  }
 }
-// === FIN DEL SERVICE TEMPORAL ===
 
 @Component({
   selector: 'app-capture',
@@ -127,10 +111,9 @@ class CaptureService {
     IonInput,
     IonButton,
     IonList,
-    IonTextarea,
-    IonBadge
+    IonTextarea
   ],
-  providers: [CaptureService] // ← Agregar el service como provider
+  providers: [CaptureService]
 })
 export class CapturePage implements OnInit {
   lugares: Lugar[] = [];
@@ -146,7 +129,6 @@ export class CapturePage implements OnInit {
     pais: ''
   };
   lugarEditando: any = null;
-  terminoBusqueda: string = '';
 
   constructor(
     private captureService: CaptureService,
@@ -261,19 +243,6 @@ export class CapturePage implements OnInit {
       ]
     });
     await alert.present();
-  }
-
-  async buscarLugares() {
-    if (!this.terminoBusqueda.trim()) {
-      this.cargarLugares();
-      return;
-    }
-
-    try {
-      this.lugares = await this.captureService.buscarLugares(this.terminoBusqueda);
-    } catch (error: any) {
-      this.mostrarError('Error al buscar lugares: ' + error.message);
-    }
   }
 
   async mostrarError(mensaje: string) {

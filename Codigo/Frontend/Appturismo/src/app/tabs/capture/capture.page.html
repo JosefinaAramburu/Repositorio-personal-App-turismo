@@ -56,7 +56,7 @@
       <div class="buttons-container">
         <ion-button *ngIf="!lugarEditando" expand="block" (click)="crearLugar()" 
                    [disabled]="!nuevoLugar.nombre || !nuevoLugar.categoria">
-          Agregar Lugar
+          {{ lugarEditando ? 'Actualizar Lugar' : 'Agregar Lugar' }}
         </ion-button>
         
         <div *ngIf="lugarEditando" class="edit-buttons">
@@ -71,27 +71,10 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Búsqueda -->
+  <!-- Lista de lugares (más simple) -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Buscar Lugares</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-      <ion-item>
-        <ion-input 
-          [(ngModel)]="terminoBusqueda" 
-          placeholder="Buscar por nombre, categoría..."
-          (ionInput)="buscarLugares()">
-        </ion-input>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Lista de lugares -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Lugares ({{ lugares.length }})</ion-card-title>
+      <ion-card-title>Mis Lugares ({{ lugares.length }})</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
@@ -99,11 +82,10 @@
         <ion-item *ngFor="let lugar of lugares">
           <ion-label>
             <h2>{{ lugar.nombre }}</h2>
-            <ion-badge color="primary">{{ lugar.categoria }}</ion-badge>
+            <p><strong>Categoría:</strong> {{ lugar.categoria }}</p>
             <p>{{ lugar.descripcion }}</p>
             <p><strong>Horario:</strong> {{ lugar.horario }}</p>
             <p><strong>Precio:</strong> {{ lugar.precio }}</p>
-            <p><strong>Rating:</strong> {{ lugar.rating }}/5</p>
           </ion-label>
           <div class="action-buttons">
             <ion-button fill="clear" color="warning" (click)="editarLugar(lugar)">
@@ -117,7 +99,7 @@
       </ion-list>
 
       <ion-button expand="block" (click)="cargarLugares()">
-        Actualizar Lista
+        Recargar Lugares
       </ion-button>
     </ion-card-content>
   </ion-card>
