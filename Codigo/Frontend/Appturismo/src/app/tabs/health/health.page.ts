@@ -62,6 +62,7 @@ export class HealthPage implements OnInit {
   nuevaResenaRating: number = 0;
   isLoading: boolean = false;
   resenas: Resena[] = [];
+  usuarioActualId: number = 1; // Cambiar según el usuario logueado
 
   constructor() {
     addIcons({
@@ -78,52 +79,102 @@ export class HealthPage implements OnInit {
       
       console.log('📍 Lugar seleccionado:', this.lugarSeleccionado, 'ID:', this.idLugarSeleccionado);
       
-      await this.diagnosticarTablas();
+      await this.verificarUsuario();
       await this.cargarResenas();
     });
   }
 
   /**
-   * DIAGNÓSTICO DE TABLAS
+   * VERIFICAR QUE EXISTE EL USUARIO
    */
-  async diagnosticarTablas() {
+  async verificarUsuario() {
     try {
-      console.log('🔍 INICIANDO DIAGNÓSTICO...');
+      console.log('🔍 Verificando usuario ID:', this.usuarioActualId);
       
-      // 1. Verificar que el lugar existe
-      const { data: lugar, error: errorLugar } = await supabase
-        .from('Lugares')
-        .select('*')
-        .eq('id_lugares', this.idLugarSeleccionado)
+      const { data: usuario, error } = await supabase
+        .from('Usuario')
+        .select('id_usuario')
+        .eq('id_usuario', this.usuarioActualId)
         .single();
-      
-      console.log('📍 Lugar encontrado:', lugar);
-      if (errorLugar) console.error('❌ Error buscando lugar:', errorLugar);
-      
-      // 2. Verificar relaciones existentes para este lugar
-      const { data: relaciones, error: errorRelaciones } = await supabase
-        .from('Lugares_Resenas')
-        .select('*')
-        .eq('id_lugares', this.idLugarSeleccionado);
-      
-      console.log('🔗 Relaciones encontradas:', relaciones);
-      if (errorRelaciones) console.error('❌ Error relaciones:', errorRelaciones);
-      
-      // 3. Verificar todas las reseñas
-      const { data: todasResenas, error: errorTodasResenas } = await supabase
-        .from('Resenas')
-        .select('*');
-      
-      console.log('📝 Todas las reseñas:', todasResenas);
-      if (errorTodasResenas) console.error('❌ Error todas reseñas:', errorTodasResenas);
+
+      if (error) {
+        console.error('❌ Usuario no encontrado:', error);
+        
+        // Crear usuario por defecto si no existe
+        await this.crearUsuarioPorDefecto();
+      } else {
+        console.log('✅ Usuario encontrado:', usuario);
+      }
       
     } catch (error) {
-      console.error('❌ Error en diagnóstico:', error);
+      console.error('❌ Error verificando usuario:', error);
+      await this.crearUsuarioPorDefecto();
     }
   }
 
   /**
-   * CARGAR RESEÑAS - VERSIÓN SIMPLIFICADA Y ROBUSTA
+   * CREAR USUARIO POR DEFECTO SI NO EXISTE
+   */
+  async crearUsuarioPorDefecto() {
+    try {
+      console.log('🔄 Creando usuario por defecto...');
+      
+      const usuarioData = {
+        nombre: 'Usuario',
+        apellido: 'Demo',
+        email: 'demo@example.com',
+        contraseña: 'password123',
+        fecha_nacimiento: '1990-01-01'
+      };
+
+      const { data: nuevoUsuario, error } = await supabase
+        .from('Usuario')
+        .insert([usuarioData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ Error creando usuario:', error);
+        
+        // Si falla, buscar cualquier usuario existente
+        await this.buscarUsuarioExistente();
+      } else {
+        this.usuarioActualId = nuevoUsuario.id_usuario;
+        console.log('✅ Usuario creado con ID:', this.usuarioActualId);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error creando usuario por defecto:', error);
+    }
+  }
+
+  /**
+   * BUSCAR CUALQUIER USUARIO EXISTENTE
+   */
+  async buscarUsuarioExistente() {
+    try {
+      console.log('🔍 Buscando usuario existente...');
+      
+      const { data: usuarios, error } = await supabase
+        .from('Usuario')
+        .select('id_usuario')
+        .limit(1);
+
+      if (!error && usuarios && usuarios.length > 0) {
+        this.usuarioActualId = usuarios[0].id_usuario;
+        console.log('✅ Usando usuario existente ID:', this.usuarioActualId);
+      } else {
+        console.error('❌ No hay usuarios en la base de datos');
+        await this.mostrarToast('Error: No hay usuarios configurados en el sistema', 'danger');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error buscando usuario existente:', error);
+    }
+  }
+
+  /**
+   * CARGAR RESEÑAS
    */
   async cargarResenas() {
     if (this.isLoading) return;
@@ -138,38 +189,17 @@ export class HealthPage implements OnInit {
     try {
       console.log('🔄 Cargando reseñas para lugar ID:', this.idLugarSeleccionado);
 
-      // PRIMERO: Verificar que tenemos un ID válido
       if (!this.idLugarSeleccionado || this.idLugarSeleccionado <= 0) {
         throw new Error('ID de lugar inválido');
       }
 
-      // OPCIÓN A: Usar consulta directa si hay problemas con las relaciones
-      console.log('🔍 Probando consulta directa...');
-      
-      const { data: reseñasDirectas, error: errorDirecto } = await supabase
-        .from('Resenas')
-        .select('*')
-        .order('fecha', { ascending: false });
-
-      if (!errorDirecto && reseñasDirectas) {
-        console.log('✅ Reseñas cargadas directamente:', reseñasDirectas.length);
-        // Por ahora, mostrar todas las reseñas (luego filtramos por lugar)
-        this.resenas = reseñasDirectas.map(resena => this.transformarResena(resena));
-        await loading.dismiss();
-        this.isLoading = false;
-        return;
-      }
-
-      // OPCIÓN B: Usar el método original con relaciones
-      console.log('🔍 Probando con relaciones...');
-      
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('Lugares_Resenas')
         .select('id_resenas')
         .eq('id_lugares', this.idLugarSeleccionado);
 
       if (errorRelaciones) {
-        console.error('❌ Error con relaciones:', errorRelaciones);
+        console.error('❌ Error cargando relaciones:', errorRelaciones);
         throw errorRelaciones;
       }
 
@@ -212,7 +242,7 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * AGREGAR RESEÑA - VERSIÓN MÁS ROBUSTA
+   * AGREGAR RESEÑA - CON MANEJO DE USUARIO
    */
   async agregarResena() {
     if (!this.nuevaResenaTexto.trim()) {
@@ -230,6 +260,12 @@ export class HealthPage implements OnInit {
       return;
     }
 
+    // Verificar que tenemos un usuario válido
+    if (!this.usuarioActualId || this.usuarioActualId <= 0) {
+      await this.mostrarToast('Error: No se pudo identificar el usuario', 'danger');
+      return;
+    }
+
     const loading = await this.loadingController.create({
       message: 'Publicando reseña...',
       spinner: 'crescent'
@@ -238,13 +274,14 @@ export class HealthPage implements OnInit {
 
     try {
       console.log('🔄 Iniciando creación de reseña...');
+      console.log('👤 Usando usuario ID:', this.usuarioActualId);
 
       // PASO 1: Crear la reseña en la tabla principal
       const resenaData = {
-        id_usuario: 1, // Usuario temporal - cambiar por usuario real
+        id_usuario: this.usuarioActualId, // Usar el ID verificado
         texto: this.nuevaResenaTexto.trim(),
         puntuacion: this.nuevaResenaRating,
-        fecha: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+        fecha: new Date().toISOString().split('T')[0]
       };
 
       console.log('📝 Datos de reseña:', resenaData);
@@ -257,6 +294,14 @@ export class HealthPage implements OnInit {
 
       if (errorResena) {
         console.error('❌ Error creando reseña:', errorResena);
+        
+        if (errorResena.code === '23503') { // Foreign key violation
+          await this.mostrarToast('Error: Problema con el usuario. Intentando resolver...', 'warning');
+          await this.verificarUsuario(); // Reintentar verificar usuario
+          await loading.dismiss();
+          return;
+        }
+        
         throw new Error(`No se pudo crear la reseña: ${errorResena.message}`);
       }
 
@@ -316,7 +361,7 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * TRANSFORMAR RESEÑA - MÉTODO AUXILIAR
+   * TRANSFORMAR RESEÑA
    */
   private transformarResena(resena: any): Resena {
     return {
@@ -364,22 +409,24 @@ export class HealthPage implements OnInit {
 
   private getNombreUsuario(idUsuario: number): string {
     const usuarios: { [key: number]: string } = {
-      1: 'María González', 
-      2: 'Carlos Rodríguez', 
-      3: 'Ana Martínez',
-      4: 'Javier López', 
-      5: 'Tú'
+      1: 'Usuario Demo',
+      2: 'María González', 
+      3: 'Carlos Rodríguez', 
+      4: 'Ana Martínez',
+      5: 'Javier López', 
+      6: 'Tú'
     };
     return usuarios[idUsuario] || `Usuario ${idUsuario}`;
   }
 
   private getRandomAvatar(idUsuario: number): string {
     const avatars: { [key: number]: string } = {
-      1: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-      2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', 
-      4: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-      5: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'
+      1: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      2: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+      3: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      4: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', 
+      5: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      6: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'
     };
     return avatars[idUsuario] || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
   }
