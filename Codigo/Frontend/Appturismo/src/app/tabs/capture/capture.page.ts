@@ -16,7 +16,6 @@ import {
   IonBadge
 } from '@ionic/angular/standalone';
 
-// === SERVICE TEMPORAL DENTRO DEL MISMO ARCHIVO ===
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
