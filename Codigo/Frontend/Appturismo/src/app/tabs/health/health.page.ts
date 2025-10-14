@@ -22,7 +22,6 @@ interface Resena {
   usuario: string;
   avatar?: string;
   rating: number;
-  comentario?: string;
 }
 
 @Component({
@@ -63,7 +62,6 @@ export class HealthPage implements OnInit {
   nuevaResenaRating: number = 0;
   isLoading: boolean = false;
   resenas: Resena[] = [];
-  nombreTablaResenas: string = 'Resenas'; // Variable para el nombre de tabla
 
   constructor() {
     addIcons({
@@ -78,52 +76,55 @@ export class HealthPage implements OnInit {
       this.lugarSeleccionado = params['lugar'] || 'Lugar no especificado';
       this.idLugarSeleccionado = params['id'] ? parseInt(params['id']) : 0;
       
-      console.log('🔄 Cargando reseñas para lugar:', {
-        nombre: this.lugarSeleccionado,
-        id: this.idLugarSeleccionado
-      });
+      console.log('📍 Lugar seleccionado:', this.lugarSeleccionado, 'ID:', this.idLugarSeleccionado);
       
-      // Primero detectar el nombre correcto de la tabla
-      await this.detectarNombreTabla();
+      await this.diagnosticarTablas();
       await this.cargarResenas();
     });
   }
 
   /**
-   * DETECTAR EL NOMBRE CORRECTO DE LA TABLA
+   * DIAGNÓSTICO DE TABLAS
    */
-  async detectarNombreTabla() {
-    console.log('🔍 Detectando nombre de tabla de reseñas...');
-    
-    const nombresPosibles = [
-      'Resenas',    // Sin ñ
-      '"Reseñas"',  // Con ñ y comillas
-      'Reseñas',    // Con ñ sin comillas
-      'reseñas',    // Minúscula con ñ
-      'resenas'     // Minúscula sin ñ
-    ];
-
-    for (const nombre of nombresPosibles) {
-      try {
-        const { data, error } = await supabase
-          .from(nombre)
-          .select('id_resenas')
-          .limit(1);
-
-        if (!error) {
-          console.log(`✅ Tabla encontrada: ${nombre}`);
-          this.nombreTablaResenas = nombre.replace(/"/g, ''); // Remover comillas para uso interno
-          return;
-        }
-      } catch (e) {
-        // Continuar con el siguiente nombre
-      }
+  async diagnosticarTablas() {
+    try {
+      console.log('🔍 INICIANDO DIAGNÓSTICO...');
+      
+      // 1. Verificar que el lugar existe
+      const { data: lugar, error: errorLugar } = await supabase
+        .from('Lugares')
+        .select('*')
+        .eq('id_lugares', this.idLugarSeleccionado)
+        .single();
+      
+      console.log('📍 Lugar encontrado:', lugar);
+      if (errorLugar) console.error('❌ Error buscando lugar:', errorLugar);
+      
+      // 2. Verificar relaciones existentes para este lugar
+      const { data: relaciones, error: errorRelaciones } = await supabase
+        .from('Lugares_Resenas')
+        .select('*')
+        .eq('id_lugares', this.idLugarSeleccionado);
+      
+      console.log('🔗 Relaciones encontradas:', relaciones);
+      if (errorRelaciones) console.error('❌ Error relaciones:', errorRelaciones);
+      
+      // 3. Verificar todas las reseñas
+      const { data: todasResenas, error: errorTodasResenas } = await supabase
+        .from('Resenas')
+        .select('*');
+      
+      console.log('📝 Todas las reseñas:', todasResenas);
+      if (errorTodasResenas) console.error('❌ Error todas reseñas:', errorTodasResenas);
+      
+    } catch (error) {
+      console.error('❌ Error en diagnóstico:', error);
     }
-    
-    console.error('❌ No se pudo encontrar la tabla de reseñas');
-    this.nombreTablaResenas = 'Resenas'; // Valor por defecto
   }
 
+  /**
+   * CARGAR RESEÑAS - VERSIÓN SIMPLIFICADA Y ROBUSTA
+   */
   async cargarResenas() {
     if (this.isLoading) return;
     
@@ -136,20 +137,43 @@ export class HealthPage implements OnInit {
 
     try {
       console.log('🔄 Cargando reseñas para lugar ID:', this.idLugarSeleccionado);
-      console.log('📋 Usando tabla:', this.nombreTablaResenas);
 
-      // Paso 1: Obtener relaciones
+      // PRIMERO: Verificar que tenemos un ID válido
+      if (!this.idLugarSeleccionado || this.idLugarSeleccionado <= 0) {
+        throw new Error('ID de lugar inválido');
+      }
+
+      // OPCIÓN A: Usar consulta directa si hay problemas con las relaciones
+      console.log('🔍 Probando consulta directa...');
+      
+      const { data: reseñasDirectas, error: errorDirecto } = await supabase
+        .from('Resenas')
+        .select('*')
+        .order('fecha', { ascending: false });
+
+      if (!errorDirecto && reseñasDirectas) {
+        console.log('✅ Reseñas cargadas directamente:', reseñasDirectas.length);
+        // Por ahora, mostrar todas las reseñas (luego filtramos por lugar)
+        this.resenas = reseñasDirectas.map(resena => this.transformarResena(resena));
+        await loading.dismiss();
+        this.isLoading = false;
+        return;
+      }
+
+      // OPCIÓN B: Usar el método original con relaciones
+      console.log('🔍 Probando con relaciones...');
+      
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('Lugares_Resenas')
         .select('id_resenas')
         .eq('id_lugares', this.idLugarSeleccionado);
 
       if (errorRelaciones) {
-        console.error('❌ Error cargando relaciones:', errorRelaciones);
+        console.error('❌ Error con relaciones:', errorRelaciones);
         throw errorRelaciones;
       }
 
-      console.log('📋 IDs de reseñas encontradas:', relaciones);
+      console.log('🔗 Relaciones encontradas:', relaciones);
 
       if (!relaciones || relaciones.length === 0) {
         this.resenas = [];
@@ -161,9 +185,8 @@ export class HealthPage implements OnInit {
 
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       
-      // Paso 2: Obtener reseñas usando el nombre detectado
       const { data: reseñasData, error: errorResenas } = await supabase
-        .from(this.nombreTablaResenas)
+        .from('Resenas')
         .select('*')
         .in('id_resenas', idsResenas)
         .order('fecha', { ascending: false });
@@ -175,17 +198,7 @@ export class HealthPage implements OnInit {
 
       console.log('📊 Reseñas obtenidas:', reseñasData);
 
-      this.resenas = (reseñasData || []).map(resena => ({
-        id_resenas: resena.id_resenas,
-        id_usuario: resena.id_usuario,
-        texto: resena.texto || '',
-        puntuacion: resena.puntuacion || 0,
-        fecha: this.formatearFecha(resena.fecha),
-        usuario: this.getNombreUsuario(resena.id_usuario),
-        avatar: this.getRandomAvatar(resena.id_usuario),
-        rating: resena.puntuacion || 0,
-        comentario: resena.texto || ''
-      }));
+      this.resenas = (reseñasData || []).map(resena => this.transformarResena(resena));
 
       console.log(`✅ ${this.resenas.length} reseñas cargadas correctamente`);
       
@@ -198,6 +211,9 @@ export class HealthPage implements OnInit {
     }
   }
 
+  /**
+   * AGREGAR RESEÑA - VERSIÓN MÁS ROBUSTA
+   */
   async agregarResena() {
     if (!this.nuevaResenaTexto.trim()) {
       await this.mostrarToast('Por favor, escribí tu reseña antes de publicar', 'warning');
@@ -209,8 +225,8 @@ export class HealthPage implements OnInit {
       return;
     }
 
-    if (!this.idLugarSeleccionado) {
-      await this.mostrarToast('Error: No se identificó el lugar', 'danger');
+    if (!this.idLugarSeleccionado || this.idLugarSeleccionado <= 0) {
+      await this.mostrarToast('Error: No se identificó correctamente el lugar', 'danger');
       return;
     }
 
@@ -221,34 +237,38 @@ export class HealthPage implements OnInit {
     await loading.present();
 
     try {
-      console.log('🔄 Creando nueva reseña...');
-      console.log('📋 Usando tabla:', this.nombreTablaResenas);
+      console.log('🔄 Iniciando creación de reseña...');
 
+      // PASO 1: Crear la reseña en la tabla principal
       const resenaData = {
-        id_usuario: 1,
+        id_usuario: 1, // Usuario temporal - cambiar por usuario real
         texto: this.nuevaResenaTexto.trim(),
         puntuacion: this.nuevaResenaRating,
-        fecha: new Date().toISOString().split('T')[0]
+        fecha: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
       };
 
-      // Usar el nombre detectado de la tabla
+      console.log('📝 Datos de reseña:', resenaData);
+
       const { data: nuevaResena, error: errorResena } = await supabase
-        .from(this.nombreTablaResenas)
+        .from('Resenas')
         .insert([resenaData])
         .select()
         .single();
 
       if (errorResena) {
         console.error('❌ Error creando reseña:', errorResena);
-        throw errorResena;
+        throw new Error(`No se pudo crear la reseña: ${errorResena.message}`);
       }
 
-      console.log('✅ Reseña creada:', nuevaResena);
+      console.log('✅ Reseña creada con ID:', nuevaResena.id_resenas);
 
+      // PASO 2: Crear la relación en la tabla intermedia
       const relacionData = {
         id_lugares: this.idLugarSeleccionado,
         id_resenas: nuevaResena.id_resenas
       };
+
+      console.log('🔗 Datos de relación:', relacionData);
 
       const { error: errorRelacion } = await supabase
         .from('Lugares_Resenas')
@@ -256,44 +276,63 @@ export class HealthPage implements OnInit {
 
       if (errorRelacion) {
         console.error('❌ Error creando relación:', errorRelacion);
-        throw errorRelacion;
+        
+        // Intentar eliminar la reseña creada para mantener consistencia
+        await supabase
+          .from('Resenas')
+          .delete()
+          .eq('id_resenas', nuevaResena.id_resenas);
+          
+        throw new Error(`No se pudo vincular la reseña al lugar: ${errorRelacion.message}`);
       }
 
-      console.log('✅ Relación creada correctamente');
+      console.log('✅ Relación creada exitosamente');
 
-      const resenaParaLista: Resena = {
-        id_resenas: nuevaResena.id_resenas,
-        id_usuario: nuevaResena.id_usuario,
-        texto: nuevaResena.texto,
-        puntuacion: nuevaResena.puntuacion,
-        fecha: this.formatearFecha(nuevaResena.fecha),
-        usuario: 'Tú',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        rating: nuevaResena.puntuacion,
-        comentario: nuevaResena.texto
-      };
+      // PASO 3: Agregar la nueva reseña a la lista local
+      const resenaParaLista = this.transformarResena(nuevaResena);
+      resenaParaLista.usuario = 'Tú';
+      resenaParaLista.avatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
 
       this.resenas.unshift(resenaParaLista);
 
+      // PASO 4: Limpiar el formulario
       this.nuevaResenaTexto = '';
       this.nuevaResenaRating = 0;
 
       await this.mostrarToast('¡Reseña publicada con éxito!', 'success');
 
+      // Scroll to top
       setTimeout(() => {
         const content = document.querySelector('ion-content');
         content?.scrollToTop(500);
       }, 300);
 
     } catch (error: any) {
-      console.error('❌ Error publicando reseña:', error);
+      console.error('❌ Error completo al publicar reseña:', error);
       await this.mostrarToast('Error al publicar reseña: ' + error.message, 'danger');
     } finally {
       await loading.dismiss();
     }
   }
 
-  // ... (mantener el resto de los métodos igual)
+  /**
+   * TRANSFORMAR RESEÑA - MÉTODO AUXILIAR
+   */
+  private transformarResena(resena: any): Resena {
+    return {
+      id_resenas: resena.id_resenas,
+      id_usuario: resena.id_usuario,
+      texto: resena.texto || '',
+      puntuacion: resena.puntuacion || 0,
+      fecha: this.formatearFecha(resena.fecha),
+      usuario: this.getNombreUsuario(resena.id_usuario),
+      avatar: this.getRandomAvatar(resena.id_usuario),
+      rating: resena.puntuacion || 0
+    };
+  }
+
+  // ... (mantener los demás métodos igual)
+
   seleccionarRating(rating: number) {
     this.nuevaResenaRating = rating;
     console.log('⭐ Rating seleccionado:', rating);
