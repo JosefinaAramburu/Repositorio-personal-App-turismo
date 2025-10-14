@@ -52,7 +52,7 @@ import {
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// INTERFAZ MEJORADA CON DATOS DE RESEÑAS - CORREGIDA
+// INTERFAZ MEJORADA
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -60,8 +60,8 @@ export interface Lugar {
   categoria: string;
   descripcion: string;
   horario: string;
-  totalResenas: number;      // ← Cambiado de opcional a requerido
-  promedioRating: number;    // ← Cambiado de opcional a requerido
+  totalResenas: number;
+  promedioRating: number;
 }
 
 @Injectable({
@@ -72,7 +72,6 @@ export class CaptureService {
   async crearLugar(lugar: Lugar): Promise<any> {
     console.log('🔄 Creando lugar:', lugar);
     
-    // Solo enviar los campos necesarios a Supabase
     const lugarParaInsertar = {
       id_destino: lugar.id_destino,
       nombre: lugar.nombre,
@@ -109,14 +108,13 @@ export class CaptureService {
       throw new Error(`Error al obtener lugares: ${error.message}`);
     }
     
-    // Obtener estadísticas de reseñas para cada lugar
     const lugaresConResenas = await Promise.all(
       (data || []).map(async (lugar) => {
         const estadisticas = await this.obtenerEstadisticasResenas(lugar.id_lugares!);
         return {
           ...lugar,
-          totalResenas: estadisticas.totalResenas || 0,        // ← Valor por defecto
-          promedioRating: estadisticas.promedioRating || 0     // ← Valor por defecto
+          totalResenas: estadisticas.totalResenas || 0,
+          promedioRating: estadisticas.promedioRating || 0
         };
       })
     );
@@ -126,28 +124,50 @@ export class CaptureService {
 
   async obtenerEstadisticasResenas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
     try {
-      const { data, error } = await supabase
-        .from('Lugares_resenas')
-        .select('calificacion')
+      console.log('📊 Obteniendo estadísticas para lugar:', idLugar);
+
+      const { data: relaciones, error: errorRelaciones } = await supabase
+        .from('Lugares_Resenas')
+        .select('id_resenas')
         .eq('id_lugares', idLugar);
 
-      if (error) {
-        console.error('Error obteniendo estadísticas:', error);
+      if (errorRelaciones) {
+        console.error('❌ Error obteniendo relaciones:', errorRelaciones);
         return { totalResenas: 0, promedioRating: 0 };
       }
 
-      const totalResenas = data?.length || 0;
+      if (!relaciones || relaciones.length === 0) {
+        return { totalResenas: 0, promedioRating: 0 };
+      }
+
+      const idsResenas = relaciones.map(rel => rel.id_resenas);
+      
+      const { data: reseñasData, error: errorResenas } = await supabase
+        .from('Resenas')
+        .select('puntuacion')
+        .in('id_resenas', idsResenas);
+
+      if (errorResenas) {
+        console.error('❌ Error obteniendo reseñas:', errorResenas);
+        return { totalResenas: 0, promedioRating: 0 };
+      }
+
+      const totalResenas = reseñasData?.length || 0;
       
       if (totalResenas === 0) {
         return { totalResenas: 0, promedioRating: 0 };
       }
 
-      const sumaRatings = data?.reduce((sum, resena) => sum + (resena.calificacion || 0), 0) || 0;
+      const sumaRatings = reseñasData?.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0) || 0;
       const promedioRating = sumaRatings / totalResenas;
 
-      return { totalResenas, promedioRating };
+      return { 
+        totalResenas, 
+        promedioRating: Number(promedioRating.toFixed(2)) 
+      };
+
     } catch (error) {
-      console.error('Error calculando estadísticas:', error);
+      console.error('❌ Error calculando estadísticas:', error);
       return { totalResenas: 0, promedioRating: 0 };
     }
   }
@@ -155,7 +175,6 @@ export class CaptureService {
   async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
     console.log('🔄 Actualizando lugar', id, updates);
     
-    // Solo actualizar campos editables, no las estadísticas
     const { totalResenas, promedioRating, ...camposEditables } = updates;
     
     const { data, error } = await supabase
@@ -176,17 +195,15 @@ export class CaptureService {
   async eliminarLugar(id: number): Promise<void> {
     console.log('🔄 Eliminando lugar', id);
     
-    // Primero eliminar las reseñas asociadas
-    const { error: errorResenas } = await supabase
-      .from('Lugares_resenas')
+    const { error: errorRelaciones } = await supabase
+      .from('Lugares_Resenas')
       .delete()
       .eq('id_lugares', id);
     
-    if (errorResenas) {
-      console.error('❌ Error eliminando reseñas del lugar:', errorResenas);
+    if (errorRelaciones) {
+      console.error('❌ Error eliminando relaciones de reseñas:', errorRelaciones);
     }
     
-    // Luego eliminar el lugar
     const { error } = await supabase
       .from('Lugares')
       .delete()
@@ -247,8 +264,8 @@ export class CapturePage implements OnInit {
     categoria: '',
     descripcion: '',
     horario: '',
-    totalResenas: 0,      // ← Valor por defecto agregado
-    promedioRating: 0     // ← Valor por defecto agregado
+    totalResenas: 0,
+    promedioRating: 0
   };
   lugarEditando: Lugar | null = null;
   mostrarFormulario = false;
@@ -277,7 +294,6 @@ export class CapturePage implements OnInit {
     this.cargarLugares();
   }
 
-  // 🎯 FUNCIONES DE NAVEGACIÓN
   abrirFormulario() {
     this.mostrarFormulario = true;
     this.lugarEditando = null;
@@ -290,7 +306,6 @@ export class CapturePage implements OnInit {
     this.limpiarFormulario();
   }
 
-  // 🎯 NAVEGACIÓN A RESEÑAS
   verResenas(lugar: Lugar) {
     if (!lugar.id_lugares) {
       this.mostrarError('No se puede acceder a las reseñas de este lugar');
@@ -306,7 +321,6 @@ export class CapturePage implements OnInit {
     });
   }
 
-  // 🎯 FUNCIONES PRINCIPALES
   async cargarLugares() {
     if (this.isLoading) return;
     
@@ -422,7 +436,6 @@ export class CapturePage implements OnInit {
     await alert.present();
   }
 
-  // 🎯 FUNCIONES DE DISEÑO Y UTILIDAD
   getCategoriaIcon(categoria: string): string {
     const iconMap: { [key: string]: string } = {
       'Monumento': 'business-outline',
@@ -471,7 +484,6 @@ export class CapturePage implements OnInit {
     return colorMap[categoria] || 'medium';
   }
 
-  // 🎯 FUNCIONES PRIVADAS
   private validarFormulario(): boolean {
     if (!this.nuevoLugar.nombre?.trim()) {
       this.mostrarError('El nombre del lugar es obligatorio');
@@ -507,8 +519,8 @@ export class CapturePage implements OnInit {
       categoria: '',
       descripcion: '',
       horario: '',
-      totalResenas: 0,      // ← Valor por defecto agregado
-      promedioRating: 0     // ← Valor por defecto agregado
+      totalResenas: 0,
+      promedioRating: 0
     };
   }
 

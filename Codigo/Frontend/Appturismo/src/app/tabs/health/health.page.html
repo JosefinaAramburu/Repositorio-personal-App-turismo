@@ -70,7 +70,7 @@
                     <span 
                       *ngFor="let star of [1,2,3,4,5]" 
                       class="star-symbol-small"
-                      [class.active]="star <= resena.rating">
+                      [class.active]="star <= resena.puntuacion">  <!-- CORREGIDO: rating → puntuacion -->
                       ★
                     </span>
                   </div>
@@ -80,7 +80,7 @@
             </div>
           </div>
 
-          <p class="review-text">{{resena.texto}}</p>
+          <p class="review-text">{{resena.texto}}</p>  <!-- CORREGIDO: comentario → texto -->
         </ion-card-content>
       </ion-card>
     </div>

@@ -1,6 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CapturePage } from './capture.page';
 import { AlertController, LoadingController, ToastController, NavController } from '@ionic/angular';
+import { CaptureService } from './capture.page';
+
+// Mocks más específicos para TypeScript
+class MockAlertElement {
+  present = jasmine.createSpy('present').and.returnValue(Promise.resolve());
+  onDidDismiss = jasmine.createSpy('onDidDismiss').and.returnValue(Promise.resolve({ role: 'cancel' }));
+}
+
+class MockLoadingElement {
+  present = jasmine.createSpy('present').and.returnValue(Promise.resolve());
+  dismiss = jasmine.createSpy('dismiss').and.returnValue(Promise.resolve());
+}
+
+class MockToastElement {
+  present = jasmine.createSpy('present').and.returnValue(Promise.resolve());
+}
 
 class MockCaptureService {
   crearLugar = jasmine.createSpy('crearLugar').and.returnValue(Promise.resolve({
@@ -30,31 +46,48 @@ class MockNavController {
 describe('CapturePage', () => {
   let component: CapturePage;
   let fixture: ComponentFixture<CapturePage>;
+  let alertControllerSpy: jasmine.SpyObj<AlertController>;
+  let loadingControllerSpy: jasmine.SpyObj<LoadingController>;
+  let toastControllerSpy: jasmine.SpyObj<ToastController>;
+  let navControllerSpy: jasmine.SpyObj<NavController>;
 
   beforeEach(async () => {
-    const mockCaptureService = new MockCaptureService();
-    const alertControllerSpy = jasmine.createSpyObj('AlertController', ['create']);
-    const loadingControllerSpy = jasmine.createSpyObj('LoadingController', ['create']);
-    const toastControllerSpy = jasmine.createSpyObj('ToastController', ['create']);
-    const navControllerSpy = jasmine.createSpyObj('NavController', ['navigateForward']);
+    // Crear spies más específicos
+    alertControllerSpy = jasmine.createSpyObj('AlertController', ['create']);
+    loadingControllerSpy = jasmine.createSpyObj('LoadingController', ['create']);
+    toastControllerSpy = jasmine.createSpyObj('ToastController', ['create']);
+    navControllerSpy = jasmine.createSpyObj('NavController', ['navigateForward']);
 
+    // Configurar los spies con tipos más específicos
     alertControllerSpy.create.and.returnValue(Promise.resolve({
       present: () => Promise.resolve(),
-      onDidDismiss: () => Promise.resolve({ role: 'cancel' })
-    }));
+      onDidDismiss: () => Promise.resolve({ role: 'cancel' }),
+      // Propiedades mínimas requeridas para HTMLIonAlertElement
+      el: {} as any,
+      dismiss: () => Promise.resolve(),
+      role: 'alert'
+    } as any));
     
     loadingControllerSpy.create.and.returnValue(Promise.resolve({
       present: () => Promise.resolve(),
-      dismiss: () => Promise.resolve()
-    }));
+      dismiss: () => Promise.resolve(),
+      // Propiedades mínimas requeridas para HTMLIonLoadingElement
+      el: {} as any,
+      role: 'loading'
+    } as any));
     
     toastControllerSpy.create.and.returnValue(Promise.resolve({
-      present: () => Promise.resolve()
-    }));
+      present: () => Promise.resolve(),
+      // Propiedades mínimas requeridas para HTMLIonToastElement
+      el: {} as any,
+      dismiss: () => Promise.resolve(),
+      role: 'toast'
+    } as any));
 
     await TestBed.configureTestingModule({
       imports: [CapturePage],
       providers: [
+        { provide: CaptureService, useClass: MockCaptureService },
         { provide: AlertController, useValue: alertControllerSpy },
         { provide: LoadingController, useValue: loadingControllerSpy },
         { provide: ToastController, useValue: toastControllerSpy },
@@ -83,28 +116,6 @@ describe('CapturePage', () => {
       promedioRating: 0
     });
     expect(component.lugarEditando).toBeNull();
-  });
-
-  it('should validate form correctly', () => {
-    // Acceder a métodos privados usando bracket notation
-    component.nuevoLugar.nombre = 'Test';
-    component.nuevoLugar.categoria = 'Category';
-    expect(component['validarFormulario']()).toBeTrue();
-
-    component.nuevoLugar.nombre = '';
-    expect(component['validarFormulario']()).toBeFalse();
-  });
-
-  it('should clean form correctly', () => {
-    component.nuevoLugar.nombre = 'Test';
-    component.nuevoLugar.totalResenas = 5;
-    component.nuevoLugar.promedioRating = 4.5;
-    
-    component['limpiarFormulario']();
-    
-    expect(component.nuevoLugar.nombre).toBe('');
-    expect(component.nuevoLugar.totalResenas).toBe(0);
-    expect(component.nuevoLugar.promedioRating).toBe(0);
   });
 
   it('should set editing place', () => {
@@ -194,29 +205,6 @@ describe('CapturePage', () => {
     expect(navCtrl.navigateForward).not.toHaveBeenCalled();
   });
 
-  it('should validate edit form correctly', () => {
-    const testLugar = {
-      id_lugares: 1,
-      id_destino: 1,
-      nombre: 'Test',
-      categoria: 'Category',
-      descripcion: 'Desc',
-      horario: '9-18',
-      totalResenas: 3,
-      promedioRating: 4.2
-    };
-
-    component.lugarEditando = { ...testLugar };
-    expect(component['validarFormularioEdicion']()).toBeTrue();
-
-    component.lugarEditando!.nombre = '';
-    expect(component['validarFormularioEdicion']()).toBeFalse();
-
-    component.lugarEditando!.nombre = 'Test';
-    component.lugarEditando!.categoria = '';
-    expect(component['validarFormularioEdicion']()).toBeFalse();
-  });
-
   it('should get categoria icon correctly', () => {
     expect(component.getCategoriaIcon('Monumento')).toBe('business-outline');
     expect(component.getCategoriaIcon('Museo')).toBe('library-outline');
@@ -233,5 +221,50 @@ describe('CapturePage', () => {
     expect(component.getCategoriaColor('Monumento')).toBe('warning');
     expect(component.getCategoriaColor('Museo')).toBe('tertiary');
     expect(component.getCategoriaColor('Unknown')).toBe('medium');
+  });
+
+  // Tests para métodos privados usando any para bypass TypeScript
+  it('should validate form correctly', () => {
+    component.nuevoLugar.nombre = 'Test';
+    component.nuevoLugar.categoria = 'Category';
+    expect((component as any).validarFormulario()).toBeTrue();
+
+    component.nuevoLugar.nombre = '';
+    expect((component as any).validarFormulario()).toBeFalse();
+  });
+
+  it('should clean form correctly', () => {
+    component.nuevoLugar.nombre = 'Test';
+    component.nuevoLugar.totalResenas = 5;
+    component.nuevoLugar.promedioRating = 4.5;
+    
+    (component as any).limpiarFormulario();
+    
+    expect(component.nuevoLugar.nombre).toBe('');
+    expect(component.nuevoLugar.totalResenas).toBe(0);
+    expect(component.nuevoLugar.promedioRating).toBe(0);
+  });
+
+  it('should validate edit form correctly', () => {
+    const testLugar = {
+      id_lugares: 1,
+      id_destino: 1,
+      nombre: 'Test',
+      categoria: 'Category',
+      descripcion: 'Desc',
+      horario: '9-18',
+      totalResenas: 3,
+      promedioRating: 4.2
+    };
+
+    component.lugarEditando = { ...testLugar };
+    expect((component as any).validarFormularioEdicion()).toBeTrue();
+
+    component.lugarEditando!.nombre = '';
+    expect((component as any).validarFormularioEdicion()).toBeFalse();
+
+    component.lugarEditando!.nombre = 'Test';
+    component.lugarEditando!.categoria = '';
+    expect((component as any).validarFormularioEdicion()).toBeFalse();
   });
 });
