@@ -20,12 +20,18 @@ import {
   ToastController,
   NavController,
   LoadingController,
-  IonBadge
+  IonBadge,
+  IonIcon,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { supabase } from '../../supabase';
 
+// Agregar estos iconos
+import { addIcons } from 'ionicons';
+import { refreshOutline, createOutline } from 'ionicons/icons';
+
 interface Resena {
-  id_reseñas?: number;
+  id_resenas?: number;
   id_usuario: number;
   id_lugar: number;
   texto: string;
@@ -57,7 +63,9 @@ interface Resena {
     IonAvatar,
     IonBackButton,
     IonButtons,
-    IonBadge
+    IonBadge,
+    IonIcon,
+    IonSpinner
   ],
 })
 export class HealthPage implements OnInit {
@@ -73,6 +81,13 @@ export class HealthPage implements OnInit {
   isLoading: boolean = false;
   
   resenas: Resena[] = [];
+
+  constructor() {
+    addIcons({
+      refreshOutline,
+      createOutline
+    });
+  }
 
   async ngOnInit() {
     this.route.queryParams.subscribe(async (params) => {
@@ -98,8 +113,9 @@ export class HealthPage implements OnInit {
     await loading.present();
 
     try {
+      // Usar el nombre exacto de tu tabla "Reseñas" (con ñ)
       const { data, error } = await supabase
-        .from('Reseñas')
+        .from('Reseñas')  // ← CON Ñ
         .select('*')
         .eq('id_lugar', this.idLugarSeleccionado)
         .order('fecha', { ascending: false });
@@ -113,7 +129,7 @@ export class HealthPage implements OnInit {
 
       // Transformar datos de Supabase a nuestro formato
       this.resenas = (data || []).map(resena => ({
-        id_reseñas: resena.id_reseñas,
+        id_resenas: resena.id_reseñas,  // Mapear id_reseñas → id_resenas
         id_usuario: resena.id_usuario,
         id_lugar: resena.id_lugar,
         texto: resena.texto,
@@ -155,9 +171,9 @@ export class HealthPage implements OnInit {
     await loading.present();
 
     try {
-      // Insertar en Supabase
+      // Insertar en Supabase - usar nombre exacto "Reseñas"
       const { data, error } = await supabase
-        .from('Reseñas')
+        .from('Reseñas')  // ← CON Ñ
         .insert([
           {
             id_usuario: 1, // Por ahora usuario fijo
@@ -179,7 +195,7 @@ export class HealthPage implements OnInit {
 
       // Agregar la nueva reseña localmente
       const nuevaResena: Resena = {
-        id_reseñas: data.id_reseñas,
+        id_resenas: data.id_reseñas,  // Mapear id_reseñas → id_resenas
         id_usuario: data.id_usuario,
         id_lugar: data.id_lugar,
         texto: data.texto,
