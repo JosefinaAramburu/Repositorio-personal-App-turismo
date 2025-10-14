@@ -1,10 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, NavController, ToastController } from '@ionic/angular';
+import { 
+  IonHeader, 
+  IonToolbar, 
+  IonTitle, 
+  IonContent, 
+  IonCard, 
+  IonCardContent, 
+  IonCardHeader, 
+  IonCardTitle, 
+  IonCardSubtitle,
+  IonButton,
+  IonTextarea,
+  IonAvatar,
+  IonBackButton,
+  IonButtons,
+  ToastController,
+  NavController,
+  LoadingController,
+  IonBadge
+} from '@ionic/angular/standalone';
+import { supabase } from '../../supabase';
 
 interface Resena {
+  id_reseñas?: number;
+  id_usuario: number;
+  id_lugar: number;
   texto: string;
   fecha: string;
   usuario: string;
@@ -17,59 +40,102 @@ interface Resena {
   templateUrl: './health.page.html',
   styleUrls: ['./health.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonCard,
+    IonCardContent,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardSubtitle,
+    IonButton,
+    IonTextarea,
+    IonAvatar,
+    IonBackButton,
+    IonButtons,
+    IonBadge
+  ],
 })
 export class HealthPage implements OnInit {
+  private toastController = inject(ToastController);
+  private loadingController = inject(LoadingController);
+  private navCtrl = inject(NavController);
+  private route = inject(ActivatedRoute);
+
   lugarSeleccionado: string = 'Lugar no especificado';
+  idLugarSeleccionado: number = 0;
   nuevaResenaTexto: string = '';
   nuevaResenaRating: number = 0;
+  isLoading: boolean = false;
   
-  resenas: Resena[] = [
-    { 
-      texto: 'Hermoso lugar, muy limpio y bien mantenido. La arquitectura es impresionante y vale totalmente la pena visitarlo. Recomiendo ir temprano para evitar multitudes.', 
-      fecha: '14/09/2025', 
-      usuario: 'María González',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-      rating: 5
-    },
-    { 
-      texto: 'Muy interesante, pero algo lleno. La experiencia fue buena aunque había mucha gente. Los guías son muy conocedores y las explicaciones muy completas.', 
-      fecha: '21/09/2025', 
-      usuario: 'Carlos Rodríguez',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      rating: 4
-    },
-    { 
-      texto: 'Increíble experiencia cultural. La historia del lugar es fascinante y la preservación es excelente. Perfecto para visitar en familia.', 
-      fecha: '05/10/2025', 
-      usuario: 'Ana Martínez',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-      rating: 5
-    },
-    { 
-      texto: 'Buen lugar pero un poco caro. La entrada podría tener mejor precio considerando lo que ofrece. Aún así, recomiendo la visita.', 
-      fecha: '08/10/2025', 
-      usuario: 'Javier López',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-      rating: 3
-    }
-  ];
+  resenas: Resena[] = [];
 
-  constructor(
-    private route: ActivatedRoute, 
-    private navCtrl: NavController,
-    private toastController: ToastController
-  ) {}
-
-  ngOnInit() {
-    this.route.queryParams.subscribe((params) => {
+  async ngOnInit() {
+    this.route.queryParams.subscribe(async (params) => {
       this.lugarSeleccionado = params['lugar'] || 'Lugar no especificado';
-      console.log('Lugar seleccionado:', this.lugarSeleccionado);
+      this.idLugarSeleccionado = params['id'] ? parseInt(params['id']) : 0;
+      console.log('Lugar seleccionado:', this.lugarSeleccionado, 'ID:', this.idLugarSeleccionado);
+      
+      await this.cargarResenas();
     });
   }
 
   /**
-   * Agregar una nueva reseña
+   * Cargar reseñas desde Supabase
+   */
+  async cargarResenas() {
+    if (this.isLoading) return;
+    
+    this.isLoading = true;
+    const loading = await this.loadingController.create({
+      message: 'Cargando reseñas...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+
+    try {
+      const { data, error } = await supabase
+        .from('Reseñas')
+        .select('*')
+        .eq('id_lugar', this.idLugarSeleccionado)
+        .order('fecha', { ascending: false });
+
+      if (error) {
+        console.error('Error cargando reseñas:', error);
+        throw error;
+      }
+
+      console.log('Datos crudos de Supabase:', data);
+
+      // Transformar datos de Supabase a nuestro formato
+      this.resenas = (data || []).map(resena => ({
+        id_reseñas: resena.id_reseñas,
+        id_usuario: resena.id_usuario,
+        id_lugar: resena.id_lugar,
+        texto: resena.texto,
+        fecha: new Date(resena.fecha).toLocaleDateString('es-AR'),
+        usuario: this.getNombreUsuario(resena.id_usuario),
+        avatar: this.getRandomAvatar(resena.id_usuario),
+        rating: resena.puntuacion
+      }));
+
+      console.log('Reseñas transformadas:', this.resenas);
+      
+    } catch (error: any) {
+      console.error('Error:', error);
+      await this.mostrarToast('Error al cargar reseñas: ' + error.message, 'danger');
+    } finally {
+      await loading.dismiss();
+      this.isLoading = false;
+    }
+  }
+
+  /**
+   * Agregar una nueva reseña a la base de datos
    */
   async agregarResena() {
     if (!this.nuevaResenaTexto.trim()) {
@@ -77,31 +143,74 @@ export class HealthPage implements OnInit {
       return;
     }
 
-    const nuevaResena: Resena = {
-      texto: this.nuevaResenaTexto.trim(),
-      fecha: new Date().toLocaleDateString('es-AR'),
-      usuario: 'Tú',
-      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-      rating: this.nuevaResenaRating || 5
-    };
+    if (this.nuevaResenaRating === 0) {
+      await this.mostrarToast('Por favor, seleccioná una calificación', 'warning');
+      return;
+    }
 
-    // Agregar la nueva reseña al inicio del array
-    this.resenas.unshift(nuevaResena);
-    
-    // Limpiar formulario
-    this.nuevaResenaTexto = '';
-    this.nuevaResenaRating = 0;
+    const loading = await this.loadingController.create({
+      message: 'Publicando reseña...',
+      spinner: 'crescent'
+    });
+    await loading.present();
 
-    // Mostrar mensaje de éxito
-    await this.mostrarToast('¡Reseña publicada con éxito!', 'success');
+    try {
+      // Insertar en Supabase
+      const { data, error } = await supabase
+        .from('Reseñas')
+        .insert([
+          {
+            id_usuario: 1, // Por ahora usuario fijo
+            id_lugar: this.idLugarSeleccionado,
+            texto: this.nuevaResenaTexto.trim(),
+            puntuacion: this.nuevaResenaRating,
+            fecha: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+          }
+        ])
+        .select()
+        .single();
 
-    // Scroll to top para ver la nueva reseña
-    setTimeout(() => {
-      const content = document.querySelector('ion-content');
-      if (content) {
-        content.scrollToTop(500);
+      if (error) {
+        console.error('Error creando reseña:', error);
+        throw error;
       }
-    }, 300);
+
+      console.log('Reseña creada en Supabase:', data);
+
+      // Agregar la nueva reseña localmente
+      const nuevaResena: Resena = {
+        id_reseñas: data.id_reseñas,
+        id_usuario: data.id_usuario,
+        id_lugar: data.id_lugar,
+        texto: data.texto,
+        fecha: new Date(data.fecha).toLocaleDateString('es-AR'),
+        usuario: 'Tú', // Por ahora fijo
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        rating: data.puntuacion
+      };
+
+      this.resenas.unshift(nuevaResena);
+
+      // Limpiar formulario
+      this.nuevaResenaTexto = '';
+      this.nuevaResenaRating = 0;
+
+      await this.mostrarToast('¡Reseña publicada con éxito!', 'success');
+
+      // Scroll to top para ver la nueva reseña
+      setTimeout(() => {
+        const content = document.querySelector('ion-content');
+        if (content) {
+          content.scrollToTop(500);
+        }
+      }, 300);
+
+    } catch (error: any) {
+      console.error('Error:', error);
+      await this.mostrarToast('Error al publicar reseña: ' + error.message, 'danger');
+    } finally {
+      await loading.dismiss();
+    }
   }
 
   /**
@@ -132,14 +241,40 @@ export class HealthPage implements OnInit {
   }
 
   /**
+   * Obtener nombre de usuario (por ahora simulado)
+   */
+  private getNombreUsuario(idUsuario: number): string {
+    const usuarios: { [key: number]: string } = {
+      1: 'María González',
+      2: 'Carlos Rodríguez', 
+      3: 'Ana Martínez',
+      4: 'Javier López'
+    };
+    return usuarios[idUsuario] || `Usuario ${idUsuario}`;
+  }
+
+  /**
+   * Generar avatar aleatorio consistente por usuario
+   */
+  private getRandomAvatar(idUsuario: number): string {
+    const avatars: { [key: number]: string } = {
+      1: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+      2: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      3: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      4: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
+    };
+    return avatars[idUsuario] || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+  }
+
+  /**
    * Mostrar toast de notificación
    */
-  async mostrarToast(mensaje: string, tipo: string = 'warning') {
+  private async mostrarToast(mensaje: string, color: string = 'warning') {
     const toast = await this.toastController.create({
       message: mensaje,
-      duration: 2000,
+      duration: 3000,
       position: 'bottom',
-      color: tipo === 'success' ? 'success' : 'warning',
+      color: color,
       buttons: [
         {
           text: 'OK',
@@ -151,6 +286,13 @@ export class HealthPage implements OnInit {
   }
 
   /**
+   * Recargar reseñas
+   */
+  async recargarResenas() {
+    await this.cargarResenas();
+  }
+
+  /**
    * Lifecycle hook - cuando la página entra
    */
   ionViewDidEnter() {
@@ -158,14 +300,7 @@ export class HealthPage implements OnInit {
   }
 
   /**
-   * Lifecycle hook - cuando la página sale
-   */
-  ionViewWillLeave() {
-    console.log('Saliendo de la página de reseñas');
-  }
-
-  /**
-   * Navegar de vuelta a lugares
+   * Navegar de vuelta
    */
   volverALugares() {
     this.navCtrl.navigateBack('/tabs/capture');

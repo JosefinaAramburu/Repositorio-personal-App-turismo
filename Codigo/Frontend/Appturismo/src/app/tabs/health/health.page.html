@@ -3,7 +3,12 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/capture" text="Atrás"></ion-back-button>
     </ion-buttons>
-    <ion-title> Reseñas</ion-title>
+    <ion-title>Reseñas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="recargarResenas()" fill="clear">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -17,8 +22,11 @@
           <div class="stat">
             <span class="star-symbol">★</span>
             <span class="rating">{{obtenerPromedioRating()}}</span>
-            <span class="reviews-count">({{resenas.length}} reseñas)</span>
+            <span class="reviews-count">({{resenas.length}} reseña{{resenas.length !== 1 ? 's' : ''}})</span>
           </div>
+          <ion-badge *ngIf="resenas.length > 0" color="success">
+            {{resenas.length}} opinione{{resenas.length !== 1 ? 's' : ''}}
+          </ion-badge>
         </div>
       </div>
     </div>
@@ -53,7 +61,7 @@
           <div class="review-header">
             <div class="user-info">
               <ion-avatar class="user-avatar">
-                <img [src]="resena.avatar || 'assets/avatar-default.png'" alt="Usuario">
+                <img [src]="resena.avatar || 'assets/avatar-default.png'" alt="Usuario" (error)="resena.avatar = 'assets/avatar-default.png'">
               </ion-avatar>
               <div class="user-details">
                 <h4 class="user-name">{{resena.usuario}}</h4>
@@ -73,17 +81,29 @@
           </div>
 
           <p class="review-text">{{resena.texto}}</p>
+          
+          <div class="review-footer" *ngIf="resena.id_reseñas">
+            <ion-badge color="light">ID: {{resena.id_reseñas}}</ion-badge>
+          </div>
         </ion-card-content>
       </ion-card>
     </div>
   </div>
 
   <!-- Sin Reseñas Mejorado -->
-  <div *ngIf="resenas.length === 0" class="empty-reviews">
+  <div *ngIf="resenas.length === 0 && !isLoading" class="empty-reviews">
     <div class="empty-content">
       <span class="empty-icon">💬</span>
       <h3>No hay reseñas aún</h3>
       <p>Sé el primero en compartir tu experiencia en {{lugarSeleccionado}}</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-content">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando reseñas...</p>
     </div>
   </div>
 
@@ -140,9 +160,9 @@
           expand="block" 
           color="primary" 
           (click)="agregarResena()"
-          [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0"
+          [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0 || isLoading"
           class="submit-button">
-          <span slot="start">📝</span>
+          <ion-icon name="create-outline" slot="start"></ion-icon>
           Publicar Reseña
         </ion-button>
       </ion-card-content>
