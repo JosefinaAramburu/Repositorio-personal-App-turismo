@@ -3,6 +3,7 @@
   <ion-card>
     <ion-card-header>
       <ion-card-title>
+        <ion-icon name="{{ lugarEditando ? 'create-outline' : 'add-circle-outline' }}"></ion-icon>
         {{ lugarEditando ? 'Editar Lugar' : 'Agregar Nuevo Lugar' }}
       </ion-card-title>
     </ion-card-header>
@@ -13,7 +14,8 @@
         <ion-input 
           [ngModel]="lugarEditando ? lugarEditando.nombre : nuevoLugar.nombre"
           (ngModelChange)="lugarEditando ? lugarEditando.nombre = $event : nuevoLugar.nombre = $event"
-          placeholder="Nombre del lugar">
+          placeholder="Ingresa el nombre del lugar"
+          required>
         </ion-input>
       </ion-item>
 
@@ -22,7 +24,8 @@
         <ion-input 
           [ngModel]="lugarEditando ? lugarEditando.categoria : nuevoLugar.categoria"
           (ngModelChange)="lugarEditando ? lugarEditando.categoria = $event : nuevoLugar.categoria = $event"
-          placeholder="Ej: Restaurante, Hotel, etc.">
+          placeholder="Ej: Monumento, Restaurante, Parque"
+          required>
         </ion-input>
       </ion-item>
 
@@ -31,7 +34,8 @@
         <ion-textarea 
           [ngModel]="lugarEditando ? lugarEditando.descripcion : nuevoLugar.descripcion"
           (ngModelChange)="lugarEditando ? lugarEditando.descripcion = $event : nuevoLugar.descripcion = $event"
-          placeholder="Descripción del lugar">
+          placeholder="Describe el lugar..."
+          rows="3">
         </ion-textarea>
       </ion-item>
 
@@ -49,21 +53,25 @@
         <ion-input 
           [ngModel]="lugarEditando ? lugarEditando.precio : nuevoLugar.precio"
           (ngModelChange)="lugarEditando ? lugarEditando.precio = $event : nuevoLugar.precio = $event"
-          placeholder="Ej: $, $$, $$$">
+          placeholder="Ej: Gratis, €, €€, €€€">
         </ion-input>
       </ion-item>
 
       <div class="buttons-container">
         <ion-button *ngIf="!lugarEditando" expand="block" (click)="crearLugar()" 
-                   [disabled]="!nuevoLugar.nombre || !nuevoLugar.categoria">
-          {{ lugarEditando ? 'Actualizar Lugar' : 'Agregar Lugar' }}
+                   [disabled]="!nuevoLugar.nombre?.trim() || !nuevoLugar.categoria?.trim()"
+                   color="primary">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Agregar Lugar
         </ion-button>
         
         <div *ngIf="lugarEditando" class="edit-buttons">
-          <ion-button expand="block" (click)="guardarEdicion()">
+          <ion-button expand="block" (click)="guardarEdicion()" color="success">
+            <ion-icon name="checkmark-outline" slot="start"></ion-icon>
             Guardar Cambios
           </ion-button>
-          <ion-button expand="block" fill="outline" (click)="cancelarEdicion()">
+          <ion-button expand="block" fill="outline" color="medium" (click)="cancelarEdicion()">
+            <ion-icon name="close-outline" slot="start"></ion-icon>
             Cancelar
           </ion-button>
         </div>
@@ -71,34 +79,57 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- Lista de lugares (más simple) -->
+  <!-- Lista de lugares -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Mis Lugares ({{ lugares.length }})</ion-card-title>
+      <ion-card-title class="list-title">
+        <ion-icon name="location-outline"></ion-icon>
+        Mis Lugares ({{ lugares.length }})
+      </ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
-      <ion-list>
-        <ion-item *ngFor="let lugar of lugares">
-          <ion-label>
-            <h2>{{ lugar.nombre }}</h2>
-            <p><strong>Categoría:</strong> {{ lugar.categoria }}</p>
-            <p>{{ lugar.descripcion }}</p>
-            <p><strong>Horario:</strong> {{ lugar.horario }}</p>
-            <p><strong>Precio:</strong> {{ lugar.precio }}</p>
+      <!-- Estado vacío -->
+      <div *ngIf="lugares.length === 0" class="empty-state">
+        <ion-icon name="map-outline" class="empty-icon"></ion-icon>
+        <h3>No hay lugares guardados</h3>
+        <p>Agrega tu primer lugar usando el formulario superior</p>
+      </div>
+
+      <!-- Lista de lugares -->
+      <ion-list *ngIf="lugares.length > 0" class="places-list">
+        <ion-item *ngFor="let lugar of lugares" class="place-item">
+          <ion-label class="place-content">
+            <h2 class="place-name">{{ lugar.nombre }}</h2>
+            <div class="place-category">
+              <ion-badge color="primary">{{ lugar.categoria }}</ion-badge>
+            </div>
+            <p class="place-description" *ngIf="lugar.descripcion">{{ lugar.descripcion }}</p>
+            <div class="place-details">
+              <div class="detail-item" *ngIf="lugar.horario">
+                <ion-icon name="time-outline"></ion-icon>
+                <span>{{ lugar.horario }}</span>
+              </div>
+              <div class="detail-item" *ngIf="lugar.precio">
+                <ion-icon name="cash-outline"></ion-icon>
+                <span>{{ lugar.precio }}</span>
+              </div>
+            </div>
           </ion-label>
-          <div class="action-buttons">
-            <ion-button fill="clear" color="warning" (click)="editarLugar(lugar)">
-              Editar
+          <div class="action-buttons" slot="end">
+            <ion-button fill="clear" color="warning" (click)="editarLugar(lugar)" size="small">
+              <ion-icon name="create-outline"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" color="danger" (click)="eliminarLugar(lugar.id_lugares!)">
-              Eliminar
+            <ion-button fill="clear" color="danger" (click)="eliminarLugar(lugar.id_lugares!)" size="small">
+              <ion-icon name="trash-outline"></ion-icon>
             </ion-button>
           </div>
         </ion-item>
       </ion-list>
 
-      <ion-button expand="block" (click)="cargarLugares()">
+      <!-- Botón de recargar -->
+      <ion-button expand="block" fill="outline" (click)="cargarLugares()" class="reload-button">
+        <ion-icon name="refresh-outline" slot="start"></ion-icon>
         Recargar Lugares
       </ion-button>
     </ion-card-content>
