@@ -107,12 +107,24 @@ ion-header {
     margin-bottom: 8px;
   }
   
-  ion-input, ion-textarea, ion-select {
-    -padding-start: 12px;
-  --padding-end: 12px;
-  --color: black; /* ✅ Esto cambia el color del texto */
-  color: black; 
+  ion-input,
+  ion-textarea,
+  ion-select {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --color: #000; /* ✅ Texto ingresado o existente negro */
+    color: #000 !important; /* ✅ Forzar color del texto */
   }
+
+  /* Label dentro del input (placeholder) */
+  ion-label {
+    color: #222 !important;
+  }
+}
+
+ion-item {
+  --color: #000; /* ✅ Color general de texto dentro de los ion-item */
+  --highlight-color-focused: #3b82f6;
 }
 
 .form-buttons {
@@ -380,17 +392,4 @@ ion-loading {
     --box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
     transform: scale(1.05);
   }
-}
-/* Forzar color de texto en inputs y textareas */
-ion-input, ion-textarea {
-  --color: #000; /* texto negro */
-  color: #000;
-}
-
-ion-item {
-  --highlight-color-focused: #3b82f6; /* azul al hacer foco (opcional) */
-}
-
-.input-label {
-  color: #222 !important; /* título del input en gris oscuro */
 }
