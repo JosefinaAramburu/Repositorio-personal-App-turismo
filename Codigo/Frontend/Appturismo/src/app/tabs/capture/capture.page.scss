@@ -65,14 +65,24 @@ ion-header {
   }
 }
 
-// FORMULARIO
+// 🔥🔥🔥 FORMULARIO - TEXTO NEGRO FORZADO 🔥🔥🔥
 .form-container {
   padding: 16px;
   animation: fadeIn 0.3s ease-in;
   
+  // FORZAR TEXTO NEGRO EN TODO EL FORMULARIO
+  * {
+    color: black !important;
+  }
+  
   .form-card {
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    
+    // Forzar negro en toda la tarjeta del formulario
+    * {
+      color: black !important;
+    }
     
     .form-title {
       display: flex;
@@ -80,7 +90,7 @@ ion-header {
       gap: 8px;
       font-size: 1.3rem;
       font-weight: 700;
-      color: #1e293b;
+      color: black !important;
       
       ion-icon {
         color: #3b82f6;
@@ -89,7 +99,7 @@ ion-header {
     }
     
     ion-card-subtitle {
-      color: #64748b;
+      color: black !important;
       font-size: 0.9rem;
     }
   }
@@ -102,29 +112,103 @@ ion-header {
   
   .input-label {
     font-weight: 600;
-    color: black;
+    color: black !important;
     font-size: 0.9rem;
     margin-bottom: 8px;
   }
   
+  // 🔥 FORZAR NEGRO EN TODOS LOS INPUTS
   ion-input,
   ion-textarea,
   ion-select {
-    --padding-start: 12px;
-    --padding-end: 12px;
-    --color: #000; /* ✅ Texto ingresado o existente negro */
-    color: #000 !important; /* ✅ Forzar color del texto */
+    --color: black !important;
+    --placeholder-color: #6b7280 !important;
+    color: black !important;
+    font-weight: 600 !important;
+    
+    // Forzar en todas las partes posibles
+    &::part(input),
+    &::part(textarea),
+    &::part(native) {
+      color: black !important;
+      font-weight: 600 !important;
+    }
+    
+    // Cuando está enfocado - MÁS NEGRITA
+    &.ion-focused {
+      font-weight: 700 !important;
+      
+      &::part(input),
+      &::part(textarea),
+      &::part(native) {
+        font-weight: 700 !important;
+      }
+    }
+    
+    // Cuando tiene valor
+    &.has-value {
+      font-weight: 600 !important;
+      
+      &::part(input),
+      &::part(textarea),
+      &::part(native) {
+        font-weight: 600 !important;
+      }
+    }
   }
-
-  /* Label dentro del input (placeholder) */
-  ion-label {
-    color: #222 !important;
+  
+  // 🔥 FORZAR para inputs con datos existentes (edición)
+  ion-input[ng-reflect-model],
+  ion-textarea[ng-reflect-model],
+  ion-input[value],
+  ion-textarea[value] {
+    font-weight: 600 !important;
+    
+    &::part(input),
+    &::part(textarea),
+    &::part(native) {
+      font-weight: 600 !important;
+    }
   }
 }
 
-ion-item {
-  --color: #000; /* ✅ Color general de texto dentro de los ion-item */
-  --highlight-color-focused: #3b82f6;
+// 🔥 FORZAR NEGRO EN TODOS LOS ION-ITEM DEL FORMULARIO
+.form-container ion-item {
+  --color: black !important;
+  
+  ion-label {
+    color: black !important;
+    font-weight: 600;
+  }
+  
+  // Cuando está enfocado (editando)
+  &.item-has-focus {
+    --background: #f8fafc;
+    
+    ion-label {
+      font-weight: 700 !important;
+      color: #3b82f6 !important;
+    }
+    
+    ion-input,
+    ion-textarea {
+      font-weight: 700 !important;
+      
+      &::part(input),
+      &::part(textarea),
+      &::part(native) {
+        font-weight: 700 !important;
+      }
+    }
+  }
+}
+
+// Placeholder (dejarlo gris para que no se confunda)
+ion-input::part(placeholder),
+ion-textarea::part(placeholder) {
+  color: #6b7280 !important;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 .form-buttons {
@@ -205,7 +289,7 @@ ion-item {
   
   ion-icon {
     font-size: 1.4rem;
-    color: black;
+    color: white;
   }
   
   // Colores por categoría
