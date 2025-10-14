@@ -16,8 +16,8 @@ export class HealthPage implements OnInit {
   mostrarFormulario = false;
 
   nuevaResena = {
-    titulo: '', // Esto va a texto
-    contenido: '', // Esto también va a texto
+    titulo: '',
+    contenido: '',
     calificacion: 5
   };
 
@@ -35,9 +35,9 @@ export class HealthPage implements OnInit {
       console.log('🔄 Cargando reseñas desde Supabase...');
       
       const { data, error } = await this.supabase
-        .from('Resenas') // ← Nombre exacto de tu tabla
+        .from('"Resenas"') // ← COMILLAS DOBLES para tablas con mayúsculas
         .select('*')
-        .order('fecha', { ascending: false }); // ← fecha en lugar de fecha_creacion
+        .order('fecha', { ascending: false });
 
       if (error) {
         console.error('❌ Error cargando reseñas:', error);
@@ -61,14 +61,17 @@ export class HealthPage implements OnInit {
       console.log('🔄 Agregando reseña...');
 
       const { data, error } = await this.supabase
-        .from('Resenas') // ← Nombre exacto de tu tabla
+        .from('"Resenas"') // ← COMILLAS DOBLES para tablas con mayúsculas
         .insert([{
-          texto: this.nuevaResena.titulo + ': ' + this.nuevaResena.contenido, // ← Juntamos título y contenido en texto
-          puntuacion: this.nuevaResena.calificacion, // ← puntuacion en lugar de calificacion
-          fecha: new Date().toISOString() // ← fecha en lugar de fecha_creacion
-          // id_usuario lo omitimos por ahora o puedes poner un valor por defecto
+          texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
+          puntuacion: this.nuevaResena.calificacion,
+          fecha: new Date().toISOString(),
+          id_usuario: 1 // ← Necesitamos este campo por la FK
         }])
         .select();
+
+      console.log('📡 RESPUESTA DE SUPABASE - data:', data);
+      console.log('📡 RESPUESTA DE SUPABASE - error:', error);
 
       if (error) {
         console.error('❌ Error agregando reseña:', error);
@@ -97,14 +100,14 @@ export class HealthPage implements OnInit {
     }
   }
 
-  async eliminarResena(id: number) { // ← Cambié a number porque id_resenas es SERIAL
+  async eliminarResena(id: number) {
     try {
       console.log('🔄 Eliminando reseña...');
 
       const { error } = await this.supabase
-        .from('Resenas') // ← Nombre exacto de tu tabla
+        .from('"Resenas"') 
         .delete()
-        .eq('id_resenas', id); // ← id_resenas en lugar de id
+        .eq('id_resenas', id);
 
       if (error) {
         console.error('❌ Error eliminando reseña:', error);
