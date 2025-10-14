@@ -9,7 +9,7 @@
     </ion-card-header>
 
     <ion-card-content>
-      <!-- Nombre con binding bidireccional -->
+      <!-- Nombre -->
       <ion-item>
         <ion-label position="stacked">Nombre *</ion-label>
         <ion-input 
@@ -19,7 +19,7 @@
         </ion-input>
       </ion-item>
 
-      <!-- Categoría con binding bidireccional -->
+      <!-- Categoría -->
       <ion-item>
         <ion-label position="stacked">Categoría *</ion-label>
         <ion-input 
@@ -29,7 +29,7 @@
         </ion-input>
       </ion-item>
 
-      <!-- Descripción con binding bidireccional -->
+      <!-- Descripción -->
       <ion-item>
         <ion-label position="stacked">Descripción</ion-label>
         <ion-textarea 
@@ -39,7 +39,7 @@
         </ion-textarea>
       </ion-item>
 
-      <!-- Horario con binding bidireccional -->
+      <!-- Horario -->
       <ion-item>
         <ion-label position="stacked">Horario</ion-label>
         <ion-input 
@@ -48,14 +48,7 @@
         </ion-input>
       </ion-item>
 
-      <!-- Precio con binding bidireccional -->
-      <ion-item>
-        <ion-label position="stacked">Precio</ion-label>
-        <ion-input 
-          [(ngModel)]="lugarEditando ? lugarEditando.precio : nuevoLugar.precio"
-          placeholder="Ej: Gratis, €, €€, €€€">
-        </ion-input>
-      </ion-item>
+      <!-- ELIMINAMOS COMPLETAMENTE EL CAMPO PRECIO -->
 
       <div class="buttons-container">
         <ion-button *ngIf="!lugarEditando" expand="block" (click)="crearLugar()" 
@@ -98,7 +91,7 @@
 
       <!-- Lista de lugares -->
       <ion-list *ngIf="lugares.length > 0" class="places-list">
-        <ion-item *ngFor="let lugar of lugares" class="place-item">
+        <ion-item *ngFor="let lugar of lugares; trackBy: trackByLugar" class="place-item">
           <ion-label class="place-content">
             <h2 class="place-name">{{ lugar.nombre }}</h2>
             <div class="place-category">
@@ -110,11 +103,7 @@
                 <ion-icon name="time-outline"></ion-icon>
                 <span>{{ lugar.horario }}</span>
               </div>
-              <!-- Mostramos precio aunque no esté en BD -->
-              <div class="detail-item" *ngIf="lugar.precio">
-                <ion-icon name="cash-outline"></ion-icon>
-                <span>{{ lugar.precio }}</span>
-              </div>
+              <!-- ELIMINAMOS LA SECCIÓN DE PRECIO -->
             </div>
           </ion-label>
           <div class="action-buttons" slot="end">

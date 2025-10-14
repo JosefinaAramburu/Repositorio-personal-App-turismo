@@ -30,7 +30,6 @@ import {
   checkmarkOutline,
   closeOutline,
   timeOutline,
-  cashOutline,
   trashOutline,
   refreshOutline
 } from 'ionicons/icons';
@@ -38,7 +37,7 @@ import {
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// SOLO los campos que existen en la BD
+// SOLO los campos que EXISTEN en tu BD
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -46,6 +45,7 @@ export interface Lugar {
   categoria: string;
   descripcion: string;
   horario: string;
+  // NO incluir precio, created_at, etc.
 }
 
 @Injectable({
@@ -160,17 +160,17 @@ export class CapturePage implements OnInit {
 
   lugares: Lugar[] = [];
   
-  // Objeto para el formulario - usamos 'any' para flexibilidad
-  nuevoLugar: any = {
+  // SOLO campos que existen en la BD
+  nuevoLugar: Lugar = {
     id_destino: 1,
     nombre: '',
     categoria: '',
     descripcion: '',
-    horario: '',
-    precio: '' // Este campo solo existe en el formulario
+    horario: ''
+    // SIN precio
   };
   
-  lugarEditando: any = null;
+  lugarEditando: Lugar | null = null;
   isLoading = false;
 
   constructor() {
@@ -183,9 +183,9 @@ export class CapturePage implements OnInit {
       checkmarkOutline,
       closeOutline,
       timeOutline,
-      cashOutline,
       trashOutline,
       refreshOutline
+      // Eliminamos cashOutline
     });
   }
 
@@ -234,17 +234,8 @@ export class CapturePage implements OnInit {
       });
       await loading.present();
 
-      // CREAMOS UN OBJETO LIMPIO SIN EL CAMPO 'precio'
-      const lugarParaBD: Lugar = {
-        id_destino: this.nuevoLugar.id_destino,
-        nombre: this.nuevoLugar.nombre,
-        categoria: this.nuevoLugar.categoria,
-        descripcion: this.nuevoLugar.descripcion,
-        horario: this.nuevoLugar.horario
-        // NO incluimos 'precio'
-      };
-
-      await this.captureService.crearLugar(lugarParaBD);
+      // Enviamos el objeto directamente - YA NO TIENE PRECIO
+      await this.captureService.crearLugar(this.nuevoLugar);
       
       // Limpiar formulario
       this.limpiarFormulario();
@@ -264,11 +255,7 @@ export class CapturePage implements OnInit {
 
   editarLugar(lugar: Lugar) {
     console.log('✏️ Editando lugar:', lugar);
-    // Creamos objeto para edición
-    this.lugarEditando = { 
-      ...lugar,
-      precio: '' // Agregamos precio vacío para el formulario
-    };
+    this.lugarEditando = { ...lugar };
     // Scroll to top para ver el formulario de edición
     const content = document.querySelector('ion-content');
     content?.scrollToTop(500);
@@ -286,10 +273,7 @@ export class CapturePage implements OnInit {
       });
       await loading.present();
 
-      // CREAMOS OBJETO LIMPIO SIN 'precio'
-      const { precio, ...lugarParaBD } = this.lugarEditando;
-      
-      await this.captureService.actualizarLugar(lugarParaBD.id_lugares!, lugarParaBD);
+      await this.captureService.actualizarLugar(this.lugarEditando.id_lugares!, this.lugarEditando);
       
       this.lugarEditando = null;
       await this.cargarLugares();
@@ -389,8 +373,7 @@ export class CapturePage implements OnInit {
       nombre: '',
       categoria: '',
       descripcion: '',
-      horario: '',
-      precio: ''
+      horario: ''
     };
   }
 
