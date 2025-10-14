@@ -3,11 +3,11 @@ import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-capture',
+  selector: 'app-capture',  // ✅ CAMBIADO: 'app-login' → 'app-capture'
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
 })
-export class CapturePage {
+export class CapturePage {  // ✅ CAMBIADO: 'LoginPage' → 'CapturePage'
   email: string = '';
   password: string = '';
 
