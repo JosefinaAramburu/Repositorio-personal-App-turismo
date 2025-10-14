@@ -65,7 +65,7 @@ ion-header {
   }
 }
 
-// FORMULARIO
+// FORMULARIO - MEJORAS PARA TEXTO EN EDICIÓN
 .form-container {
   padding: 16px;
   animation: fadeIn 0.3s ease-in;
@@ -112,19 +112,73 @@ ion-header {
   ion-select {
     --padding-start: 12px;
     --padding-end: 12px;
-    --color: #000; /* ✅ Texto ingresado o existente negro */
-    color: #000 !important; /* ✅ Forzar color del texto */
+    --color: #000;
+    color: #000 !important;
+    
+    /* 🔥 MEJORA: Texto en negrita cuando está enfocado/editando */
+    &.ion-focused,
+    &.ion-touched,
+    &.has-value {
+      font-weight: 600 !important;
+    }
   }
 
-  /* Label dentro del input (placeholder) */
-  ion-label {
-    color: #222 !important;
+  /* 🔥 MEJORA: Placeholder más oscuro */
+  ion-input::part(placeholder),
+  ion-textarea::part(placeholder) {
+    color: #4b5563 !important;
+    font-weight: 500;
+    opacity: 0.8;
+  }
+
+  /* 🔥 MEJORA: Input activo con borde más destacado */
+  &.item-has-focus {
+    --highlight-color-focused: #3b82f6;
+    --highlight-height: 3px;
+    
+    ion-input,
+    ion-textarea {
+      font-weight: 700 !important;
+      --color: #1e293b !important;
+    }
   }
 }
 
+/* 🔥 NUEVO: Estilos específicos para inputs con valor */
+ion-input.has-value,
+ion-textarea.has-value {
+  font-weight: 600 !important;
+  --color: #1e293b !important;
+}
+
+/* 🔥 MEJORA: Labels más destacados */
+.input-label {
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+}
+
 ion-item {
-  --color: #000; /* ✅ Color general de texto dentro de los ion-item */
+  --color: #000;
   --highlight-color-focused: #3b82f6;
+  
+  /* 🔥 MEJORA: Item cuando está siendo editado */
+  &.item-has-focus {
+    --background: #f8fafc;
+    --border-radius: 12px;
+    
+    ion-label {
+      font-weight: 700 !important;
+      color: #3b82f6 !important;
+    }
+    
+    ion-input,
+    ion-textarea {
+      font-weight: 700 !important;
+    }
+  }
 }
 
 .form-buttons {
@@ -138,7 +192,7 @@ ion-item {
   }
 }
 
-// LISTA DE LUGARES
+// LISTA DE LUGARES - MEJORAS PARA TEXTO EDITADO
 .list-container {
   padding: 16px;
   
@@ -315,6 +369,23 @@ ion-fab-button {
   }
 }
 
+// 🔥 NUEVA ANIMACIÓN para inputs en edición
+@keyframes inputFocus {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.ion-focused {
+  animation: inputFocus 0.2s ease-in-out;
+}
+
 // ESTADOS VACÍOS
 .empty-state {
   text-align: center;
@@ -391,5 +462,11 @@ ion-loading {
   ion-fab-button:hover {
     --box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
     transform: scale(1.05);
+  }
+  
+  
+  .form-item:hover {
+    --background: #f8fafc;
+    transition: all 0.2s ease;
   }
 }
