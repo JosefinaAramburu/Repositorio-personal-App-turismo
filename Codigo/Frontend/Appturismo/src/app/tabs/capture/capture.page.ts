@@ -1,23 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
-import { FormsModule } from '@angular/forms'; // ✅ NECESARIO para ngModel
-
-// ✅ IMPORTAR todos los componentes de Ionic que usas
-import { IonContent } from '@ionic/angular/standalone';
-import { IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/angular/standalone';
-import { IonItem } from '@ionic/angular/standalone';
-import { IonLabel } from '@ionic/angular/standalone';
-import { IonInput } from '@ionic/angular/standalone';
-import { IonButton } from '@ionic/angular/standalone';
+import { FormsModule } from '@angular/forms';
+import { IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-capture',
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
-  standalone: true, // ✅ AGREGAR esto
-  imports: [ // ✅ AGREGAR todos los imports necesarios
-    FormsModule, // Para ngModel
+  standalone: true,
+  imports: [
+    FormsModule,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -29,7 +22,7 @@ import { IonButton } from '@ionic/angular/standalone';
     IonButton
   ]
 })
-export class CapturePage {
+export class CapturePage implements OnInit {
   email: string = '';
   password: string = '';
 
@@ -38,6 +31,18 @@ export class CapturePage {
     private alertController: AlertController,
     private loadingController: LoadingController
   ) {}
+
+  ngOnInit() {
+    // ✅ Verificar si ya está logueado al cargar la página
+    this.checkIfLoggedIn();
+  }
+
+  checkIfLoggedIn() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (isLoggedIn) {
+      this.router.navigate(['/home']);
+    }
+  }
 
   async login() {
     if (!this.email || !this.password) {
@@ -56,6 +61,10 @@ export class CapturePage {
     setTimeout(() => {
       loading.dismiss();
       if (this.email === 'usuario@test.com' && this.password === '1234') {
+        // ✅ Guardar estado de login
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userEmail', this.email);
+        
         this.router.navigate(['/home']);
       } else {
         this.showAlert('Credenciales inválidas', 'El correo o la contraseña son incorrectos.');
