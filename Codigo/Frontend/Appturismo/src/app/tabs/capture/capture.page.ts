@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CaptureService, Lugar } from './capture.service';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { 
@@ -16,6 +15,101 @@ import {
   IonTextarea,
   IonBadge
 } from '@ionic/angular/standalone';
+
+// === SERVICE TEMPORAL DENTRO DEL MISMO ARCHIVO ===
+import { Injectable } from '@angular/core';
+import { supabase } from '../../supabase';
+
+export interface Lugar {
+  id_lugares?: number;
+  id_destino: number;
+  nombre: string;
+  categoria: string;
+  descripcion: string;
+  horario: string;
+  imagen?: string;
+  rating?: number;
+  precio?: string;
+  ciudad?: string;
+  pais?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+class CaptureService {
+  // CREATE - Crear nuevo lugar
+  async crearLugar(lugar: Omit<Lugar, 'id_lugares'>): Promise<any> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .insert([lugar])
+      .select();
+    
+    if (error) {
+      console.error('Error creando lugar:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // READ - Obtener todos los lugares
+  async obtenerLugares(): Promise<Lugar[]> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .select('*')
+      .order('id_lugares', { ascending: true });
+    
+    if (error) {
+      console.error('Error obteniendo lugares:', error);
+      throw error;
+    }
+    return data || [];
+  }
+
+  // UPDATE - Actualizar lugar
+  async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .update(updates)
+      .eq('id_lugares', id)
+      .select();
+    
+    if (error) {
+      console.error('Error actualizando lugar:', error);
+      throw error;
+    }
+    return data;
+  }
+
+  // DELETE - Eliminar lugar
+  async eliminarLugar(id: number): Promise<any> {
+    const { error } = await supabase
+      .from('Lugares')
+      .delete()
+      .eq('id_lugares', id);
+    
+    if (error) {
+      console.error('Error eliminando lugar:', error);
+      throw error;
+    }
+    return { success: true };
+  }
+
+  // BUSCAR lugares
+  async buscarLugares(termino: string): Promise<Lugar[]> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .select('*')
+      .or(`nombre.ilike.%${termino}%,categoria.ilike.%${termino}%,descripcion.ilike.%${termino}%`);
+    
+    if (error) {
+      console.error('Error buscando lugares:', error);
+      throw error;
+    }
+    return data || [];
+  }
+}
+// === FIN DEL SERVICE TEMPORAL ===
 
 @Component({
   selector: 'app-capture',
@@ -36,7 +130,8 @@ import {
     IonList,
     IonTextarea,
     IonBadge
-  ]
+  ],
+  providers: [CaptureService] // ← Agregar el service como provider
 })
 export class CapturePage implements OnInit {
   lugares: Lugar[] = [];
