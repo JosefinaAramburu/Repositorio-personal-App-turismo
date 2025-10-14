@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js';
 export class HealthPage implements OnInit {
   resenas: any[] = [];
   cargando = false;
-  mostrarFormulario = false; // ← Controla si mostrar el formulario
+  mostrarFormulario = false; // Controla si mostrar el formulario
 
   nuevaResena = {
     titulo: '',
@@ -75,7 +75,7 @@ export class HealthPage implements OnInit {
         return;
       }
 
-      // 1. Recargar las reseñas desde Supabase para tener los datos actualizados
+      // 1. Recargar las reseñas desde Supabase
       await this.cargarResenas();
 
       // 2. Limpiar formulario
@@ -120,8 +120,5 @@ export class HealthPage implements OnInit {
     }
   }
 
-  // Método para mostrar/ocultar el formulario
-  toggleFormulario() {
-    this.mostrarFormulario = !this.mostrarFormulario;
-  }
+  // QUITÉ el método toggleFormulario - usamos directamente mostrarFormulario = true/false
 }
