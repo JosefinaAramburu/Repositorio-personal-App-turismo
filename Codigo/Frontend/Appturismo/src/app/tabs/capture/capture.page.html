@@ -48,8 +48,6 @@
         </ion-input>
       </ion-item>
 
-      <!-- ELIMINAMOS COMPLETAMENTE EL CAMPO PRECIO -->
-
       <div class="buttons-container">
         <ion-button *ngIf="!lugarEditando" expand="block" (click)="crearLugar()" 
                    [disabled]="!nuevoLugar.nombre?.trim() || !nuevoLugar.categoria?.trim()"
@@ -103,7 +101,6 @@
                 <ion-icon name="time-outline"></ion-icon>
                 <span>{{ lugar.horario }}</span>
               </div>
-              <!-- ELIMINAMOS LA SECCIÓN DE PRECIO -->
             </div>
           </ion-label>
           <div class="action-buttons" slot="end">
