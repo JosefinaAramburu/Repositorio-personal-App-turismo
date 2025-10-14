@@ -3,18 +3,28 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   IonContent, 
+  IonHeader,
+  IonTitle,
+  IonToolbar,
+  IonButtons,
+  IonButton,
   IonCard, 
   IonCardHeader, 
   IonCardTitle, 
+  IonCardSubtitle,
   IonCardContent, 
   IonItem, 
   IonLabel, 
   IonInput, 
-  IonButton,
   IonList,
   IonTextarea,
   IonIcon,
   IonBadge,
+  IonFab,
+  IonFabButton,
+  IonSelect,
+  IonSelectOption,
+  IonLoading,
   AlertController, 
   LoadingController,
   ToastController
@@ -31,13 +41,15 @@ import {
   closeOutline,
   timeOutline,
   trashOutline,
-  refreshOutline
+  refreshOutline,
+  addOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
 
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// INTERFAZ EXACTA - solo campos que existen en tu BD
+// INTERFAZ
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -128,18 +140,28 @@ export class CaptureService {
     CommonModule,
     FormsModule,
     IonContent,
+    IonHeader,
+    IonTitle,
+    IonToolbar,
+    IonButtons,
+    IonButton,
     IonCard,
     IonCardHeader,
     IonCardTitle,
+    IonCardSubtitle,
     IonCardContent,
     IonItem,
     IonLabel,
     IonInput,
-    IonButton,
     IonList,
     IonTextarea,
     IonIcon,
-    IonBadge
+    IonBadge,
+    IonFab,
+    IonFabButton,
+    IonSelect,
+    IonSelectOption,
+    IonLoading
   ],
   providers: [CaptureService]
 })
@@ -158,6 +180,7 @@ export class CapturePage implements OnInit {
     horario: ''
   };
   lugarEditando: Lugar | null = null;
+  mostrarFormulario = false;
   isLoading = false;
 
   constructor() {
@@ -171,7 +194,9 @@ export class CapturePage implements OnInit {
       closeOutline,
       timeOutline,
       trashOutline,
-      refreshOutline
+      refreshOutline,
+      addOutline,
+      closeCircleOutline
     });
   }
 
@@ -179,25 +204,30 @@ export class CapturePage implements OnInit {
     this.cargarLugares();
   }
 
+  // 🎯 FUNCIONES DE NAVEGACIÓN
+  abrirFormulario() {
+    this.mostrarFormulario = true;
+    this.lugarEditando = null;
+    this.limpiarFormulario();
+  }
+
+  cerrarFormulario() {
+    this.mostrarFormulario = false;
+    this.lugarEditando = null;
+    this.limpiarFormulario();
+  }
+
+  // 🎯 FUNCIONES PRINCIPALES
   async cargarLugares() {
     if (this.isLoading) return;
     
     this.isLoading = true;
     
     try {
-      const loading = await this.loadingController.create({
-        message: 'Cargando lugares...',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
       this.lugares = await this.captureService.obtenerLugares();
-      
-      await loading.dismiss();
       this.isLoading = false;
       
     } catch (error: any) {
-      await this.loadingController.dismiss();
       this.isLoading = false;
       this.mostrarError('Error al cargar lugares: ' + error.message);
     }
@@ -217,9 +247,10 @@ export class CapturePage implements OnInit {
       
       this.limpiarFormulario();
       await this.cargarLugares();
+      this.mostrarFormulario = false;
       
       await loading.dismiss();
-      this.mostrarExito('Lugar creado exitosamente');
+      this.mostrarExito('¡Lugar creado exitosamente!');
       
     } catch (error: any) {
       await this.loadingController.dismiss();
@@ -229,8 +260,7 @@ export class CapturePage implements OnInit {
 
   editarLugar(lugar: Lugar) {
     this.lugarEditando = { ...lugar };
-    const content = document.querySelector('ion-content');
-    content?.scrollToTop(500);
+    this.mostrarFormulario = true;
   }
 
   async guardarEdicion() {
@@ -246,10 +276,11 @@ export class CapturePage implements OnInit {
       await this.captureService.actualizarLugar(this.lugarEditando.id_lugares!, this.lugarEditando);
       
       this.lugarEditando = null;
+      this.mostrarFormulario = false;
       await this.cargarLugares();
       
       await loading.dismiss();
-      this.mostrarExito('Lugar actualizado exitosamente');
+      this.mostrarExito('¡Lugar actualizado exitosamente!');
       
     } catch (error: any) {
       await this.loadingController.dismiss();
@@ -259,21 +290,24 @@ export class CapturePage implements OnInit {
 
   cancelarEdicion() {
     this.lugarEditando = null;
+    this.mostrarFormulario = false;
     this.limpiarFormulario();
   }
 
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
-      header: 'Confirmar eliminación',
-      message: '¿Estás seguro de que quieres eliminar este lugar? Esta acción no se puede deshacer.',
+      header: '¿Eliminar lugar?',
+      message: 'Esta acción no se puede deshacer. El lugar será eliminado permanentemente.',
       buttons: [
         {
           text: 'Cancelar',
-          role: 'cancel'
+          role: 'cancel',
+          cssClass: 'secondary'
         },
         {
           text: 'Eliminar',
           role: 'destructive',
+          cssClass: 'danger-button',
           handler: async () => {
             try {
               const loading = await this.loadingController.create({
@@ -286,7 +320,7 @@ export class CapturePage implements OnInit {
               await this.cargarLugares();
               
               await loading.dismiss();
-              this.mostrarExito('Lugar eliminado exitosamente');
+              this.mostrarExito('¡Lugar eliminado exitosamente!');
               
             } catch (error: any) {
               await this.loadingController.dismiss();
@@ -299,6 +333,56 @@ export class CapturePage implements OnInit {
     await alert.present();
   }
 
+  // 🎯 FUNCIONES DE DISEÑO Y UTILIDAD
+  getCategoriaIcon(categoria: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Monumento': 'business-outline',
+      'Museo': 'library-outline',
+      'Parque': 'leaf-outline',
+      'Playa': 'water-outline',
+      'Restaurante': 'restaurant-outline',
+      'Cafetería': 'cafe-outline',
+      'Mirador': 'eye-outline',
+      'Histórico': 'time-outline',
+      'Shopping': 'cart-outline',
+      'Otro': 'location-outline'
+    };
+    return iconMap[categoria] || 'location-outline';
+  }
+
+  getCategoriaClass(categoria: string): string {
+    const classMap: { [key: string]: string } = {
+      'Monumento': 'monumento',
+      'Museo': 'museo',
+      'Parque': 'parque',
+      'Playa': 'playa',
+      'Restaurante': 'restaurante',
+      'Cafetería': 'cafeteria',
+      'Mirador': 'mirador',
+      'Histórico': 'historico',
+      'Shopping': 'shopping',
+      'Otro': 'otro'
+    };
+    return classMap[categoria] || 'otro';
+  }
+
+  getCategoriaColor(categoria: string): string {
+    const colorMap: { [key: string]: string } = {
+      'Monumento': 'warning',
+      'Museo': 'tertiary',
+      'Parque': 'success',
+      'Playa': 'info',
+      'Restaurante': 'danger',
+      'Cafetería': 'orange',
+      'Mirador': 'primary',
+      'Histórico': 'medium',
+      'Shopping': 'pink',
+      'Otro': 'dark'
+    };
+    return colorMap[categoria] || 'medium';
+  }
+
+  // 🎯 FUNCIONES PRIVADAS
   private validarFormulario(): boolean {
     if (!this.nuevoLugar.nombre?.trim()) {
       this.mostrarError('El nombre del lugar es obligatorio');
@@ -342,7 +426,13 @@ export class CapturePage implements OnInit {
       message: mensaje,
       duration: 4000,
       color: 'danger',
-      position: 'top'
+      position: 'top',
+      buttons: [
+        {
+          icon: 'close-circle-outline',
+          role: 'cancel'
+        }
+      ]
     });
     await toast.present();
   }
@@ -352,7 +442,8 @@ export class CapturePage implements OnInit {
       message: mensaje,
       duration: 3000,
       color: 'success',
-      position: 'top'
+      position: 'top',
+      icon: 'checkmark-circle-outline'
     });
     await toast.present();
   }
