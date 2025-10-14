@@ -65,7 +65,7 @@ ion-header {
   }
 }
 
-// FORMULARIO - MEJORAS PARA TEXTO EN EDICIÓN
+// FORMULARIO - CORRECCIONES PARA TEXTO NEGRO
 .form-container {
   padding: 16px;
   animation: fadeIn 0.3s ease-in;
@@ -102,72 +102,87 @@ ion-header {
   
   .input-label {
     font-weight: 600;
-    color: black;
+    color: #000000;
     font-size: 0.9rem;
     margin-bottom: 8px;
   }
   
+  /* 🔥 CORRECCIÓN: Forzar texto negro en inputs */
   ion-input,
-  ion-textarea,
+  ion-textarea {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --color: #000000 !important;
+    --placeholder-color: #6b7280 !important;
+    --placeholder-opacity: 1;
+    color: #000000 !important;
+    font-weight: 500;
+    
+    /* Para el texto ingresado */
+    .native-input {
+      color: #000000 !important;
+      font-weight: 500;
+    }
+    
+    /* Para el texto del textarea */
+    .native-textarea {
+      color: #000000 !important;
+      font-weight: 500;
+    }
+    
+    /* 🔥 Cuando está enfocado - NEGRITA Y NEGRO */
+    &.ion-focused {
+      font-weight: 700 !important;
+      --color: #000000 !important;
+      
+      .native-input,
+      .native-textarea {
+        font-weight: 700 !important;
+        color: #000000 !important;
+      }
+    }
+    
+    /* 🔥 Cuando tiene valor - NEGRITA Y NEGRO */
+    &.has-value {
+      font-weight: 600 !important;
+      --color: #000000 !important;
+      
+      .native-input,
+      .native-textarea {
+        font-weight: 600 !important;
+        color: #000000 !important;
+      }
+    }
+  }
+  
   ion-select {
     --padding-start: 12px;
     --padding-end: 12px;
-    --color: #000;
-    color: #000 !important;
+    --color: #000000 !important;
+    color: #000000 !important;
+    font-weight: 500;
     
-    /* 🔥 MEJORA: Texto en negrita cuando está enfocado/editando */
     &.ion-focused,
-    &.ion-touched,
     &.has-value {
       font-weight: 600 !important;
-    }
-  }
-
-  /* 🔥 MEJORA: Placeholder más oscuro */
-  ion-input::part(placeholder),
-  ion-textarea::part(placeholder) {
-    color: #4b5563 !important;
-    font-weight: 500;
-    opacity: 0.8;
-  }
-
-  /* 🔥 MEJORA: Input activo con borde más destacado */
-  &.item-has-focus {
-    --highlight-color-focused: #3b82f6;
-    --highlight-height: 3px;
-    
-    ion-input,
-    ion-textarea {
-      font-weight: 700 !important;
-      --color: #1e293b !important;
+      --color: #000000 !important;
     }
   }
 }
 
-/* 🔥 NUEVO: Estilos específicos para inputs con valor */
-ion-input.has-value,
-ion-textarea.has-value {
-  font-weight: 600 !important;
-  --color: #1e293b !important;
-}
-
-/* 🔥 MEJORA: Labels más destacados */
-.input-label {
-  font-weight: 700;
-  color: #374151;
-  font-size: 0.95rem;
-  margin-bottom: 8px;
-  letter-spacing: -0.2px;
-}
-
+/* 🔥 CORRECCIÓN GLOBAL: Forzar color negro en todo el texto de formularios */
 ion-item {
-  --color: #000;
+  --color: #000000 !important;
   --highlight-color-focused: #3b82f6;
   
-  /* 🔥 MEJORA: Item cuando está siendo editado */
+  ion-label {
+    color: #000000 !important;
+    font-weight: 600;
+  }
+  
+  /* Cuando el item está enfocado */
   &.item-has-focus {
     --background: #f8fafc;
-    --border-radius: 12px;
     
     ion-label {
       font-weight: 700 !important;
@@ -177,8 +192,24 @@ ion-item {
     ion-input,
     ion-textarea {
       font-weight: 700 !important;
+      --color: #000000 !important;
     }
   }
+}
+
+/* 🔥 CORRECCIÓN ESPECÍFICA para inputs de Ionic */
+ion-input::part(native),
+ion-textarea::part(native) {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+/* 🔥 Placeholder más visible pero no interferente */
+ion-input::part(placeholder),
+ion-textarea::part(placeholder) {
+  color: #6b7280 !important;
+  font-weight: 500;
+  opacity: 0.8;
 }
 
 .form-buttons {
@@ -192,7 +223,7 @@ ion-item {
   }
 }
 
-// LISTA DE LUGARES - MEJORAS PARA TEXTO EDITADO
+// LISTA DE LUGARES
 .list-container {
   padding: 16px;
   
@@ -259,7 +290,7 @@ ion-item {
   
   ion-icon {
     font-size: 1.4rem;
-    color: black;
+    color: white;
   }
   
   // Colores por categoría
@@ -303,7 +334,7 @@ ion-item {
         align-items: center;
         gap: 6px;
         font-size: 0.8rem;
-        color: black;
+        color: #000000;
         
         ion-icon {
           font-size: 0.9rem;
@@ -369,23 +400,6 @@ ion-fab-button {
   }
 }
 
-// 🔥 NUEVA ANIMACIÓN para inputs en edición
-@keyframes inputFocus {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.ion-focused {
-  animation: inputFocus 0.2s ease-in-out;
-}
-
 // ESTADOS VACÍOS
 .empty-state {
   text-align: center;
@@ -405,7 +419,7 @@ ion-fab-button {
   }
   
   p {
-    color: black;
+    color: #000000;
     font-size: 0.95rem;
     margin: 0;
     line-height: 1.5;
@@ -462,11 +476,5 @@ ion-loading {
   ion-fab-button:hover {
     --box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
     transform: scale(1.05);
-  }
-  
-  
-  .form-item:hover {
-    --background: #f8fafc;
-    transition: all 0.2s ease;
   }
 }
