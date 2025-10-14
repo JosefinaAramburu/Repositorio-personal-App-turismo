@@ -38,25 +38,14 @@ import {
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// Interfaz para la base de datos - solo campos que existen
-export interface LugarBD {
+// SOLO los campos que existen en la BD
+export interface Lugar {
   id_lugares?: number;
   id_destino: number;
   nombre: string;
   categoria: string;
   descripcion: string;
   horario: string;
-}
-
-// Interfaz para el formulario - incluye todos los campos del HTML
-export interface LugarFormulario {
-  id_lugares?: number;
-  id_destino: number;
-  nombre: string;
-  categoria: string;
-  descripcion: string;
-  horario: string;
-  precio?: string; // Campo adicional para el formulario
 }
 
 @Injectable({
@@ -65,7 +54,7 @@ export interface LugarFormulario {
 export class CaptureService {
   
   // CREATE - Crear nuevo lugar
-  async crearLugar(lugar: LugarBD): Promise<any> {
+  async crearLugar(lugar: Lugar): Promise<any> {
     console.log('🔄 Service: Creando lugar en Supabase...', lugar);
     
     const { data, error } = await supabase
@@ -84,7 +73,7 @@ export class CaptureService {
   }
 
   // READ - Obtener todos los lugares
-  async obtenerLugares(): Promise<LugarBD[]> {
+  async obtenerLugares(): Promise<Lugar[]> {
     console.log('🔄 Service: Obteniendo lugares de Supabase...');
     
     const { data, error } = await supabase
@@ -102,7 +91,7 @@ export class CaptureService {
   }
 
   // UPDATE - Actualizar lugar
-  async actualizarLugar(id: number, updates: Partial<LugarBD>): Promise<any> {
+  async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
     console.log('🔄 Service: Actualizando lugar', id, updates);
     
     const { data, error } = await supabase
@@ -146,7 +135,7 @@ export class CaptureService {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule, // <-- IMPORTANTE: FormsModule para ngModel
+    FormsModule,
     IonContent,
     IonCard,
     IonCardHeader,
@@ -169,19 +158,19 @@ export class CapturePage implements OnInit {
   private loadingController = inject(LoadingController);
   private toastController = inject(ToastController);
 
-  lugares: LugarBD[] = [];
+  lugares: Lugar[] = [];
   
-  // Formulario con binding bidireccional - incluye todos los campos
-  nuevoLugar: LugarFormulario = {
+  // Objeto para el formulario - usamos 'any' para flexibilidad
+  nuevoLugar: any = {
     id_destino: 1,
     nombre: '',
     categoria: '',
     descripcion: '',
     horario: '',
-    precio: ''
+    precio: '' // Este campo solo existe en el formulario
   };
   
-  lugarEditando: LugarFormulario | null = null;
+  lugarEditando: any = null;
   isLoading = false;
 
   constructor() {
@@ -245,14 +234,14 @@ export class CapturePage implements OnInit {
       });
       await loading.present();
 
-      // Convertimos a LugarBD (solo campos que existen en BD)
-      const lugarParaBD: LugarBD = {
+      // CREAMOS UN OBJETO LIMPIO SIN EL CAMPO 'precio'
+      const lugarParaBD: Lugar = {
         id_destino: this.nuevoLugar.id_destino,
         nombre: this.nuevoLugar.nombre,
         categoria: this.nuevoLugar.categoria,
         descripcion: this.nuevoLugar.descripcion,
         horario: this.nuevoLugar.horario
-        // precio no se incluye porque no existe en BD
+        // NO incluimos 'precio'
       };
 
       await this.captureService.crearLugar(lugarParaBD);
@@ -273,12 +262,12 @@ export class CapturePage implements OnInit {
     }
   }
 
-  editarLugar(lugar: LugarBD) {
+  editarLugar(lugar: Lugar) {
     console.log('✏️ Editando lugar:', lugar);
-    // Convertimos de LugarBD a LugarFormulario
+    // Creamos objeto para edición
     this.lugarEditando = { 
       ...lugar,
-      precio: '' // Inicializamos precio vacío
+      precio: '' // Agregamos precio vacío para el formulario
     };
     // Scroll to top para ver el formulario de edición
     const content = document.querySelector('ion-content');
@@ -297,9 +286,10 @@ export class CapturePage implements OnInit {
       });
       await loading.present();
 
-      // Convertimos a LugarBD (excluimos precio)
-      const { id_lugares, precio, ...updates } = this.lugarEditando;
-      await this.captureService.actualizarLugar(id_lugares!, updates);
+      // CREAMOS OBJETO LIMPIO SIN 'precio'
+      const { precio, ...lugarParaBD } = this.lugarEditando;
+      
+      await this.captureService.actualizarLugar(lugarParaBD.id_lugares!, lugarParaBD);
       
       this.lugarEditando = null;
       await this.cargarLugares();
@@ -433,7 +423,7 @@ export class CapturePage implements OnInit {
   }
 
   // Helper para trackBy en ngFor
-  trackByLugar(index: number, lugar: LugarBD): number {
+  trackByLugar(index: number, lugar: Lugar): number {
     return lugar.id_lugares!;
   }
 }
