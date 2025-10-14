@@ -1,35 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
 import { CapturePage } from './capture.page';
-
+import { Router } from '@angular/router';
+import { AlertController, LoadingController } from '@ionic/angular';
 
 describe('CapturePage', () => {
- let component: CapturePage;
- let fixture: ComponentFixture<CapturePage>;
+  let component: CapturePage;
+  let fixture: ComponentFixture<CapturePage>;
 
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [CapturePage],
+      providers: [
+        { provide: Router, useValue: {} },
+        { provide: AlertController, useValue: {} },
+        { provide: LoadingController, useValue: {} }
+      ]
+    }).compileComponents();
 
- beforeEach(async () => {
-   await TestBed.configureTestingModule({
-     declarations: [CapturePage],
-     imports: [
-       CommonModule,   // para *ngIf y *ngFor
-       FormsModule,    // si tu página usa formularios
-       IonicModule.forRoot()  // necesario para componentes <ion-*>
-     ]
-   }).compileComponents();
+    fixture = TestBed.createComponent(CapturePage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-
-   fixture = TestBed.createComponent(CapturePage);
-   component = fixture.componentInstance;
-   fixture.detectChanges();
- });
-
-
- it('should create', () => {
-   expect(component).toBeTruthy();
- });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });
-
-
