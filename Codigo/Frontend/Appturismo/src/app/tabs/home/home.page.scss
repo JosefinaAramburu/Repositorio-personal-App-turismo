@@ -1,155 +1,98 @@
-/* ===========================
-Home Styles (Ionic)
-=========================== */
-/* 🌌 Fondo general del contenido */
 ion-content {
---background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-color: #fff;
-min-height: 100vh;
-display: block;
+  --background: #ffffff;
 }
-/* 🧭 Header / Toolbar (quitar blanco y líneas) */
-ion-header,
-ion-toolbar {
---background: transparent !important;
---ion-color-base: transparent !important;
---border-width: 0 !important;
-color: #fff;
-box-shadow: none;
+
+
+.titulo-principal {
+  position: sticky; /* 👈 se mantiene visible al hacer scroll */
+  top: 0; /* 👈 se pega arriba de la pantalla */
+  z-index: 10; /* 👈 queda encima del contenido */
+  background: #ffffff; /* 👈 fondo blanco solo para el título */
+  padding: 1rem 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #030303;
+  text-align: left;
+ 
 }
-.header-md::after,
-.header-ios::after {
-/* elimina la línea inferior del toolbar en iOS/MD */
-background: transparent !important;
-height: 0 !important;
+
+
+
+
+/* Buscador */
+.buscador-container {
+  margin-top: 1rem;
 }
-/* ===========================
-Tarjeta Resumen superior
-=========================== */
-.summary-card {
-border-radius: 20px;
-text-align: center;
-padding: 1rem;
-margin: 1rem;
-background: rgba(255, 255, 255, 0.15);
--webkit-backdrop-filter: blur(10px);
-backdrop-filter: blur(10px);
-box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-color: #fff;
+
+
+ion-searchbar {
+  border-radius: 12px;
+  --background: #fff;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.301);
 }
-/* 🔵 Circulitos de stats */
-.circle-stats {
-display: flex;
-justify-content: space-around;
-gap: .75rem;
-margin-bottom: 1rem;
-.mini-circle {
-background: rgba(255, 255, 255, 0.2);
-border-radius: 50%;
-width: 90px;
-height: 90px;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-h3 {
-margin: 0;
-font-size: 1.2rem;
-font-weight: bold;
-color: #fff;
+
+
+/* Subtítulo */
+.subtitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
 }
-p {
-margin: 0;
-font-size: 0.8rem;
-color: #ddd;
+
+
+/* Categorías */
+.categorias-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
+
+
+.categoria-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.377);
+  transition: 0.2s ease-in-out;
 }
-.highlight {
-background: rgba(56, 128, 255, 0.2);
-border: 2px solid #3880ff;
-h3 { color: #3880ff; }
+
+
+.categoria-card ion-icon {
+  font-size: 2rem;
+  color: var(--ion-color-primary);
+  margin-right: 1rem;
+  margin-top: 0.3rem;
 }
+
+
+.categoria-texto {
+  display: flex;
+  flex-direction: column;
 }
-/* 🧪 Macronutrientes en línea */
-.macros-inline {
-display: flex;
-justify-content: space-between;
-text-align: center;
-margin-top: 1rem;
-gap: .5rem;
-div {
-flex: 1;
-p {
-margin: 0;
-font-size: 0.9rem;
-font-weight: 600;
-color: #fff;
+
+
+.categoria-texto h3 {
+  font-size: 1.05rem;
+  color: #000000;
+  margin: 0;
+  font-weight: 600;
 }
-small {
-display: block;
-color: #ddd;
-font-size: 0.75rem;
-margin-bottom: 0.3rem;
+
+
+.categoria-texto p {
+  font-size: 0.9rem;
+  color: #111111;
+  margin-top: 0.3rem;
 }
-ion-progress-bar {
-height: 6px;
-border-radius: 4px;
---background: rgba(255, 255, 255, 0.25);
---progress-background: rgba(255, 255, 255, 0.6);
+
+
+.categoria-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.432);
 }
-}
-}
-/* 👤 Avatar */
-ion-avatar img {
-border-radius: 50%;
-object-fit: cover;
-border: 2px solid #fff;
-}
-/* ===========================
-Listas de comidas (cards)
-=========================== */
-ion-list {
-background: transparent !important;
-box-shadow: none !important;
-margin: 1rem;
-border-radius: 12px;
-}
-ion-item {
---background: rgba(255, 255, 255, 0.1);
---color: #fff;
---border-color: rgba(255, 255, 255, 0.15);
---inner-padding-end: 12px;
---inner-padding-start: 12px;
-margin-bottom: 0.6rem;
-border-radius: 12px;
--webkit-backdrop-filter: blur(6px);
-backdrop-filter: blur(6px);
-ion-label {
-color: #fff !important;
-}
-}
-/* Opcional: quitar borde separador entre items en iOS/MD */
-.list-md,
-.list-ios {
---ion-item-border-color: transparent;
-}
-ion-title {
-color: #fff !important;
-font-weight: bold;
-font-size: 1.4rem;
-}
-/* ===========================
-Utilidades reutilizables
-=========================== */
-.glass-card {
-background: rgba(255, 255, 255, 0.15);
--webkit-backdrop-filter: blur(10px);
-backdrop-filter: blur(10px);
-border-radius: 16px;
-box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-/* Por si alguna vista fuerza blanco vía :host */
-:host {
-background: transparent !important;
-}
+
+

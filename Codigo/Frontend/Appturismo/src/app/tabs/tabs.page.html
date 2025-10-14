@@ -1,28 +1,126 @@
-<ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="home" [routerLink]="['/tabs/home']">
-      <img src="assets/img/home-outline.svg" alt="Logout" style="width: 24px; height: 24px;" />
-    </ion-tab-button>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Eventos</ion-title>
+  </ion-toolbar>
+</ion-header>
 
 
-    <ion-tab-button tab="health" [routerLink]="['/tabs/health']">
-      <img src="assets/img/heart-sharp.svg" alt="Logout" style="width: 24px; height: 24px;" />
-    </ion-tab-button>
+<ion-content class="ion-padding">
+<!-- Buscador simple -->
+  <ion-searchbar [(ngModel)]="filtro" placeholder="Buscar eventos..." (ionInput)="aplicarFiltro()"></ion-searchbar>
 
-    <ion-tab-button tab="capture" [routerLink]="['/tabs/capture']">
-      <img src="assets/img/camera-sharp.svg" alt="Logout" style="width: 24px; height: 24px;" /> 
-    </ion-tab-button>
 
-    <ion-tab-button tab="stats" [routerLink]="['/tabs/stats']">
-      <img src="assets/img/bar-chart-sharp.svg" alt="Logout" style="width: 24px; height: 24px;" /> 
-    </ion-tab-button>
- 
-    <ion-tab-button (click)="logoutDirect()" tab="profile">
-      <img src="assets/img/log-out-outline.svg" alt="Logout" style="width: 24px; height: 24px;" />
-    </ion-tab-button>
-    
-  </ion-tab-bar>
-</ion-tabs>
+  <!-- Alta -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Agregar Evento</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input [(ngModel)]="nuevoEvento.nombre"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Tipo</ion-label>
+        <ion-input [(ngModel)]="nuevoEvento.tipo_de_evento" placeholder="ej: música, feria, fiesta"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha inicio</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" [(ngModel)]="nuevoEvento.fecha_de_inicio"></ion-datetime>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha fin</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" [(ngModel)]="nuevoEvento.fecha_fin"></ion-datetime>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Destino (id)</ion-label>
+        <ion-input type="number" [(ngModel)]="nuevoEvento.id_destino"></ion-input>
+      </ion-item>
+
+
+      <ion-button expand="block" (click)="agregarEvento()">Agregar</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+
+  <!-- Edición -->
+  <ion-card *ngIf="editando">
+    <ion-card-header>
+      <ion-card-title>Editar Evento</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input [(ngModel)]="eventoEditando.nombre"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Tipo</ion-label>
+        <ion-input [(ngModel)]="eventoEditando.tipo_de_evento"></ion-input>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha inicio</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" [(ngModel)]="eventoEditando.fecha_de_inicio"></ion-datetime>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Fecha fin</ion-label>
+        <ion-datetime display-format="DD/MM/YYYY" [(ngModel)]="eventoEditando.fecha_fin"></ion-datetime>
+      </ion-item>
+
+
+      <ion-item>
+        <ion-label position="floating">Destino (id)</ion-label>
+        <ion-input type="number" [(ngModel)]="eventoEditando.id_destino"></ion-input>
+      </ion-item>
+
+
+      <ion-button expand="block" (click)="guardarEdicion()">Guardar cambios</ion-button>
+      <ion-button expand="block" fill="outline" color="medium" (click)="cancelarEdicion()">Cancelar</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+
+  <!-- Listado estilo mockup -->
+  <ion-list>
+    <ion-item *ngFor="let e of eventosFiltrados" lines="none">
+      <ion-card style="width:100%;">
+        <ion-item>
+          <ion-icon [name]="getIcon(e.tipo_de_evento)" slot="start" [style.fontSize.px]="28" [style.color]="getIconColor(e.tipo_de_evento)"></ion-icon>
+          <ion-label>
+            <h2>{{ e.nombre }}</h2>
+            <p>
+              {{ formatFecha(e.fecha_de_inicio) }}
+              <span *ngIf="e.fecha_de_fin"> — {{ formatFecha(e.fecha_de_fin) }}</span>
+            </p>
+            <p *ngIf="e.destino?.nombre_ciudad" class="ion-text-capitalize">{{ e.destino?.nombre_ciudad }}</p>
+          </ion-label>
+        </ion-item>
+
+
+        <ion-item lines="none">
+          <ion-button fill="clear" color="primary" (click)="editarEvento(e)">Editar</ion-button>
+          <ion-button fill="clear" color="danger" (click)="eliminarEvento(e.id_eventos)">Eliminar</ion-button>
+        </ion-item>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+
+</ion-content>
+
 
 
 
