@@ -13,11 +13,11 @@ import { createClient } from '@supabase/supabase-js';
 export class HealthPage implements OnInit {
   resenas: any[] = [];
   cargando = false;
-  mostrarFormulario = false; // Controla si mostrar el formulario
+  mostrarFormulario = false;
 
   nuevaResena = {
-    titulo: '',
-    contenido: '',
+    titulo: '', // Esto va a texto
+    contenido: '', // Esto también va a texto
     calificacion: 5
   };
 
@@ -35,9 +35,9 @@ export class HealthPage implements OnInit {
       console.log('🔄 Cargando reseñas desde Supabase...');
       
       const { data, error } = await this.supabase
-        .from('resenas')
+        .from('Resenas') // ← Nombre exacto de tu tabla
         .select('*')
-        .order('fecha_creacion', { ascending: false });
+        .order('fecha', { ascending: false }); // ← fecha en lugar de fecha_creacion
 
       if (error) {
         console.error('❌ Error cargando reseñas:', error);
@@ -61,12 +61,12 @@ export class HealthPage implements OnInit {
       console.log('🔄 Agregando reseña...');
 
       const { data, error } = await this.supabase
-        .from('resenas')
+        .from('Resenas') // ← Nombre exacto de tu tabla
         .insert([{
-          titulo: this.nuevaResena.titulo,
-          contenido: this.nuevaResena.contenido,
-          calificacion: this.nuevaResena.calificacion,
-          fecha_creacion: new Date().toISOString()
+          texto: this.nuevaResena.titulo + ': ' + this.nuevaResena.contenido, // ← Juntamos título y contenido en texto
+          puntuacion: this.nuevaResena.calificacion, // ← puntuacion en lugar de calificacion
+          fecha: new Date().toISOString() // ← fecha en lugar de fecha_creacion
+          // id_usuario lo omitimos por ahora o puedes poner un valor por defecto
         }])
         .select();
 
@@ -97,14 +97,14 @@ export class HealthPage implements OnInit {
     }
   }
 
-  async eliminarResena(id: string) {
+  async eliminarResena(id: number) { // ← Cambié a number porque id_resenas es SERIAL
     try {
       console.log('🔄 Eliminando reseña...');
 
       const { error } = await this.supabase
-        .from('resenas')
+        .from('Resenas') // ← Nombre exacto de tu tabla
         .delete()
-        .eq('id', id);
+        .eq('id_resenas', id); // ← id_resenas en lugar de id
 
       if (error) {
         console.error('❌ Error eliminando reseña:', error);
@@ -119,6 +119,4 @@ export class HealthPage implements OnInit {
       console.error('❌ Error general:', error);
     }
   }
-
-  // QUITÉ el método toggleFormulario - usamos directamente mostrarFormulario = true/false
 }

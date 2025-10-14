@@ -12,7 +12,7 @@
     </button>
   </div>
 
-  <!-- Formulario (solo se muestra cuando mostrarFormulario es true) -->
+  <!-- Formulario -->
   <div *ngIf="mostrarFormulario" class="agregar-resena">
     <div class="form-header">
       <h3>Agregar Nueva Reseña</h3>
@@ -114,9 +114,9 @@
     <div *ngIf="resenas.length > 0" class="resenas-grid">
       <div *ngFor="let resena of resenas" class="resena-card">
         <div class="resena-header">
-          <h4 class="resena-titulo">{{ resena.titulo }}</h4>
+          <h4 class="resena-titulo">{{ resena.texto?.split(':')[0] }}</h4> <!-- Extrae el título del texto -->
           <button 
-            (click)="eliminarResena(resena.id)" 
+            (click)="eliminarResena(resena.id_resenas)" <!-- id_resenas en lugar de id -->
             class="btn-eliminar"
             title="Eliminar reseña"
           >
@@ -126,15 +126,15 @@
         
         <div class="calificacion-resena">
           <span class="estrellas">
-            {{ '★'.repeat(resena.calificacion) }}{{ '☆'.repeat(5 - resena.calificacion) }}
+            {{ '★'.repeat(resena.puntuacion) }}{{ '☆'.repeat(5 - resena.puntuacion) }} <!-- puntuacion en lugar de calificacion -->
           </span>
-          <span class="puntuacion">({{ resena.calificacion }}/5)</span>
+          <span class="puntuacion">({{ resena.puntuacion }}/5)</span> <!-- puntuacion en lugar de calificacion -->
         </div>
         
-        <p class="contenido-resena">{{ resena.contenido }}</p>
+        <p class="contenido-resena">{{ resena.texto?.split(':')[1] }}</p> <!-- Extrae el contenido del texto -->
         
         <div class="fecha-resena">
-          {{ resena.fecha_creacion | date:'medium' }}
+          {{ resena.fecha | date:'medium' }} <!-- fecha en lugar de fecha_creacion -->
         </div>
       </div>
     </div>
