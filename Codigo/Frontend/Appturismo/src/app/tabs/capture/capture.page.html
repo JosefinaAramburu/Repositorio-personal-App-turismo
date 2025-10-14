@@ -9,50 +9,50 @@
     </ion-card-header>
 
     <ion-card-content>
+      <!-- Nombre con binding bidireccional -->
       <ion-item>
         <ion-label position="stacked">Nombre *</ion-label>
         <ion-input 
-          [ngModel]="lugarEditando ? lugarEditando.nombre : nuevoLugar.nombre"
-          (ngModelChange)="lugarEditando ? lugarEditando.nombre = $event : nuevoLugar.nombre = $event"
+          [(ngModel)]="lugarEditando ? lugarEditando.nombre : nuevoLugar.nombre"
           placeholder="Ingresa el nombre del lugar"
           required>
         </ion-input>
       </ion-item>
 
+      <!-- Categoría con binding bidireccional -->
       <ion-item>
         <ion-label position="stacked">Categoría *</ion-label>
         <ion-input 
-          [ngModel]="lugarEditando ? lugarEditando.categoria : nuevoLugar.categoria"
-          (ngModelChange)="lugarEditando ? lugarEditando.categoria = $event : nuevoLugar.categoria = $event"
+          [(ngModel)]="lugarEditando ? lugarEditando.categoria : nuevoLugar.categoria"
           placeholder="Ej: Monumento, Restaurante, Parque"
           required>
         </ion-input>
       </ion-item>
 
+      <!-- Descripción con binding bidireccional -->
       <ion-item>
         <ion-label position="stacked">Descripción</ion-label>
         <ion-textarea 
-          [ngModel]="lugarEditando ? lugarEditando.descripcion : nuevoLugar.descripcion"
-          (ngModelChange)="lugarEditando ? lugarEditando.descripcion = $event : nuevoLugar.descripcion = $event"
+          [(ngModel)]="lugarEditando ? lugarEditando.descripcion : nuevoLugar.descripcion"
           placeholder="Describe el lugar..."
           rows="3">
         </ion-textarea>
       </ion-item>
 
+      <!-- Horario con binding bidireccional -->
       <ion-item>
         <ion-label position="stacked">Horario</ion-label>
         <ion-input 
-          [ngModel]="lugarEditando ? lugarEditando.horario : nuevoLugar.horario"
-          (ngModelChange)="lugarEditando ? lugarEditando.horario = $event : nuevoLugar.horario = $event"
+          [(ngModel)]="lugarEditando ? lugarEditando.horario : nuevoLugar.horario"
           placeholder="Ej: 9:00 - 18:00">
         </ion-input>
       </ion-item>
 
+      <!-- Precio con binding bidireccional -->
       <ion-item>
         <ion-label position="stacked">Precio</ion-label>
         <ion-input 
-          [ngModel]="lugarEditando ? lugarEditando.precio : nuevoLugar.precio"
-          (ngModelChange)="lugarEditando ? lugarEditando.precio = $event : nuevoLugar.precio = $event"
+          [(ngModel)]="lugarEditando ? lugarEditando.precio : nuevoLugar.precio"
           placeholder="Ej: Gratis, €, €€, €€€">
         </ion-input>
       </ion-item>
@@ -110,6 +110,7 @@
                 <ion-icon name="time-outline"></ion-icon>
                 <span>{{ lugar.horario }}</span>
               </div>
+              <!-- Mostramos precio aunque no esté en BD -->
               <div class="detail-item" *ngIf="lugar.precio">
                 <ion-icon name="cash-outline"></ion-icon>
                 <span>{{ lugar.precio }}</span>
