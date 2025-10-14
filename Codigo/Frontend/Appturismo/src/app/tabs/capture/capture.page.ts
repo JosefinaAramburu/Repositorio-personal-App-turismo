@@ -124,50 +124,34 @@ export class CaptureService {
 
   async obtenerEstadisticasResenas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
     try {
-      console.log('📊 Obteniendo estadísticas para lugar:', idLugar);
-
+      // SIN Ñ - MUCHO MÁS SIMPLE
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('Lugares_Resenas')
         .select('id_resenas')
         .eq('id_lugares', idLugar);
 
-      if (errorRelaciones) {
-        console.error('❌ Error obteniendo relaciones:', errorRelaciones);
-        return { totalResenas: 0, promedioRating: 0 };
-      }
-
-      if (!relaciones || relaciones.length === 0) {
+      if (errorRelaciones || !relaciones || relaciones.length === 0) {
         return { totalResenas: 0, promedioRating: 0 };
       }
 
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       
-      const { data: reseñasData, error: errorResenas } = await supabase
-        .from('resenas')
+      const { data: resenas, error: errorResenas } = await supabase
+        .from('Resenas')
         .select('puntuacion')
         .in('id_resenas', idsResenas);
 
-      if (errorResenas) {
-        console.error('❌ Error obteniendo reseñas:', errorResenas);
+      if (errorResenas || !resenas) {
         return { totalResenas: 0, promedioRating: 0 };
       }
 
-      const totalResenas = reseñasData?.length || 0;
-      
-      if (totalResenas === 0) {
-        return { totalResenas: 0, promedioRating: 0 };
-      }
+      const totalResenas = resenas.length;
+      const sumaRatings = resenas.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0);
+      const promedioRating = totalResenas > 0 ? sumaRatings / totalResenas : 0;
 
-      const sumaRatings = reseñasData?.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0) || 0;
-      const promedioRating = sumaRatings / totalResenas;
-
-      return { 
-        totalResenas, 
-        promedioRating: Number(promedioRating.toFixed(2)) 
-      };
-
+      return { totalResenas, promedioRating };
     } catch (error) {
-      console.error('❌ Error calculando estadísticas:', error);
+      console.error('Error calculando estadísticas:', error);
       return { totalResenas: 0, promedioRating: 0 };
     }
   }
@@ -195,6 +179,7 @@ export class CaptureService {
   async eliminarLugar(id: number): Promise<void> {
     console.log('🔄 Eliminando lugar', id);
     
+    // Primero eliminar las relaciones de reseñas
     const { error: errorRelaciones } = await supabase
       .from('Lugares_Resenas')
       .delete()
@@ -204,6 +189,7 @@ export class CaptureService {
       console.error('❌ Error eliminando relaciones de reseñas:', errorRelaciones);
     }
     
+    // Luego eliminar el lugar
     const { error } = await supabase
       .from('Lugares')
       .delete()

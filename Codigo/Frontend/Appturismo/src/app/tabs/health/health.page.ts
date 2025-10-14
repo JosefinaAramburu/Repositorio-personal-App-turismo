@@ -14,7 +14,7 @@ import { addIcons } from 'ionicons';
 import { refreshOutline, createOutline, star } from 'ionicons/icons';
 
 interface Resena {
-  id: number;
+  id_resenas: number;
   id_usuario: number;
   texto: string;
   puntuacion: number;
@@ -64,14 +64,6 @@ export class HealthPage implements OnInit {
   resenas: Resena[] = [];
   usuarioActualId: number = 1;
 
-  // Variables para nombres de columnas con valores por defecto
-  private columnaIdResenas: string = 'id_resenas';
-  private columnaIdLugares: string = 'id_lugares';
-  private columnaIdUsuario: string = 'id_usuario';
-  private columnaTexto: string = 'texto';
-  private columnaPuntuacion: string = 'puntuacion';
-  private columnaFecha: string = 'fecha';
-
   constructor() {
     addIcons({
       refreshOutline,
@@ -87,140 +79,11 @@ export class HealthPage implements OnInit {
       
       console.log('📍 Lugar seleccionado:', this.lugarSeleccionado, 'ID:', this.idLugarSeleccionado);
       
-      await this.diagnosticarEstructuraTablas();
       await this.verificarUsuario();
       await this.cargarResenas();
     });
   }
 
-  /**
-   * DIAGNOSTICAR ESTRUCTURA DE TABLAS
-   */
-  async diagnosticarEstructuraTablas() {
-    try {
-      console.log('🔍 DIAGNÓSTICO DE ESTRUCTURA DE TABLAS');
-      
-      // Verificar estructura de Lugares_Resenas
-      const { data: estructuraLR, error: errorLR } = await supabase
-        .from('Lugares_Resenas')
-        .select('*')
-        .limit(1);
-      
-      console.log('📋 Estructura Lugares_Resenas:', estructuraLR);
-      if (estructuraLR && estructuraLR.length > 0) {
-        const columnas = Object.keys(estructuraLR[0]);
-        console.log('📊 Columnas de Lugares_Resenas:', columnas);
-        
-        // Detectar nombres de columnas de forma segura
-        this.detectarNombresColumnas(columnas, 'Lugares_Resenas');
-      }
-      if (errorLR) console.error('❌ Error Lugares_Resenas:', errorLR);
-      
-      // Verificar estructura de Resenas
-      const { data: estructuraR, error: errorR } = await supabase
-        .from('Resenas')
-        .select('*')
-        .limit(1);
-      
-      console.log('📋 Estructura Resenas:', estructuraR);
-      if (estructuraR && estructuraR.length > 0) {
-        const columnas = Object.keys(estructuraR[0]);
-        console.log('📊 Columnas de Resenas:', columnas);
-        
-        // Detectar nombres de columnas de forma segura
-        this.detectarNombresColumnas(columnas, 'Resenas');
-      }
-      if (errorR) console.error('❌ Error Resenas:', errorR);
-      
-      console.log('🎯 Columnas detectadas:', {
-        idResenas: this.columnaIdResenas,
-        idLugares: this.columnaIdLugares,
-        idUsuario: this.columnaIdUsuario,
-        texto: this.columnaTexto,
-        puntuacion: this.columnaPuntuacion,
-        fecha: this.columnaFecha
-      });
-      
-    } catch (error) {
-      console.error('❌ Error en diagnóstico de estructura:', error);
-    }
-  }
-
-  /**
-   * DETECTAR NOMBRES DE COLUMNAS DE FORMA SEGURA
-   */
-  private detectarNombresColumnas(columnas: string[], tabla: string) {
-    // Para Lugares_Resenas
-    if (tabla === 'Lugares_Resenas') {
-      if (columnas.includes('id_resenas')) {
-        this.columnaIdResenas = 'id_resenas';
-      } else if (columnas.includes('id_resena')) {
-        this.columnaIdResenas = 'id_resena';
-      } else if (columnas.includes('resena_id')) {
-        this.columnaIdResenas = 'resena_id';
-      }
-      
-      if (columnas.includes('id_lugares')) {
-        this.columnaIdLugares = 'id_lugares';
-      } else if (columnas.includes('id_lugar')) {
-        this.columnaIdLugares = 'id_lugar';
-      } else if (columnas.includes('lugar_id')) {
-        this.columnaIdLugares = 'lugar_id';
-      }
-    }
-    
-    // Para Resenas
-    if (tabla === 'Resenas') {
-      if (columnas.includes('id_resenas')) {
-        this.columnaIdResenas = 'id_resenas';
-      } else if (columnas.includes('id_resena')) {
-        this.columnaIdResenas = 'id_resena';
-      } else if (columnas.includes('id')) {
-        this.columnaIdResenas = 'id';
-      }
-      
-      if (columnas.includes('id_usuario')) {
-        this.columnaIdUsuario = 'id_usuario';
-      } else if (columnas.includes('usuario_id')) {
-        this.columnaIdUsuario = 'usuario_id';
-      }
-      
-      if (columnas.includes('texto')) {
-        this.columnaTexto = 'texto';
-      } else if (columnas.includes('comentario')) {
-        this.columnaTexto = 'comentario';
-      } else if (columnas.includes('descripcion')) {
-        this.columnaTexto = 'descripcion';
-      }
-      
-      if (columnas.includes('puntuacion')) {
-        this.columnaPuntuacion = 'puntuacion';
-      } else if (columnas.includes('calificacion')) {
-        this.columnaPuntuacion = 'calificacion';
-      } else if (columnas.includes('rating')) {
-        this.columnaPuntuacion = 'rating';
-      }
-      
-      if (columnas.includes('fecha')) {
-        this.columnaFecha = 'fecha';
-      } else if (columnas.includes('fecha_creacion')) {
-        this.columnaFecha = 'fecha_creacion';
-      } else if (columnas.includes('created_at')) {
-        this.columnaFecha = 'created_at';
-      }
-    }
-  }
-
-  /**
-   * OBTENER VALOR DE COLUMNA DE FORMA SEGURA
-   */
-  private obtenerValorColumna(objeto: any, columna: string): any {
-    return objeto[columna];
-  }
-
-  /**
-   * VERIFICAR USUARIO
-   */
   async verificarUsuario() {
     try {
       console.log('🔍 Verificando usuario ID:', this.usuarioActualId);
@@ -252,7 +115,7 @@ export class HealthPage implements OnInit {
         nombre: 'Usuario',
         apellido: 'Demo',
         email: 'demo@example.com',
-        contraseña: 'password123',
+        contrasena: 'password123',
         fecha_nacimiento: '1990-01-01'
       };
 
@@ -296,9 +159,6 @@ export class HealthPage implements OnInit {
     }
   }
 
-  /**
-   * CARGAR RESEÑAS - VERSIÓN CORREGIDA
-   */
   async cargarResenas() {
     if (this.isLoading) return;
     
@@ -316,11 +176,11 @@ export class HealthPage implements OnInit {
         throw new Error('ID de lugar inválido');
       }
 
-      // Obtener relaciones usando nombres de columnas detectados
+      // SIN Ñ - MUCHO MÁS SIMPLE
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('Lugares_Resenas')
-        .select(this.columnaIdResenas)
-        .eq(this.columnaIdLugares, this.idLugarSeleccionado);
+        .select('id_resenas')
+        .eq('id_lugares', this.idLugarSeleccionado);
 
       if (errorRelaciones) {
         console.error('❌ Error cargando relaciones:', errorRelaciones);
@@ -337,24 +197,22 @@ export class HealthPage implements OnInit {
         return;
       }
 
-      // Obtener IDs de reseñas de forma segura
-      const idsResenas = relaciones.map(rel => this.obtenerValorColumna(rel, this.columnaIdResenas));
+      const idsResenas = relaciones.map(rel => rel.id_resenas);
       
-      // Obtener reseñas usando nombres de columnas detectados
-      const { data: reseñasData, error: errorResenas } = await supabase
+      const { data: resenasData, error: errorResenas } = await supabase
         .from('Resenas')
         .select('*')
-        .in(this.columnaIdResenas, idsResenas)
-        .order(this.columnaFecha, { ascending: false });
+        .in('id_resenas', idsResenas)
+        .order('fecha', { ascending: false });
 
       if (errorResenas) {
         console.error('❌ Error cargando reseñas:', errorResenas);
         throw errorResenas;
       }
 
-      console.log('📊 Reseñas obtenidas:', reseñasData);
+      console.log('📊 Reseñas obtenidas:', resenasData);
 
-      this.resenas = (reseñasData || []).map(resena => this.transformarResena(resena));
+      this.resenas = (resenasData || []).map(resena => this.transformarResena(resena));
 
       console.log(`✅ ${this.resenas.length} reseñas cargadas correctamente`);
       
@@ -367,9 +225,6 @@ export class HealthPage implements OnInit {
     }
   }
 
-  /**
-   * AGREGAR RESEÑA - VERSIÓN CORREGIDA
-   */
   async agregarResena() {
     if (!this.nuevaResenaTexto.trim()) {
       await this.mostrarToast('Por favor, escribí tu reseña antes de publicar', 'warning');
@@ -401,12 +256,13 @@ export class HealthPage implements OnInit {
       console.log('🔄 Iniciando creación de reseña...');
       console.log('👤 Usando usuario ID:', this.usuarioActualId);
 
-      // Crear objeto de datos de forma explícita
-      const resenaData: Record<string, any> = {};
-      resenaData[this.columnaIdUsuario] = this.usuarioActualId;
-      resenaData[this.columnaTexto] = this.nuevaResenaTexto.trim();
-      resenaData[this.columnaPuntuacion] = this.nuevaResenaRating;
-      resenaData[this.columnaFecha] = new Date().toISOString().split('T')[0];
+      // SIN Ñ - MUCHO MÁS SIMPLE
+      const resenaData = {
+        id_usuario: this.usuarioActualId,
+        texto: this.nuevaResenaTexto.trim(),
+        puntuacion: this.nuevaResenaRating,
+        fecha: new Date().toISOString().split('T')[0]
+      };
 
       console.log('📝 Datos de reseña:', resenaData);
 
@@ -418,23 +274,16 @@ export class HealthPage implements OnInit {
 
       if (errorResena) {
         console.error('❌ Error creando reseña:', errorResena);
-        
-        if (errorResena.code === '23503') {
-          await this.mostrarToast('Error: Problema con el usuario. Intentando resolver...', 'warning');
-          await this.verificarUsuario();
-          await loading.dismiss();
-          return;
-        }
-        
         throw new Error(`No se pudo crear la reseña: ${errorResena.message}`);
       }
 
       console.log('✅ Reseña creada:', nuevaResena);
 
-      // Crear relación
-      const relacionData: Record<string, any> = {};
-      relacionData[this.columnaIdLugares] = this.idLugarSeleccionado;
-      relacionData[this.columnaIdResenas] = this.obtenerValorColumna(nuevaResena, this.columnaIdResenas);
+      // SIN Ñ - MUCHO MÁS SIMPLE
+      const relacionData = {
+        id_lugares: this.idLugarSeleccionado,
+        id_resenas: nuevaResena.id_resenas
+      };
 
       console.log('🔗 Datos de relación:', relacionData);
 
@@ -444,32 +293,29 @@ export class HealthPage implements OnInit {
 
       if (errorRelacion) {
         console.error('❌ Error creando relación:', errorRelacion);
-        
-        // Eliminar reseña creada
-        await supabase
-          .from('Resenas')
-          .delete()
-          .eq(this.columnaIdResenas, this.obtenerValorColumna(nuevaResena, this.columnaIdResenas));
-          
         throw new Error(`No se pudo vincular la reseña al lugar: ${errorRelacion.message}`);
       }
 
       console.log('✅ Relación creada exitosamente');
 
-      // Agregar a lista local
-      const resenaParaLista = this.transformarResena(nuevaResena);
-      resenaParaLista.usuario = 'Tú';
-      resenaParaLista.avatar = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+      const resenaParaLista: Resena = {
+        id_resenas: nuevaResena.id_resenas,
+        id_usuario: nuevaResena.id_usuario,
+        texto: nuevaResena.texto,
+        puntuacion: nuevaResena.puntuacion,
+        fecha: this.formatearFecha(nuevaResena.fecha),
+        usuario: 'Tú',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        rating: nuevaResena.puntuacion
+      };
 
       this.resenas.unshift(resenaParaLista);
 
-      // Limpiar formulario
       this.nuevaResenaTexto = '';
       this.nuevaResenaRating = 0;
 
       await this.mostrarToast('¡Reseña publicada con éxito!', 'success');
 
-      // Scroll to top
       setTimeout(() => {
         const content = document.querySelector('ion-content');
         content?.scrollToTop(500);
@@ -483,23 +329,18 @@ export class HealthPage implements OnInit {
     }
   }
 
-  /**
-   * TRANSFORMAR RESEÑA - VERSIÓN CORREGIDA
-   */
   private transformarResena(resena: any): Resena {
     return {
-      id: this.obtenerValorColumna(resena, this.columnaIdResenas),
-      id_usuario: this.obtenerValorColumna(resena, this.columnaIdUsuario),
-      texto: this.obtenerValorColumna(resena, this.columnaTexto) || '',
-      puntuacion: this.obtenerValorColumna(resena, this.columnaPuntuacion) || 0,
-      fecha: this.formatearFecha(this.obtenerValorColumna(resena, this.columnaFecha)),
-      usuario: this.getNombreUsuario(this.obtenerValorColumna(resena, this.columnaIdUsuario)),
-      avatar: this.getRandomAvatar(this.obtenerValorColumna(resena, this.columnaIdUsuario)),
-      rating: this.obtenerValorColumna(resena, this.columnaPuntuacion) || 0
+      id_resenas: resena.id_resenas,
+      id_usuario: resena.id_usuario,
+      texto: resena.texto || '',
+      puntuacion: resena.puntuacion || 0,
+      fecha: this.formatearFecha(resena.fecha),
+      usuario: this.getNombreUsuario(resena.id_usuario),
+      avatar: this.getRandomAvatar(resena.id_usuario),
+      rating: resena.puntuacion || 0
     };
   }
-
-  // ... (mantener los demás métodos igual)
 
   seleccionarRating(rating: number) {
     this.nuevaResenaRating = rating;
