@@ -52,65 +52,71 @@ export class HealthPage implements OnInit {
     }
   }
 
-  async agregarResena() {
-    console.log('🔴 MÉTODO agregarResena INICIADO');
+  // MÉTODO NUEVO - más simple para probar
+  async probarAgregarResena() {
+    console.log('🎯 MÉTODO probarAgregarResena LLAMADO');
+    console.log('📝 Datos en el formulario:', this.nuevaResena);
     
     if (this.cargando) {
-      console.log('🔴 Ya está cargando, saliendo...');
+      console.log('⏳ Ya está cargando...');
+      return;
+    }
+
+    if (!this.nuevaResena.titulo || !this.nuevaResena.contenido) {
+      console.log('❌ Faltan datos en el formulario');
+      alert('Por favor completa todos los campos');
       return;
     }
 
     this.cargando = true;
-    console.log('🔄 Estado cargando:', this.cargando);
+    console.log('🔄 Iniciando proceso de agregar...');
 
+    // Llamar al método original
+    await this.agregarResena();
+  }
+
+  async agregarResena() {
     try {
-      console.log('🔄 Agregando reseña...');
-      console.log('📝 Datos del formulario:', this.nuevaResena);
+      console.log('🔄 Agregando reseña a Supabase...');
 
-      // Preparar datos EXACTAMENTE como están en tu tabla
       const datosParaSupabase = {
         texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
         puntuacion: this.nuevaResena.calificacion,
-        fecha: new Date().toISOString().split('T')[0], // Solo la fecha (YYYY-MM-DD)
+        fecha: new Date().toISOString().split('T')[0],
         id_usuario: 1
       };
 
-      console.log('📤 Datos para Supabase:', datosParaSupabase);
+      console.log('📤 Enviando a Supabase:', datosParaSupabase);
 
       const { data, error } = await this.supabase
         .from('"Resenas"')
         .insert([datosParaSupabase])
         .select();
 
-      console.log('📡 RESPUESTA DE SUPABASE - data:', data);
-      console.log('📡 RESPUESTA DE SUPABASE - error:', error);
+      console.log('📡 Respuesta de Supabase - data:', data);
+      console.log('📡 Respuesta de Supabase - error:', error);
 
       if (error) {
-        console.error('❌ ERROR de Supabase:', error);
-        console.error('❌ Mensaje:', error.message);
-        console.error('❌ Detalles:', error.details);
+        console.error('❌ Error de Supabase:', error);
+        alert('Error: ' + error.message);
         return;
       }
 
-      console.log('✅ Reseña agregada a Supabase, recargando lista...');
+      console.log('✅ Reseña agregada, recargando lista...');
       await this.cargarResenas();
 
-      // Limpiar formulario
-      this.nuevaResena = {
-        titulo: '',
-        contenido: '',
-        calificacion: 5
-      };
-
-      // Ocultar formulario
+      // Limpiar y cerrar
+      this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
       this.mostrarFormulario = false;
-      console.log('✅ Reseña agregada exitosamente!');
+
+      console.log('🎉 Reseña agregada exitosamente!');
+      alert('Reseña agregada correctamente!');
 
     } catch (error) {
-      console.error('❌ ERROR GENERAL:', error);
+      console.error('❌ Error general:', error);
+      alert('Error al agregar reseña');
     } finally {
       this.cargando = false;
-      console.log('🔄 Estado cargando al final:', this.cargando);
     }
   }
 

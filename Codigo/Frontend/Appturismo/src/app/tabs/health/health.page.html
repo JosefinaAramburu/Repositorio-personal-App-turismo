@@ -25,7 +25,8 @@
       </button>
     </div>
     
-    <form (ngSubmit)="agregarResena()" #resenaForm="ngForm">
+    <!-- QUITAR el form y poner div -->
+    <div>
       
       <!-- Título -->
       <div class="form-group">
@@ -75,12 +76,21 @@
         </div>
       </div>
 
-      <!-- Botones del formulario -->
+      <!-- Estado (debug) -->
+      <div class="debug-info">
+        <p>Título: "{{ nuevaResena.titulo }}"</p>
+        <p>Contenido: "{{ nuevaResena.contenido }}"</p>
+        <p>Calificación: {{ nuevaResena.calificacion }}</p>
+        <p>Estado cargando: {{ cargando }}</p>
+      </div>
+
+      <!-- Botones -->
       <div class="form-buttons">
         <button 
-          type="submit" 
+          type="button" <!-- CAMBIAR a type="button" -->
+          (click)="probarAgregarResena()" <!-- AGREGAR este método -->
           class="btn-submit"
-          [disabled]="!resenaForm.valid || cargando"
+          [disabled]="cargando || !nuevaResena.titulo || !nuevaResena.contenido"
         >
           {{ cargando ? 'Agregando...' : 'Agregar Reseña' }}
         </button>
@@ -94,10 +104,10 @@
         </button>
       </div>
 
-    </form>
+    </div>
   </div>
 
-  <!-- Lista de reseñas -->
+  <!-- Lista de reseñas (igual que antes) -->
   <div class="lista-resenas">
     <h3>Reseñas Existentes ({{ resenas.length }})</h3>
 
@@ -114,9 +124,9 @@
     <div *ngIf="resenas.length > 0" class="resenas-grid">
       <div *ngFor="let resena of resenas" class="resena-card">
         <div class="resena-header">
-          <h4 class="resena-titulo">{{ resena.texto?.split(':')[0] }}</h4> <!-- Extrae el título del texto -->
+          <h4 class="resena-titulo">{{ resena.texto?.split(':')[0] }}</h4>
           <button 
-            (click)="eliminarResena(resena.id_resenas)" <!-- id_resenas en lugar de id -->
+            (click)="eliminarResena(resena.id_resenas)" 
             class="btn-eliminar"
             title="Eliminar reseña"
           >
@@ -126,15 +136,15 @@
         
         <div class="calificacion-resena">
           <span class="estrellas">
-            {{ '★'.repeat(resena.puntuacion) }}{{ '☆'.repeat(5 - resena.puntuacion) }} <!-- puntuacion en lugar de calificacion -->
+            {{ '★'.repeat(resena.puntuacion) }}{{ '☆'.repeat(5 - resena.puntuacion) }}
           </span>
-          <span class="puntuacion">({{ resena.puntuacion }}/5)</span> <!-- puntuacion en lugar de calificacion -->
+          <span class="puntuacion">({{ resena.puntuacion }}/5)</span>
         </div>
         
-        <p class="contenido-resena">{{ resena.texto?.split(':')[1] }}</p> <!-- Extrae el contenido del texto -->
+        <p class="contenido-resena">{{ resena.texto?.split(':')[1] }}</p>
         
         <div class="fecha-resena">
-          {{ resena.fecha | date:'medium' }} <!-- fecha en lugar de fecha_creacion -->
+          {{ resena.fecha | date:'medium' }}
         </div>
       </div>
     </div>

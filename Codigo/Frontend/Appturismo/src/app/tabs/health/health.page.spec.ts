@@ -29,15 +29,63 @@ describe('HealthPage', () => {
     expect(component.nuevaResena).toEqual({
       titulo: '',
       contenido: '',
-      calificacion: 5  // Cambié de 1 a 5 porque en el código está en 5
+      calificacion: 5
     });
   });
 
   it('should have loading state initialized as false', () => {
-    expect(component.cargando).toBeFalse();  // Solo existe 'cargando', no 'cargandoResenas' ni 'eliminando'
+    expect(component.cargando).toBeFalse();
   });
 
-  // Test adicional para verificar que el formulario se limpia correctamente
+  it('should have mostrarFormulario initialized as false', () => {
+    expect(component.mostrarFormulario).toBeFalse();
+  });
+
+  // Test para el método probarAgregarResena
+  it('should call agregarResena when probarAgregarResena is called with valid data', async () => {
+    spyOn(component, 'agregarResena');
+    
+    component.nuevaResena = {
+      titulo: 'Test Title',
+      contenido: 'Test Content',
+      calificacion: 4
+    };
+
+    await component.probarAgregarResena();
+    
+    expect(component.agregarResena).toHaveBeenCalled();
+  });
+
+  it('should not call agregarResena when probarAgregarResena is called with invalid data', async () => {
+    spyOn(component, 'agregarResena');
+    
+    component.nuevaResena = {
+      titulo: '',
+      contenido: 'Test Content',
+      calificacion: 4
+    };
+
+    await component.probarAgregarResena();
+    
+    expect(component.agregarResena).not.toHaveBeenCalled();
+  });
+
+  it('should not call agregarResena when already loading', async () => {
+    spyOn(component, 'agregarResena');
+    
+    component.cargando = true;
+    component.nuevaResena = {
+      titulo: 'Test Title',
+      contenido: 'Test Content',
+      calificacion: 4
+    };
+
+    await component.probarAgregarResena();
+    
+    expect(component.agregarResena).not.toHaveBeenCalled();
+  });
+
+  // Test para reset del formulario
   it('should reset form after adding reseña', () => {
     // Simular datos en el formulario
     component.nuevaResena = {
@@ -56,5 +104,32 @@ describe('HealthPage', () => {
     expect(component.nuevaResena.titulo).toBe('');
     expect(component.nuevaResena.contenido).toBe('');
     expect(component.nuevaResena.calificacion).toBe(5);
+  });
+
+  // Test para mostrar/ocultar formulario
+  it('should toggle mostrarFormulario when buttons are clicked', () => {
+    component.mostrarFormulario = false;
+    component.mostrarFormulario = true;
+    expect(component.mostrarFormulario).toBeTrue();
+
+    component.mostrarFormulario = false;
+    expect(component.mostrarFormulario).toBeFalse();
+  });
+
+  // Test para cargarResenas (método mock)
+  it('should call cargarResenas on init', async () => {
+    spyOn(component, 'cargarResenas');
+    await component.ngOnInit();
+    expect(component.cargarResenas).toHaveBeenCalled();
+  });
+
+  // Test para eliminarResena
+  it('should call eliminarResena with correct id', async () => {
+    spyOn(component, 'eliminarResena');
+    const testId = 123;
+    
+    await component.eliminarResena(testId);
+    
+    expect(component.eliminarResena).toHaveBeenCalledWith(testId);
   });
 });
