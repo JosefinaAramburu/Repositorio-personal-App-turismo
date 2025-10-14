@@ -1,9 +1,30 @@
 <div class="resenas-container">
   <h2>Reseñas</h2>
 
-  <!-- Formulario -->
-  <div class="agregar-resena">
-    <h3>Agregar Nueva Reseña</h3>
+  <!-- Botón para mostrar formulario -->
+  <div class="boton-agregar-container">
+    <button 
+      *ngIf="!mostrarFormulario"
+      (click)="toggleFormulario()" 
+      class="btn-mostrar-formulario"
+    >
+      + Agregar Nueva Reseña
+    </button>
+  </div>
+
+  <!-- Formulario (solo se muestra cuando mostrarFormulario es true) -->
+  <div *ngIf="mostrarFormulario" class="agregar-resena">
+    <div class="form-header">
+      <h3>Agregar Nueva Reseña</h3>
+      <button 
+        (click)="toggleFormulario()" 
+        class="btn-cerrar"
+        title="Cerrar formulario"
+      >
+        ×
+      </button>
+    </div>
+    
     <form (ngSubmit)="agregarResena()" #resenaForm="ngForm">
       
       <!-- Título -->
@@ -54,18 +75,23 @@
         </div>
       </div>
 
-      <!-- Botón -->
-      <button 
-        type="submit" 
-        class="btn-submit"
-        [disabled]="!resenaForm.valid || cargando"
-      >
-        {{ cargando ? 'Agregando...' : 'Agregar Reseña' }}
-      </button>
-
-      <!-- Mensaje de validación -->
-      <div *ngIf="resenaForm.invalid && resenaForm.touched" class="error-message">
-        Por favor completa todos los campos
+      <!-- Botones del formulario -->
+      <div class="form-buttons">
+        <button 
+          type="submit" 
+          class="btn-submit"
+          [disabled]="!resenaForm.valid || cargando"
+        >
+          {{ cargando ? 'Agregando...' : 'Agregar Reseña' }}
+        </button>
+        
+        <button 
+          type="button" 
+          (click)="toggleFormulario()"
+          class="btn-cancelar"
+        >
+          Cancelar
+        </button>
       </div>
 
     </form>
@@ -77,31 +103,39 @@
 
     <div *ngIf="resenas.length === 0" class="sin-resenas">
       <p>No hay reseñas aún. ¡Sé el primero en agregar una!</p>
+      <button 
+        (click)="toggleFormulario()" 
+        class="btn-primera-resena"
+      >
+        Agregar Primera Reseña
+      </button>
     </div>
 
-    <div *ngFor="let resena of resenas" class="resena-card">
-      <div class="resena-header">
-        <h4 class="resena-titulo">{{ resena.titulo }}</h4>
-        <button 
-          (click)="eliminarResena(resena.id)" 
-          class="btn-eliminar"
-          title="Eliminar reseña"
-        >
-          ×
-        </button>
-      </div>
-      
-      <div class="calificacion-resena">
-        <span class="estrellas">
-          {{ '★'.repeat(resena.calificacion) }}{{ '☆'.repeat(5 - resena.calificacion) }}
-        </span>
-        <span class="puntuacion">({{ resena.calificacion }}/5)</span>
-      </div>
-      
-      <p class="contenido-resena">{{ resena.contenido }}</p>
-      
-      <div class="fecha-resena">
-        {{ resena.fecha_creacion | date:'medium' }}
+    <div *ngIf="resenas.length > 0" class="resenas-grid">
+      <div *ngFor="let resena of resenas" class="resena-card">
+        <div class="resena-header">
+          <h4 class="resena-titulo">{{ resena.titulo }}</h4>
+          <button 
+            (click)="eliminarResena(resena.id)" 
+            class="btn-eliminar"
+            title="Eliminar reseña"
+          >
+            ×
+          </button>
+        </div>
+        
+        <div class="calificacion-resena">
+          <span class="estrellas">
+            {{ '★'.repeat(resena.calificacion) }}{{ '☆'.repeat(5 - resena.calificacion) }}
+          </span>
+          <span class="puntuacion">({{ resena.calificacion }}/5)</span>
+        </div>
+        
+        <p class="contenido-resena">{{ resena.contenido }}</p>
+        
+        <div class="fecha-resena">
+          {{ resena.fecha_creacion | date:'medium' }}
+        </div>
       </div>
     </div>
   </div>

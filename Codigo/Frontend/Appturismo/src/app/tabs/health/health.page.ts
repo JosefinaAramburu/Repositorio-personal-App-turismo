@@ -13,6 +13,7 @@ import { createClient } from '@supabase/supabase-js';
 export class HealthPage implements OnInit {
   resenas: any[] = [];
   cargando = false;
+  mostrarFormulario = false; // ← Controla si mostrar el formulario
 
   nuevaResena = {
     titulo: '',
@@ -20,7 +21,6 @@ export class HealthPage implements OnInit {
     calificacion: 5
   };
 
-  // Configuración de Supabase DIRECTAMENTE aquí
   private supabase = createClient(
     'https://xqznsyyloofllzkywohl.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxem5zeXlsb29mbGx6a3l3b2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMDk4MTksImV4cCI6MjA3MDY4NTgxOX0.rqIz8miQTNRPLWuNXE4LDwCQY2UT-f6IgRBaChszeOk'
@@ -75,18 +75,20 @@ export class HealthPage implements OnInit {
         return;
       }
 
-      // Agregar la nueva reseña al array local
-      if (data && data.length > 0) {
-        this.resenas.unshift(data[0]);
-        console.log('✅ Reseña agregada exitosamente:', data[0]);
-      }
+      // 1. Recargar las reseñas desde Supabase para tener los datos actualizados
+      await this.cargarResenas();
 
-      // Limpiar formulario
+      // 2. Limpiar formulario
       this.nuevaResena = {
         titulo: '',
         contenido: '',
         calificacion: 5
       };
+
+      // 3. Ocultar el formulario
+      this.mostrarFormulario = false;
+
+      console.log('✅ Reseña agregada exitosamente!');
 
     } catch (error) {
       console.error('❌ Error general:', error);
@@ -109,12 +111,17 @@ export class HealthPage implements OnInit {
         return;
       }
 
-      // Remover del array local
-      this.resenas = this.resenas.filter(resena => resena.id !== id);
+      // Recargar las reseñas después de eliminar
+      await this.cargarResenas();
       console.log('✅ Reseña eliminada:', id);
 
     } catch (error) {
       console.error('❌ Error general:', error);
     }
+  }
+
+  // Método para mostrar/ocultar el formulario
+  toggleFormulario() {
+    this.mostrarFormulario = !this.mostrarFormulario;
   }
 }
