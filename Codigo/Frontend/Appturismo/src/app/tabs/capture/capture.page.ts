@@ -1,13 +1,35 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, LoadingController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms'; // ✅ NECESARIO para ngModel
+
+// ✅ IMPORTAR todos los componentes de Ionic que usas
+import { IonContent } from '@ionic/angular/standalone';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardContent } from '@ionic/angular/standalone';
+import { IonItem } from '@ionic/angular/standalone';
+import { IonLabel } from '@ionic/angular/standalone';
+import { IonInput } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular/standalone';
 
 @Component({
-  selector: 'app-capture',  // ✅ CAMBIADO: 'app-login' → 'app-capture'
+  selector: 'app-capture',
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
+  standalone: true, // ✅ AGREGAR esto
+  imports: [ // ✅ AGREGAR todos los imports necesarios
+    FormsModule, // Para ngModel
+    IonContent,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle,
+    IonCardContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonButton
+  ]
 })
-export class CapturePage {  // ✅ CAMBIADO: 'LoginPage' → 'CapturePage'
+export class CapturePage {
   email: string = '';
   password: string = '';
 
