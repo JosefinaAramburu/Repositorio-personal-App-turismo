@@ -1,167 +1,77 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/capture" text="Atrás"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Reseñas</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="recargarResenas()" fill="clear">
-        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<div class="resenas-container">
+  <h2>Reseñas</h2>
 
-<ion-content class="reviews-content">
-  <!-- Header del Lugar Mejorado -->
-  <div class="place-header" *ngIf="lugarSeleccionado">
-    <div class="place-hero">
-      <div class="place-info">
-        <h1 class="place-name">{{lugarSeleccionado}}</h1>
-        <div class="place-stats">
-          <div class="stat">
-            <span class="star-symbol">★</span>
-            <span class="rating">{{obtenerPromedioRating()}}</span>
-            <span class="reviews-count">({{resenas.length}} reseña{{resenas.length !== 1 ? 's' : ''}})</span>
-          </div>
-          <ion-badge *ngIf="resenas.length > 0" color="success">
-            {{resenas.length}} opinione{{resenas.length !== 1 ? 's' : ''}}
-          </ion-badge>
+  <!-- Formulario -->
+  <div class="agregar-resena">
+    <h3>Agregar Nueva Reseña</h3>
+    <form (ngSubmit)="agregarResena()" #resenaForm="ngForm">
+      <div class="form-group">
+        <input 
+          type="text" 
+          placeholder="Título de la reseña"
+          name="titulo" 
+          [(ngModel)]="nuevaResena.titulo" 
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <textarea 
+          placeholder="Escribe tu reseña aquí..."
+          name="contenido" 
+          [(ngModel)]="nuevaResena.contenido" 
+          required
+          rows="4"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Calificación: {{ nuevaResena.calificacion }}/5</label>
+        <input 
+          type="range" 
+          name="calificacion" 
+          [(ngModel)]="nuevaResena.calificacion" 
+          min="1" 
+          max="5" 
+          required
+        >
+        <div class="estrellas-preview">
+          {{ '★'.repeat(nuevaResena.calificacion) }}{{ '☆'.repeat(5 - nuevaResena.calificacion) }}
         </div>
+      </div>
+
+      <button type="submit" [disabled]="!resenaForm.valid || cargando">
+        {{ cargando ? 'Agregando...' : 'Agregar Reseña' }}
+      </button>
+    </form>
+  </div>
+
+  <!-- Lista de reseñas -->
+  <div class="lista-resenas">
+    <h3>Reseñas Existentes ({{ resenas.length }})</h3>
+
+    <div *ngIf="resenas.length === 0" class="sin-resenas">
+      <p>No hay reseñas aún. ¡Sé el primero en agregar una!</p>
+    </div>
+
+    <div *ngFor="let resena of resenas" class="resena-card">
+      <div class="resena-header">
+        <h4>{{ resena.titulo }}</h4>
+        <button 
+          (click)="eliminarResena(resena.id)" 
+          class="btn-eliminar"
+        >
+          ×
+        </button>
+      </div>
+      <div class="calificacion">
+        {{ '★'.repeat(resena.calificacion) }}{{ '☆'.repeat(5 - resena.calificacion) }}
+        ({{ resena.calificacion }}/5)
+      </div>
+      <p class="contenido">{{ resena.contenido }}</p>
+      <div class="fecha">
+        {{ resena.fecha_creacion | date:'medium' }}
       </div>
     </div>
   </div>
-
-  <!-- Resumen de Ratings Mejorado -->
-  <div class="ratings-summary" *ngIf="resenas.length > 0">
-    <div class="summary-card">
-      <h3>Resumen de Opiniones</h3>
-      <div class="rating-bars">
-        <div class="rating-bar" *ngFor="let star of [5,4,3,2,1]; let i = index">
-          <span class="star-label">{{star}} <span class="star-symbol-small">★</span></span>
-          <div class="bar-container">
-            <div class="bar-fill" [style.width.%]="calcularPorcentajeRating(star)"></div>
-          </div>
-          <span class="percentage">{{calcularPorcentajeRating(star)}}%</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Lista de Reseñas Mejorada -->
-  <div class="reviews-section" *ngIf="resenas.length > 0">
-    <div class="section-header">
-      <h2>Opiniones de Viajeros</h2>
-      <span class="reviews-count">{{resenas.length}} reseña{{resenas.length > 1 ? 's' : ''}}</span>
-    </div>
-
-    <div class="reviews-list">
-      <ion-card *ngFor="let resena of resenas" class="review-card">
-        <ion-card-content>
-          <div class="review-header">
-            <div class="user-info">
-              <ion-avatar class="user-avatar">
-                <img [src]="resena.avatar || 'assets/avatar-default.png'" alt="Usuario" (error)="resena.avatar = 'assets/avatar-default.png'">
-              </ion-avatar>
-              <div class="user-details">
-                <h4 class="user-name">{{resena.usuario}}</h4>
-                <div class="review-meta">
-                  <div class="rating-stars">
-                    <span 
-                      *ngFor="let star of [1,2,3,4,5]" 
-                      class="star-symbol-small"
-                      [class.active]="star <= resena.puntuacion">  <!-- CORREGIDO: rating → puntuacion -->
-                      ★
-                    </span>
-                  </div>
-                  <span class="review-date">{{resena.fecha}}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p class="review-text">{{resena.texto}}</p>  <!-- CORREGIDO: comentario → texto -->
-        </ion-card-content>
-      </ion-card>
-    </div>
-  </div>
-
-  <!-- Sin Reseñas Mejorado -->
-  <div *ngIf="resenas.length === 0 && !isLoading" class="empty-reviews">
-    <div class="empty-content">
-      <span class="empty-icon">💬</span>
-      <h3>No hay reseñas aún</h3>
-      <p>Sé el primero en compartir tu experiencia en {{lugarSeleccionado}}</p>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-state">
-    <div class="loading-content">
-      <ion-spinner name="crescent"></ion-spinner>
-      <p>Cargando reseñas...</p>
-    </div>
-  </div>
-
-  <!-- Formulario de Nueva Reseña Mejorado -->
-  <div class="add-review-section">
-    <ion-card class="add-review-card">
-      <ion-card-header>
-        <ion-card-title>Dejá tu Reseña</ion-card-title>
-        <ion-card-subtitle>Compartí tu experiencia sobre {{lugarSeleccionado}}</ion-card-subtitle>
-      </ion-card-header>
-
-      <ion-card-content>
-        <!-- Rating Mejorado -->
-        <div class="rating-input">
-          <label>Tu Calificación</label>
-          
-          <div class="stars-selector">
-            <span 
-              *ngFor="let star of [1,2,3,4,5]; let i = index"
-              [class.active]="i < nuevaResenaRating"
-              (click)="seleccionarRating(i + 1)"
-              class="star-symbol-large">
-              ★
-            </span>
-          </div>
-          
-          <span class="rating-text" *ngIf="nuevaResenaRating > 0">
-            {{nuevaResenaRating}} estrella{{nuevaResenaRating > 1 ? 's' : ''}}
-          </span>
-          <span class="rating-text" *ngIf="nuevaResenaRating === 0">
-            Toca las estrellas para calificar
-          </span>
-        </div>
-
-        <!-- Texto de la reseña Mejorado -->
-        <div class="review-input">
-          <ion-textarea
-            [(ngModel)]="nuevaResenaTexto"
-            placeholder="Contanos sobre tu experiencia... ¿Qué te gustó? ¿Qué mejorarías?"
-            rows="4"
-            autoGrow
-            maxlength="500"
-            class="custom-textarea">
-          </ion-textarea>
-          <div class="char-counter" 
-               [class.warning]="nuevaResenaTexto.length > 400"
-               [class.danger]="nuevaResenaTexto.length > 480">
-            {{nuevaResenaTexto.length}}/500 caracteres
-          </div>
-        </div>
-
-        <!-- Botón enviar Mejorado -->
-        <ion-button 
-          expand="block" 
-          color="primary" 
-          (click)="agregarResena()"
-          [disabled]="!nuevaResenaTexto.trim() || nuevaResenaRating === 0 || isLoading"
-          class="submit-button">
-          <ion-icon name="create-outline" slot="start"></ion-icon>
-          Publicar Reseña
-        </ion-button>
-      </ion-card-content>
-    </ion-card>
-  </div>
-</ion-content>
+</div>
