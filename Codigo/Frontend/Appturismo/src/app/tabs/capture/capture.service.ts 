@@ -1,0 +1,109 @@
+import { Injectable } from '@angular/core';
+import { supabase } from 'supabase.ts'; // Ajusta la ruta según donde tengas tu supabase.ts
+
+export interface Lugar {
+  id_lugares?: number;
+  id_destino: number;
+  nombre: string;
+  categoria: string;
+  descripcion: string;
+  horario: string;
+  imagen?: string;
+  rating?: number;
+  precio?: string;
+  ciudad?: string;
+  pais?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CaptureService {
+
+  // CREATE - Crear nuevo lugar
+  async crearLugar(lugar: Omit<Lugar, 'id_lugares'>): Promise<any> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .insert([lugar])
+      .select();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // READ - Obtener todos los lugares
+  async obtenerLugares(): Promise<Lugar[]> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .select(`
+        *,
+        Destino: id_destino (nombre_ciudad, pais)
+      `)
+      .order('id_lugares', { ascending: true });
+    
+    if (error) throw error;
+    
+    return data.map(item => ({
+      id_lugares: item.id_lugares,
+      id_destino: item.id_destino,
+      nombre: item.nombre,
+      categoria: item.categoria,
+      descripcion: item.descripcion,
+      horario: item.horario,
+      imagen: item.imagen || null,
+      rating: item.rating,
+      precio: item.precio,
+      ciudad: item.Destino?.nombre_ciudad || 'Barcelona',
+      pais: item.Destino?.pais || 'España'
+    }));
+  }
+
+  // UPDATE - Actualizar lugar
+  async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .update(updates)
+      .eq('id_lugares', id)
+      .select();
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // DELETE - Eliminar lugar
+  async eliminarLugar(id: number): Promise<any> {
+    const { error } = await supabase
+      .from('Lugares')
+      .delete()
+      .eq('id_lugares', id);
+    
+    if (error) throw error;
+    return { success: true };
+  }
+
+  // BUSCAR lugares
+  async buscarLugares(termino: string): Promise<Lugar[]> {
+    const { data, error } = await supabase
+      .from('Lugares')
+      .select(`
+        *,
+        Destino: id_destino (nombre_ciudad, pais)
+      `)
+      .or(`nombre.ilike.%${termino}%,categoria.ilike.%${termino}%,descripcion.ilike.%${termino}%`);
+    
+    if (error) throw error;
+    return data.map(item => ({
+      id_lugares: item.id_lugares,
+      id_destino: item.id_destino,
+      nombre: item.nombre,
+      categoria: item.categoria,
+      descripcion: item.descripcion,
+      horario: item.horario,
+      imagen: item.imagen || null,
+      rating: item.rating,
+      precio: item.precio,
+      ciudad: item.Destino?.nombre_ciudad,
+      pais: item.Destino?.pais
+    }));
+  }
+}

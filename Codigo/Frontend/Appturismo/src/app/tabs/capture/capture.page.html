@@ -4,6 +4,13 @@
       <ion-back-button defaultHref="/tabs/home" text="Atrás"></ion-back-button>
     </ion-buttons>
     <ion-title>Explorar Lugares</ion-title>
+    
+    <!-- BOTÓN AGREGAR NUEVO -->
+    <ion-buttons slot="end">
+      <ion-button (click)="agregarLugar()" color="success" title="Agregar nuevo lugar">
+        <ion-icon name="add-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -17,10 +24,16 @@
     <div class="hero-gradient"></div>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="cargando" class="loading-state">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando lugares desde Supabase...</p>
+  </div>
+
   <!-- Search Section -->
-  <div class="search-section">
+  <div *ngIf="!cargando" class="search-section">
     <div class="search-container">
-      <ion-searchbar 
+      <ion-searchbar
         [(ngModel)]="terminoBusqueda"
         (ionInput)="filtrarLugares()"
         placeholder=" Buscar ciudad, país o categoría..."
@@ -38,29 +51,28 @@
   </div>
 
   <!-- Search Results -->
-  <div *ngIf="lugaresFiltrados.length > 0" class="results-section">
+  <div *ngIf="!cargando && lugaresFiltrados.length > 0" class="results-section">
     <div class="section-header">
       <h2>Resultados para "{{terminoBusqueda}}"</h2>
       <span class="results-count">{{lugaresFiltrados.length}} lugar{{lugaresFiltrados.length > 1 ? 'es' : ''}} encontrado{{lugaresFiltrados.length > 1 ? 's' : ''}}</span>
     </div>
 
     <div class="results-grid">
-      <ion-card 
+      <ion-card
         *ngFor="let lugar of lugaresFiltrados"
-        (click)="irAResenas(lugar)"
         class="place-card"
       >
         <div class="card-image-container">
-          <div class="image-placeholder" *ngIf="!lugar.imagen || lugar.imagen.includes('undefined')">
+          <div class="image-placeholder" *ngIf="!lugar.imagen">
             <ion-icon name="location-outline"></ion-icon>
             <span>{{lugar.nombre}}</span>
           </div>
-          <img 
-            *ngIf="lugar.imagen && !lugar.imagen.includes('undefined')"
-            [src]="lugar.imagen" 
-            [alt]="lugar.nombre" 
+          <img
+            *ngIf="lugar.imagen"
+            [src]="lugar.imagen"
+            [alt]="lugar.nombre"
             class="card-image"
-            (error)="manejarErrorImagen(lugar)"> <!-- CORREGIDO -->
+            (error)="manejarErrorImagen(lugar)">
           <div class="card-overlay">
             <div class="card-badge">{{lugar.categoria}}</div>
             <div class="rating-badge" *ngIf="lugar.rating">
@@ -92,43 +104,60 @@
             </div>
           </div>
 
-          <ion-button expand="block" color="primary" class="action-button">
-            <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
-            Ver Reseñas
-          </ion-button>
+          <!-- BOTONES CRUD -->
+          <div class="crud-buttons">
+            <ion-button expand="block" color="primary" class="action-button" (click)="irAResenas(lugar)">
+              <ion-icon name="chatbubble-ellipses-outline" slot="start"></ion-icon>
+              Ver Reseñas
+            </ion-button>
+            
+            <div class="edit-delete-buttons">
+              <ion-button size="small" fill="outline" color="warning" 
+                         (click)="editarLugar(lugar); $event.stopPropagation()">
+                <ion-icon name="create-outline" slot="start"></ion-icon>
+                Editar
+              </ion-button>
+              
+              <ion-button size="small" fill="outline" color="danger" 
+                         (click)="eliminarLugar(lugar); $event.stopPropagation()">
+                <ion-icon name="trash-outline" slot="start"></ion-icon>
+                Eliminar
+              </ion-button>
+            </div>
+          </div>
         </ion-card-content>
       </ion-card>
     </div>
   </div>
 
   <!-- Popular Places -->
-  <div *ngIf="!terminoBusqueda" class="popular-section">
+  <div *ngIf="!cargando && !terminoBusqueda" class="popular-section">
     <div class="section-header">
-      <h2> Lugares Populares en Barcelona</h2>
+      <h2>Lugares Populares en Barcelona</h2>
       <p class="section-subtitle">Basado en tu ubicación actual</p>
     </div>
 
     <div class="popular-grid">
-      <ion-card 
+      <ion-card
         *ngFor="let lugar of lugaresPopulares"
         (click)="seleccionarLugar(lugar.nombre)"
         class="popular-card"
       >
         <div class="popular-image-container">
-          <div class="image-placeholder small" *ngIf="!lugar.imagen || lugar.imagen.includes('undefined')">
+          <div class="image-placeholder small" *ngIf="!lugar.imagen">
             <ion-icon name="location-outline"></ion-icon>
           </div>
-          <img 
-            *ngIf="lugar.imagen && !lugar.imagen.includes('undefined')"
-            [src]="lugar.imagen" 
-            [alt]="lugar.nombre" 
+          <img
+            *ngIf="lugar.imagen"
+            [src]="lugar.imagen"
+            [alt]="lugar.nombre"
             class="popular-image"
-            (error)="manejarErrorImagen(lugar)"> <!-- CORREGIDO -->
+            (error)="manejarErrorImagen(lugar)">
           <div class="popular-overlay">
             <ion-badge color="light">{{lugar.categoria}}</ion-badge>
           </div>
         </div>
-        
+       
         <ion-card-content class="popular-content">
           <h3 class="popular-name">{{lugar.nombre}}</h3>
           <p class="popular-location">{{lugar.ciudad}}</p>
@@ -142,7 +171,7 @@
   </div>
 
   <!-- No Results -->
-  <div *ngIf="lugaresFiltrados.length === 0 && terminoBusqueda" class="empty-state">
+  <div *ngIf="!cargando && lugaresFiltrados.length === 0 && terminoBusqueda" class="empty-state">
     <div class="empty-content">
       <div class="empty-icon">
         <ion-icon name="search-outline" color="medium"></ion-icon>

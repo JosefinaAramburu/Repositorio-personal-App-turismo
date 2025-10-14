@@ -11,21 +11,21 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  
+
   .hero-content {
     position: relative;
     z-index: 2;
     text-align: center;
     color: white;
     padding: 0 20px;
-    
+  
     .hero-title {
       font-size: 2rem;
       font-weight: 700;
       margin: 0 0 8px 0;
       text-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    
+  
     .hero-subtitle {
       font-size: 1rem;
       margin: 0;
@@ -33,7 +33,7 @@
       font-weight: 400;
     }
   }
-  
+
   .hero-gradient {
     position: absolute;
     top: 0;
@@ -41,6 +41,27 @@
     right: 0;
     bottom: 0;
     background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+  }
+}
+
+// Loading State
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  
+  ion-spinner {
+    margin-bottom: 16px;
+    color: var(--ion-color-primary);
+  }
+  
+  p {
+    color: #718096;
+    margin: 0;
+    font-size: 0.9rem;
   }
 }
 
@@ -70,11 +91,11 @@
   margin-top: 12px;
   font-size: 0.9rem;
   color: #2d3748;
-  
+
   ion-icon {
     font-size: 1.1rem;
   }
-  
+
   strong {
     color: var(--ion-color-primary);
     font-weight: 600;
@@ -84,20 +105,20 @@
 // Section Headers
 .section-header {
   padding: 24px 20px 16px 20px;
-  
+
   h2 {
     font-size: 1.5rem;
     font-weight: 700;
     color: #1a202c;
     margin: 0 0 4px 0;
   }
-  
+
   .section-subtitle {
     color: #718096;
     margin: 0;
     font-size: 0.95rem;
   }
-  
+
   .results-count {
     color: var(--ion-color-primary);
     font-weight: 600;
@@ -117,7 +138,7 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background: white;
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -128,7 +149,7 @@
   height: 200px;
   overflow: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  
+
   .image-placeholder {
     width: 100%;
     height: 100%;
@@ -138,39 +159,39 @@
     justify-content: center;
     color: white;
     background: linear-gradient(135deg, #3bb78f 0%, #0bab64 100%);
-    
+  
     ion-icon {
       font-size: 3rem;
       margin-bottom: 8px;
       opacity: 0.8;
     }
-    
+  
     span {
       font-size: 1rem;
       font-weight: 600;
       text-align: center;
       padding: 0 16px;
     }
-    
+  
     &.small {
       ion-icon {
         font-size: 2rem;
         margin-bottom: 0;
       }
-      
+    
       span {
         display: none;
       }
     }
   }
-  
+
   .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
   }
-  
+
   .card-overlay {
     position: absolute;
     top: 0;
@@ -183,7 +204,7 @@
     align-items: flex-start;
     padding: 16px;
   }
-  
+
   .card-badge {
     background: rgba(255,255,255,0.95);
     padding: 6px 12px;
@@ -192,7 +213,7 @@
     font-weight: 600;
     color: var(--ion-color-primary);
   }
-  
+
   .rating-badge {
     background: rgba(0,0,0,0.7);
     padding: 6px 10px;
@@ -203,7 +224,7 @@
     color: white;
     font-size: 0.8rem;
     font-weight: 600;
-    
+  
     ion-icon {
       font-size: 0.9rem;
     }
@@ -212,7 +233,7 @@
 
 .card-header {
   padding: 20px 20px 0 20px;
-  
+
   .place-name {
     font-size: 1.3rem;
     font-weight: 700;
@@ -220,7 +241,7 @@
     margin-bottom: 4px;
     line-height: 1.2;
   }
-  
+
   .place-location {
     display: flex;
     align-items: center;
@@ -228,7 +249,7 @@
     color: #718096;
     font-size: 0.9rem;
     font-weight: 500;
-    
+  
     ion-icon {
       font-size: 1rem;
     }
@@ -237,40 +258,57 @@
 
 .card-content {
   padding: 16px 20px 20px 20px;
-  
+
   .place-description {
     color: #4a5568;
     line-height: 1.5;
     margin-bottom: 16px;
     font-size: 0.95rem;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-clamp: 3; // PROPIEDAD ESTÁNDAR AÑADIDA
-    box-orient: vertical; // PROPIEDAD ESTÁNDAR AÑADIDA
   }
-  
+
   .place-details {
     display: flex;
     flex-direction: column;
     gap: 8px;
     margin-bottom: 20px;
-    
+  
     .detail-item {
       display: flex;
       align-items: center;
       gap: 8px;
       color: #718096;
       font-size: 0.9rem;
-      
+    
       ion-icon {
         font-size: 1rem;
         min-width: 16px;
       }
     }
   }
+
+  // CRUD Buttons
+  .crud-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .edit-delete-buttons {
+    display: flex;
+    gap: 8px;
   
+    ion-button {
+      flex: 1;
+      --border-radius: 8px;
+      font-size: 0.8rem;
+      --padding-top: 8px;
+      --padding-bottom: 8px;
+    }
+  }
+
   .action-button {
     --border-radius: 12px;
     --box-shadow: 0 4px 12px rgba(59, 183, 143, 0.3);
@@ -300,7 +338,7 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);
   transition: transform 0.2s ease;
   background: white;
-  
+
   &:active {
     transform: scale(0.95);
   }
@@ -311,13 +349,13 @@
   height: 120px;
   overflow: hidden;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  
+
   .popular-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .popular-overlay {
     position: absolute;
     top: 8px;
@@ -327,27 +365,23 @@
 
 .popular-content {
   padding: 12px;
-  
+
   .popular-name {
     font-size: 0.95rem;
     font-weight: 600;
     color: #1a202c;
     margin: 0 0 4px 0;
     line-height: 1.2;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-clamp: 2; // PROPIEDAD ESTÁNDAR AÑADIDA
-    box-orient: vertical; // PROPIEDAD ESTÁNDAR AÑADIDA
   }
-  
+
   .popular-location {
     font-size: 0.8rem;
     color: #718096;
     margin: 0 0 8px 0;
   }
-  
+
   .popular-rating {
     display: flex;
     align-items: center;
@@ -355,7 +389,7 @@
     font-size: 0.8rem;
     color: #4a5568;
     font-weight: 600;
-    
+  
     ion-icon {
       font-size: 0.9rem;
     }
@@ -366,7 +400,7 @@
 .empty-state {
   padding: 80px 20px;
   text-align: center;
-  
+
   .empty-content {
     .empty-icon {
       ion-icon {
@@ -375,14 +409,14 @@
         color: #a0aec0;
       }
     }
-    
+  
     h3 {
       color: #4a5568;
       font-size: 1.3rem;
       font-weight: 600;
       margin: 0 0 8px 0;
     }
-    
+  
     p {
       color: #718096;
       margin: 0 0 24px 0;
@@ -423,15 +457,15 @@ ion-button {
     gap: 20px;
     padding: 0 20px;
   }
-  
+
   .results-grid {
     padding: 0 20px 20px 20px;
   }
-  
+
   .hero-title {
     font-size: 2.5rem !important;
   }
-  
+
   .hero-subtitle {
     font-size: 1.2rem !important;
   }
@@ -442,14 +476,19 @@ ion-button {
   .popular-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-  
+
   .results-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  
+
   .place-card {
     margin: 0;
+  }
+}
+@media (max-width: 768px) {
+  .edit-delete-buttons {
+    flex-direction: column;
   }
 }
