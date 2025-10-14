@@ -381,3 +381,16 @@ ion-loading {
     transform: scale(1.05);
   }
 }
+/* Forzar color de texto en inputs y textareas */
+ion-input, ion-textarea {
+  --color: #000; /* texto negro */
+  color: #000;
+}
+
+ion-item {
+  --highlight-color-focused: #3b82f6; /* azul al hacer foco (opcional) */
+}
+
+.input-label {
+  color: #222 !important; /* título del input en gris oscuro */
+}
