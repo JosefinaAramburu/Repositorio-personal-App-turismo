@@ -63,6 +63,7 @@ export class HealthPage implements OnInit {
   nuevaResenaRating: number = 0;
   isLoading: boolean = false;
   resenas: Resena[] = [];
+  nombreTablaResenas: string = 'Resenas'; // Variable para el nombre de tabla
 
   constructor() {
     addIcons({
@@ -82,8 +83,45 @@ export class HealthPage implements OnInit {
         id: this.idLugarSeleccionado
       });
       
+      // Primero detectar el nombre correcto de la tabla
+      await this.detectarNombreTabla();
       await this.cargarResenas();
     });
+  }
+
+  /**
+   * DETECTAR EL NOMBRE CORRECTO DE LA TABLA
+   */
+  async detectarNombreTabla() {
+    console.log('🔍 Detectando nombre de tabla de reseñas...');
+    
+    const nombresPosibles = [
+      'Resenas',    // Sin ñ
+      '"Reseñas"',  // Con ñ y comillas
+      'Reseñas',    // Con ñ sin comillas
+      'reseñas',    // Minúscula con ñ
+      'resenas'     // Minúscula sin ñ
+    ];
+
+    for (const nombre of nombresPosibles) {
+      try {
+        const { data, error } = await supabase
+          .from(nombre)
+          .select('id_resenas')
+          .limit(1);
+
+        if (!error) {
+          console.log(`✅ Tabla encontrada: ${nombre}`);
+          this.nombreTablaResenas = nombre.replace(/"/g, ''); // Remover comillas para uso interno
+          return;
+        }
+      } catch (e) {
+        // Continuar con el siguiente nombre
+      }
+    }
+    
+    console.error('❌ No se pudo encontrar la tabla de reseñas');
+    this.nombreTablaResenas = 'Resenas'; // Valor por defecto
   }
 
   async cargarResenas() {
@@ -98,7 +136,9 @@ export class HealthPage implements OnInit {
 
     try {
       console.log('🔄 Cargando reseñas para lugar ID:', this.idLugarSeleccionado);
+      console.log('📋 Usando tabla:', this.nombreTablaResenas);
 
+      // Paso 1: Obtener relaciones
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('Lugares_Resenas')
         .select('id_resenas')
@@ -121,8 +161,9 @@ export class HealthPage implements OnInit {
 
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       
+      // Paso 2: Obtener reseñas usando el nombre detectado
       const { data: reseñasData, error: errorResenas } = await supabase
-        .from('Resenas')
+        .from(this.nombreTablaResenas)
         .select('*')
         .in('id_resenas', idsResenas)
         .order('fecha', { ascending: false });
@@ -181,6 +222,7 @@ export class HealthPage implements OnInit {
 
     try {
       console.log('🔄 Creando nueva reseña...');
+      console.log('📋 Usando tabla:', this.nombreTablaResenas);
 
       const resenaData = {
         id_usuario: 1,
@@ -189,8 +231,9 @@ export class HealthPage implements OnInit {
         fecha: new Date().toISOString().split('T')[0]
       };
 
+      // Usar el nombre detectado de la tabla
       const { data: nuevaResena, error: errorResena } = await supabase
-        .from('Resenas')
+        .from(this.nombreTablaResenas)
         .insert([resenaData])
         .select()
         .single();
@@ -250,6 +293,7 @@ export class HealthPage implements OnInit {
     }
   }
 
+  // ... (mantener el resto de los métodos igual)
   seleccionarRating(rating: number) {
     this.nuevaResenaRating = rating;
     console.log('⭐ Rating seleccionado:', rating);

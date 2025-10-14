@@ -143,7 +143,7 @@ export class CaptureService {
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       
       const { data: reseñasData, error: errorResenas } = await supabase
-        .from('Resenas')
+        .from('resenas')
         .select('puntuacion')
         .in('id_resenas', idsResenas);
 
