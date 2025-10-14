@@ -52,7 +52,7 @@ import {
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// INTERFAZ MEJORADA CON DATOS DE RESEÑAS
+// INTERFAZ MEJORADA CON DATOS DE RESEÑAS - CORREGIDA
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -60,8 +60,8 @@ export interface Lugar {
   categoria: string;
   descripcion: string;
   horario: string;
-  totalResenas?: number;
-  promedioRating?: number;
+  totalResenas: number;      // ← Cambiado de opcional a requerido
+  promedioRating: number;    // ← Cambiado de opcional a requerido
 }
 
 @Injectable({
@@ -72,9 +72,18 @@ export class CaptureService {
   async crearLugar(lugar: Lugar): Promise<any> {
     console.log('🔄 Creando lugar:', lugar);
     
+    // Solo enviar los campos necesarios a Supabase
+    const lugarParaInsertar = {
+      id_destino: lugar.id_destino,
+      nombre: lugar.nombre,
+      categoria: lugar.categoria,
+      descripcion: lugar.descripcion,
+      horario: lugar.horario
+    };
+    
     const { data, error } = await supabase
       .from('Lugares')
-      .insert([lugar])
+      .insert([lugarParaInsertar])
       .select()
       .single();
     
@@ -106,8 +115,8 @@ export class CaptureService {
         const estadisticas = await this.obtenerEstadisticasResenas(lugar.id_lugares!);
         return {
           ...lugar,
-          totalResenas: estadisticas.totalResenas,
-          promedioRating: estadisticas.promedioRating
+          totalResenas: estadisticas.totalResenas || 0,        // ← Valor por defecto
+          promedioRating: estadisticas.promedioRating || 0     // ← Valor por defecto
         };
       })
     );
@@ -146,9 +155,12 @@ export class CaptureService {
   async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
     console.log('🔄 Actualizando lugar', id, updates);
     
+    // Solo actualizar campos editables, no las estadísticas
+    const { totalResenas, promedioRating, ...camposEditables } = updates;
+    
     const { data, error } = await supabase
       .from('Lugares')
-      .update(updates)
+      .update(camposEditables)
       .eq('id_lugares', id)
       .select()
       .single();
@@ -234,7 +246,9 @@ export class CapturePage implements OnInit {
     nombre: '',
     categoria: '',
     descripcion: '',
-    horario: ''
+    horario: '',
+    totalResenas: 0,      // ← Valor por defecto agregado
+    promedioRating: 0     // ← Valor por defecto agregado
   };
   lugarEditando: Lugar | null = null;
   mostrarFormulario = false;
@@ -492,7 +506,9 @@ export class CapturePage implements OnInit {
       nombre: '',
       categoria: '',
       descripcion: '',
-      horario: ''
+      horario: '',
+      totalResenas: 0,      // ← Valor por defecto agregado
+      promedioRating: 0     // ← Valor por defecto agregado
     };
   }
 
