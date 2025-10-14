@@ -50,13 +50,13 @@ export interface Lugar {
   precio?: string;
   ciudad?: string;
   pais?: string;
-  created_at?: string;
+  // Eliminamos created_at ya que no existe en tu BD
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class CaptureService {  // <-- AGREGADO 'export' AQUÍ
+export class CaptureService {
   
   // CREATE - Crear nuevo lugar
   async crearLugar(lugar: Omit<Lugar, 'id_lugares'>): Promise<any> {
@@ -64,10 +64,7 @@ export class CaptureService {  // <-- AGREGADO 'export' AQUÍ
     
     const { data, error } = await supabase
       .from('Lugares')
-      .insert([{
-        ...lugar,
-        created_at: new Date().toISOString()
-      }])
+      .insert([lugar])  
       .select()
       .single();
     
@@ -87,7 +84,7 @@ export class CaptureService {  // <-- AGREGADO 'export' AQUÍ
     const { data, error } = await supabase
       .from('Lugares')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('id_lugares', { ascending: false });  // <-- Cambiamos a id_lugares
     
     if (error) {
       console.error('❌ Service: Error obteniendo lugares:', error);
