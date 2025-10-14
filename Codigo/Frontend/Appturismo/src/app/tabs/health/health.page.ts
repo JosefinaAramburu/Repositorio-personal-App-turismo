@@ -35,7 +35,7 @@ export class HealthPage implements OnInit {
       console.log('🔄 Cargando reseñas desde Supabase...');
       
       const { data, error } = await this.supabase
-        .from('"Resenas"') // ← COMILLAS DOBLES para tablas con mayúsculas
+        .from('"Resenas"')
         .select('*')
         .order('fecha', { ascending: false });
 
@@ -53,50 +53,64 @@ export class HealthPage implements OnInit {
   }
 
   async agregarResena() {
-    if (this.cargando) return;
+    console.log('🔴 MÉTODO agregarResena INICIADO');
+    
+    if (this.cargando) {
+      console.log('🔴 Ya está cargando, saliendo...');
+      return;
+    }
 
     this.cargando = true;
+    console.log('🔄 Estado cargando:', this.cargando);
 
     try {
       console.log('🔄 Agregando reseña...');
+      console.log('📝 Datos del formulario:', this.nuevaResena);
+
+      // Preparar datos EXACTAMENTE como están en tu tabla
+      const datosParaSupabase = {
+        texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
+        puntuacion: this.nuevaResena.calificacion,
+        fecha: new Date().toISOString().split('T')[0], // Solo la fecha (YYYY-MM-DD)
+        id_usuario: 1
+      };
+
+      console.log('📤 Datos para Supabase:', datosParaSupabase);
 
       const { data, error } = await this.supabase
-        .from('"Resenas"') // ← COMILLAS DOBLES para tablas con mayúsculas
-        .insert([{
-          texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
-          puntuacion: this.nuevaResena.calificacion,
-          fecha: new Date().toISOString(),
-          id_usuario: 1 // ← Necesitamos este campo por la FK
-        }])
+        .from('"Resenas"')
+        .insert([datosParaSupabase])
         .select();
 
       console.log('📡 RESPUESTA DE SUPABASE - data:', data);
       console.log('📡 RESPUESTA DE SUPABASE - error:', error);
 
       if (error) {
-        console.error('❌ Error agregando reseña:', error);
+        console.error('❌ ERROR de Supabase:', error);
+        console.error('❌ Mensaje:', error.message);
+        console.error('❌ Detalles:', error.details);
         return;
       }
 
-      // 1. Recargar las reseñas desde Supabase
+      console.log('✅ Reseña agregada a Supabase, recargando lista...');
       await this.cargarResenas();
 
-      // 2. Limpiar formulario
+      // Limpiar formulario
       this.nuevaResena = {
         titulo: '',
         contenido: '',
         calificacion: 5
       };
 
-      // 3. Ocultar el formulario
+      // Ocultar formulario
       this.mostrarFormulario = false;
-
       console.log('✅ Reseña agregada exitosamente!');
 
     } catch (error) {
-      console.error('❌ Error general:', error);
+      console.error('❌ ERROR GENERAL:', error);
     } finally {
       this.cargando = false;
+      console.log('🔄 Estado cargando al final:', this.cargando);
     }
   }
 
@@ -105,7 +119,7 @@ export class HealthPage implements OnInit {
       console.log('🔄 Eliminando reseña...');
 
       const { error } = await this.supabase
-        .from('"Resenas"') 
+        .from('"Resenas"')
         .delete()
         .eq('id_resenas', id);
 
@@ -114,7 +128,6 @@ export class HealthPage implements OnInit {
         return;
       }
 
-      // Recargar las reseñas después de eliminar
       await this.cargarResenas();
       console.log('✅ Reseña eliminada:', id);
 
