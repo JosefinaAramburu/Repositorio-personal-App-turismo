@@ -1,0 +1,70 @@
+<ion-content [fullscreen]="true" class="ion-padding">
+  <h1 class="titulo-principal">¿Qué hacer?</h1>
+
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">¿Qué hacer?</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+
+  <!-- 🔍 Buscador -->
+  <div class="buscador-container">
+    <ion-searchbar
+      placeholder="Buscar destino (ej: Barcelona, Alemania...)"
+      show-clear-button="focus"
+      animated="true">
+    </ion-searchbar>
+  </div>
+
+
+  <!-- 🧭 Subtítulo -->
+  <h2 class="subtitulo">Recomendaciones</h2>
+
+
+  <!-- 🗺️ Categorías (una debajo de otra con descripción) -->
+  <div class="categorias-container">
+
+
+    <ion-card button="true" class="categoria-card">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <div class="categoria-texto">
+        <h3>Eventos</h3>
+        <p>Conciertos, ferias y festivales que se realizan durante tu estadía.</p>
+      </div>
+    </ion-card>
+
+
+    <ion-card button="true" class="categoria-card">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      <div class="categoria-texto">
+        <h3>Gastronomía</h3>
+        <p>Restaurantes, bares y cafés recomendados para probar sabores locales.</p>
+      </div>
+    </ion-card>
+
+
+    <ion-card button="true" class="categoria-card">
+      <ion-icon name="map-outline"></ion-icon>
+      <div class="categoria-texto">
+        <h3>Lugares</h3>
+        <p>Puntos de interés como museos, monumentos y paisajes imperdibles.</p>
+      </div>
+    </ion-card>
+
+
+    <ion-card button="true" class="categoria-card">
+      <ion-icon name="walk-outline"></ion-icon>
+      <div class="categoria-texto">
+        <h3>Recorridos</h3>
+        <p>Rutas sugeridas y tours para aprovechar al máximo tu visita.</p>
+      </div>
+    </ion-card>
+
+
+  </div>
+</ion-content>
+
+

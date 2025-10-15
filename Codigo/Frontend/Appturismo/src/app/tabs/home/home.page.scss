@@ -1,0 +1,98 @@
+ion-content {
+  --background: #ffffff;
+}
+
+
+.titulo-principal {
+  position: sticky; /* 👈 se mantiene visible al hacer scroll */
+  top: 0; /* 👈 se pega arriba de la pantalla */
+  z-index: 10; /* 👈 queda encima del contenido */
+  background: #ffffff; /* 👈 fondo blanco solo para el título */
+  padding: 1rem 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #030303;
+  text-align: left;
+ 
+}
+
+
+
+
+/* Buscador */
+.buscador-container {
+  margin-top: 1rem;
+}
+
+
+ion-searchbar {
+  border-radius: 12px;
+  --background: #fff;
+  --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.301);
+}
+
+
+/* Subtítulo */
+.subtitulo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+}
+
+
+/* Categorías */
+.categorias-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+
+.categoria-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.377);
+  transition: 0.2s ease-in-out;
+}
+
+
+.categoria-card ion-icon {
+  font-size: 2rem;
+  color: var(--ion-color-primary);
+  margin-right: 1rem;
+  margin-top: 0.3rem;
+}
+
+
+.categoria-texto {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.categoria-texto h3 {
+  font-size: 1.05rem;
+  color: #000000;
+  margin: 0;
+  font-weight: 600;
+}
+
+
+.categoria-texto p {
+  font-size: 0.9rem;
+  color: #111111;
+  margin-top: 0.3rem;
+}
+
+
+.categoria-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.432);
+}
+
+
