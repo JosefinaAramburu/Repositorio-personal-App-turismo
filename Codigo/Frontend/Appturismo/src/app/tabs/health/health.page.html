@@ -25,9 +25,7 @@
       </button>
     </div>
     
-    <!-- QUITAR el form y poner div -->
     <div>
-      
       <!-- Título -->
       <div class="form-group">
         <label for="titulo">Título:</label>
@@ -76,19 +74,11 @@
         </div>
       </div>
 
-      <!-- Estado (debug) -->
-      <div class="debug-info">
-        <p>Título: "{{ nuevaResena.titulo }}"</p>
-        <p>Contenido: "{{ nuevaResena.contenido }}"</p>
-        <p>Calificación: {{ nuevaResena.calificacion }}</p>
-        <p>Estado cargando: {{ cargando }}</p>
-      </div>
-
       <!-- Botones -->
       <div class="form-buttons">
         <button 
-          type="button" <!-- CAMBIAR a type="button" -->
-          (click)="probarAgregarResena()" <!-- AGREGAR este método -->
+          type="button"
+          (click)="probarAgregarResena()"
           class="btn-submit"
           [disabled]="cargando || !nuevaResena.titulo || !nuevaResena.contenido"
         >
@@ -103,11 +93,10 @@
           Cancelar
         </button>
       </div>
-
     </div>
   </div>
 
-  <!-- Lista de reseñas (igual que antes) -->
+  <!-- Lista de reseñas -->
   <div class="lista-resenas">
     <h3>Reseñas Existentes ({{ resenas.length }})</h3>
 
@@ -124,7 +113,7 @@
     <div *ngIf="resenas.length > 0" class="resenas-grid">
       <div *ngFor="let resena of resenas" class="resena-card">
         <div class="resena-header">
-          <h4 class="resena-titulo">{{ resena.texto?.split(':')[0] }}</h4>
+          <h4 class="resena-titulo">{{ obtenerTitulo(resena) }}</h4>
           <button 
             (click)="eliminarResena(resena.id_resenas)" 
             class="btn-eliminar"
@@ -141,7 +130,7 @@
           <span class="puntuacion">({{ resena.puntuacion }}/5)</span>
         </div>
         
-        <p class="contenido-resena">{{ resena.texto?.split(':')[1] }}</p>
+        <p class="contenido-resena">{{ obtenerContenido(resena) }}</p>
         
         <div class="fecha-resena">
           {{ resena.fecha | date:'medium' }}

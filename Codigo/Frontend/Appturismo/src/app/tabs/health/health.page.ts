@@ -35,7 +35,7 @@ export class HealthPage implements OnInit {
       console.log('🔄 Cargando reseñas desde Supabase...');
       
       const { data, error } = await this.supabase
-        .from('Resenas')  // Sin comillas adicionales
+        .from('resenas')  // ✅ MINÚSCULA
         .select('*')
         .order('fecha', { ascending: false });
 
@@ -52,25 +52,6 @@ export class HealthPage implements OnInit {
       console.error('❌ Error general:', error);
       alert('Error inesperado al cargar reseñas');
     }
-  }
-
-  // Método mejorado para obtener título
-  obtenerTitulo(resena: any): string {
-    if (!resena.texto) return 'Sin título';
-    
-    const partes = resena.texto.split(':');
-    return partes[0]?.trim() || 'Sin título';
-  }
-
-  // Método mejorado para obtener contenido
-  obtenerContenido(resena: any): string {
-    if (!resena.texto) return 'Sin contenido';
-    
-    const partes = resena.texto.split(':');
-    if (partes.length > 1) {
-      return partes.slice(1).join(':').trim();
-    }
-    return resena.texto;
   }
 
   async probarAgregarResena() {
@@ -90,31 +71,36 @@ export class HealthPage implements OnInit {
       const datosParaSupabase = {
         texto: `${this.nuevaResena.titulo.trim()}: ${this.nuevaResena.contenido.trim()}`,
         puntuacion: this.nuevaResena.calificacion,
-        fecha: new Date().toISOString().split('T')[0], // Solo la fecha (YYYY-MM-DD)
-        id_usuario: 1 // Temporal - luego puedes usar auth
+        fecha: new Date().toISOString().split('T')[0],
+        id_usuario: 1
       };
 
+      console.log('📤 Enviando a Supabase:', datosParaSupabase);
+
       const { data, error } = await this.supabase
-        .from('Resenas')
+        .from('resenas')  // ✅ MINÚSCULA
         .insert([datosParaSupabase])
         .select();
 
-      if (error) throw error;
-
-      // Agregar la nueva reseña al array sin recargar todo
-      if (data && data[0]) {
-        this.resenas.unshift(data[0]); // Agregar al inicio
+      if (error) {
+        console.error('❌ Error de Supabase:', error);
+        alert('Error: ' + error.message);
+        return;
       }
 
-      // Limpiar formulario
+      console.log('✅ Reseña agregada, recargando lista...');
+      await this.cargarResenas();
+
+      // Limpiar y cerrar
       this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
       this.mostrarFormulario = false;
 
-      alert('✅ Reseña agregada correctamente!');
+      console.log('🎉 Reseña agregada exitosamente!');
+      alert('Reseña agregada correctamente!');
 
-    } catch (error: any) {
-      console.error('❌ Error:', error);
-      alert('Error al agregar reseña: ' + error.message);
+    } catch (error) {
+      console.error('❌ Error general:', error);
+      alert('Error al agregar reseña');
     } finally {
       this.cargando = false;
     }
@@ -125,20 +111,36 @@ export class HealthPage implements OnInit {
 
     try {
       const { error } = await this.supabase
-        .from('Resenas')
+        .from('resenas')  // ✅ MINÚSCULA
         .delete()
         .eq('id_resenas', id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error eliminando reseña:', error);
+        alert('Error al eliminar reseña: ' + error.message);
+        return;
+      }
 
-      // Eliminar del array local sin recargar
-      this.resenas = this.resenas.filter(r => r.id_resenas !== id);
-      
-      alert('✅ Reseña eliminada correctamente');
+      await this.cargarResenas();
+      console.log('✅ Reseña eliminada:', id);
+      alert('Reseña eliminada correctamente');
 
-    } catch (error: any) {
-      console.error('❌ Error:', error);
-      alert('Error al eliminar reseña: ' + error.message);
+    } catch (error) {
+      console.error('❌ Error general:', error);
+      alert('Error al eliminar reseña');
     }
+  }
+
+  // Métodos para mostrar título y contenido
+  obtenerTitulo(resena: any): string {
+    if (!resena.texto) return 'Sin título';
+    const partes = resena.texto.split(':');
+    return partes[0]?.trim() || 'Sin título';
+  }
+
+  obtenerContenido(resena: any): string {
+    if (!resena.texto) return 'Sin contenido';
+    const partes = resena.texto.split(':');
+    return partes.length > 1 ? partes.slice(1).join(':').trim() : resena.texto;
   }
 }
