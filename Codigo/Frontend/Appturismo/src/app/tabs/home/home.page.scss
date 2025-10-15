@@ -2,35 +2,29 @@ ion-content {
   --background: #ffffff;
 }
 
-
 .titulo-principal {
-  position: sticky; /* 👈 se mantiene visible al hacer scroll */
-  top: 0; /* 👈 se pega arriba de la pantalla */
-  z-index: 10; /* 👈 queda encima del contenido */
-  background: #ffffff; /* 👈 fondo blanco solo para el título */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffff;
   padding: 1rem 0.5rem;
   font-size: 1.8rem;
   font-weight: 700;
   color: #030303;
   text-align: left;
- 
+  margin: 0;
 }
-
-
-
 
 /* Buscador */
 .buscador-container {
   margin-top: 1rem;
 }
 
-
 ion-searchbar {
   border-radius: 12px;
   --background: #fff;
   --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.301);
 }
-
 
 /* Subtítulo */
 .subtitulo {
@@ -41,14 +35,12 @@ ion-searchbar {
   margin-bottom: 0.8rem;
 }
 
-
 /* Categorías */
 .categorias-container {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 
 .categoria-card {
   display: flex;
@@ -58,8 +50,8 @@ ion-searchbar {
   background: #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.377);
   transition: 0.2s ease-in-out;
+  margin: 0;
 }
-
 
 .categoria-card ion-icon {
   font-size: 2rem;
@@ -68,12 +60,11 @@ ion-searchbar {
   margin-top: 0.3rem;
 }
 
-
 .categoria-texto {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
-
 
 .categoria-texto h3 {
   font-size: 1.05rem;
@@ -82,17 +73,19 @@ ion-searchbar {
   font-weight: 600;
 }
 
-
 .categoria-texto p {
   font-size: 0.9rem;
   color: #111111;
   margin-top: 0.3rem;
+  margin-bottom: 0;
 }
-
 
 .categoria-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.432);
 }
 
-
+/* Asegurar que los ion-card no tengan márgenes extra */
+ion-card {
+  margin: 0;
+}
