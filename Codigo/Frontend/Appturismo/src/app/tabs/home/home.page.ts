@@ -7,14 +7,7 @@ import {
   IonTitle, 
   IonToolbar, 
   IonCard, 
-  IonCardContent, 
-  IonCardTitle, 
-  IonCardHeader, 
-  IonLabel, 
   IonIcon, 
-  IonItem, 
-  IonList, 
-  IonImg, 
   IonSearchbar 
 } from '@ionic/angular/standalone';
 
@@ -31,14 +24,7 @@ import {
     IonTitle, 
     IonToolbar, 
     IonCard, 
-    IonCardContent, 
-    IonCardTitle, 
-    IonCardHeader, 
-    IonLabel, 
     IonIcon, 
-    IonItem, 
-    IonList, 
-    IonImg, 
     IonSearchbar
   ]
 })
