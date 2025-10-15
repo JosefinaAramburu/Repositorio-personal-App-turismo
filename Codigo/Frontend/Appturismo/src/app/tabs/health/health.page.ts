@@ -35,110 +35,110 @@ export class HealthPage implements OnInit {
       console.log('🔄 Cargando reseñas desde Supabase...');
       
       const { data, error } = await this.supabase
-        .from('"Resenas"')
+        .from('Resenas')  // Sin comillas adicionales
         .select('*')
         .order('fecha', { ascending: false });
 
       if (error) {
         console.error('❌ Error cargando reseñas:', error);
+        alert('Error al cargar reseñas: ' + error.message);
         return;
       }
 
       this.resenas = data || [];
-      console.log('✅ Reseñas cargadas:', this.resenas);
+      console.log('✅ Reseñas cargadas:', this.resenas.length);
 
     } catch (error) {
       console.error('❌ Error general:', error);
+      alert('Error inesperado al cargar reseñas');
     }
   }
 
-  // MÉTODO NUEVO - más simple para probar
-  async probarAgregarResena() {
-    console.log('🎯 MÉTODO probarAgregarResena LLAMADO');
-    console.log('📝 Datos en el formulario:', this.nuevaResena);
+  // Método mejorado para obtener título
+  obtenerTitulo(resena: any): string {
+    if (!resena.texto) return 'Sin título';
     
-    if (this.cargando) {
-      console.log('⏳ Ya está cargando...');
-      return;
-    }
+    const partes = resena.texto.split(':');
+    return partes[0]?.trim() || 'Sin título';
+  }
 
-    if (!this.nuevaResena.titulo || !this.nuevaResena.contenido) {
-      console.log('❌ Faltan datos en el formulario');
-      alert('Por favor completa todos los campos');
+  // Método mejorado para obtener contenido
+  obtenerContenido(resena: any): string {
+    if (!resena.texto) return 'Sin contenido';
+    
+    const partes = resena.texto.split(':');
+    if (partes.length > 1) {
+      return partes.slice(1).join(':').trim();
+    }
+    return resena.texto;
+  }
+
+  async probarAgregarResena() {
+    if (this.cargando) return;
+    
+    if (!this.nuevaResena.titulo.trim() || !this.nuevaResena.contenido.trim()) {
+      alert('Por favor completa título y contenido');
       return;
     }
 
     this.cargando = true;
-    console.log('🔄 Iniciando proceso de agregar...');
-
-    // Llamar al método original
     await this.agregarResena();
   }
 
   async agregarResena() {
     try {
-      console.log('🔄 Agregando reseña a Supabase...');
-
       const datosParaSupabase = {
-        texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
+        texto: `${this.nuevaResena.titulo.trim()}: ${this.nuevaResena.contenido.trim()}`,
         puntuacion: this.nuevaResena.calificacion,
-        fecha: new Date().toISOString().split('T')[0],
-        id_usuario: 1
+        fecha: new Date().toISOString().split('T')[0], // Solo la fecha (YYYY-MM-DD)
+        id_usuario: 1 // Temporal - luego puedes usar auth
       };
 
-      console.log('📤 Enviando a Supabase:', datosParaSupabase);
-
       const { data, error } = await this.supabase
-        .from('"Resenas"')
+        .from('Resenas')
         .insert([datosParaSupabase])
         .select();
 
-      console.log('📡 Respuesta de Supabase - data:', data);
-      console.log('📡 Respuesta de Supabase - error:', error);
+      if (error) throw error;
 
-      if (error) {
-        console.error('❌ Error de Supabase:', error);
-        alert('Error: ' + error.message);
-        return;
+      // Agregar la nueva reseña al array sin recargar todo
+      if (data && data[0]) {
+        this.resenas.unshift(data[0]); // Agregar al inicio
       }
 
-      console.log('✅ Reseña agregada, recargando lista...');
-      await this.cargarResenas();
-
-      // Limpiar y cerrar
+      // Limpiar formulario
       this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
       this.mostrarFormulario = false;
 
-      console.log('🎉 Reseña agregada exitosamente!');
-      alert('Reseña agregada correctamente!');
+      alert('✅ Reseña agregada correctamente!');
 
-    } catch (error) {
-      console.error('❌ Error general:', error);
-      alert('Error al agregar reseña');
+    } catch (error: any) {
+      console.error('❌ Error:', error);
+      alert('Error al agregar reseña: ' + error.message);
     } finally {
       this.cargando = false;
     }
   }
 
   async eliminarResena(id: number) {
-    try {
-      console.log('🔄 Eliminando reseña...');
+    if (!confirm('¿Estás seguro de eliminar esta reseña?')) return;
 
+    try {
       const { error } = await this.supabase
-        .from('"Resenas"')
+        .from('Resenas')
         .delete()
         .eq('id_resenas', id);
 
-      if (error) {
-        console.error('❌ Error eliminando reseña:', error);
-        return;
-      }
+      if (error) throw error;
 
-      await this.cargarResenas();
-      console.log('✅ Reseña eliminada:', id);
+      // Eliminar del array local sin recargar
+      this.resenas = this.resenas.filter(r => r.id_resenas !== id);
+      
+      alert('✅ Reseña eliminada correctamente');
 
-    } catch (error) {
-      console.error('❌ Error general:', error);
+    } catch (error: any) {
+      console.error('❌ Error:', error);
+      alert('Error al eliminar reseña: ' + error.message);
     }
   }
 }
