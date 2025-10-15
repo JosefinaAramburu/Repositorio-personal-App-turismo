@@ -1,21 +1,3 @@
-ion-content {
-  --background: #ffffff;
-}
-
-
-.titulo-principal {
-  position: sticky; /* 👈 se mantiene visible al hacer scroll */
-  top: 0; /* 👈 se pega arriba de la pantalla */
-  z-index: 10; /* 👈 queda encima del contenido */
-  background: #ffffff; /* 👈 fondo blanco solo para el título */
-  padding: 1rem 0.5rem;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #030303;
-  text-align: left;
- 
-}
-
 
 
 
