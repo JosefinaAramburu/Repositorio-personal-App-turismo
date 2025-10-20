@@ -30,10 +30,7 @@ export const routes: Routes = [
         path: 'stats',
         loadComponent: () => import('./tabs/stats/stats.page').then(m => m.StatsPage)
       },
-      {
-        path: 'gastronomia',
-        loadComponent: () => import('./tabs/gastronomia/gastronomia.page').then(m => m.GastronomiaPage)
-      },
+    
       {
         path: '',
         redirectTo: 'home',
