@@ -1,70 +1,66 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Hoy</ion-title>
+    <ion-title>¿Qué hacer?</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="home-content">
 
-  <!-- 🔹 Tarjeta principal -->
-  <ion-card class="summary-card">
-    <ion-card-content>
+  <!-- BUSCADOR DE DESTINO -->
+  <ion-item lines="none" class="buscador">
+    <ion-input
+      [(ngModel)]="pais"
+      placeholder="Buscar país o ciudad..."
+      (ionChange)="buscarDestino()"
+      clearInput>
+    </ion-input>
+  </ion-item>
 
-      <div class="circle-stats">
-        <div class="mini-circle">
-          <h3>{{ totalConsumed }}</h3>
-          <p>Consumidas</p>
-        </div>
-        <div class="mini-circle highlight">
-          <h3>{{ totalRemaining }}</h3>
-          <p>Restantes</p>
-        </div>
-        <div class="mini-circle">
-          <h3>{{ totalBurned }}</h3>
-          <p>Quemadas</p>
-        </div>
+  <!-- Muestra el destino ingresado -->
+  <div *ngIf="pais" class="destino-seleccionado">
+    <ion-icon name="pin-outline"></ion-icon>
+    <span>{{ pais }}</span>
+  </div>
+
+  <h2 class="titulo-seccion">Recomendaciones</h2>
+
+  <div class="recomendaciones">
+
+    <!-- Eventos -->
+    <ion-card button (click)="irA('eventos')">
+      <ion-icon name="musical-notes-outline" color="danger"></ion-icon>
+      <div>
+        <h3>Eventos</h3>
+        <p>Recitales, ferias y festivales</p>
       </div>
-      
+    </ion-card>
 
-      <!-- 🔹 Macronutrientes en una sola línea -->
-      <div class="macros-inline">
-        <div>
-          <p>Carbohidratos</p>
-          <small>{{ carbs.consumed }}/{{ carbs.target }} g</small>
-          <ion-progress-bar [value]="carbs.consumed / carbs.target"></ion-progress-bar>
-        </div>
-        <div>
-          <p>Proteínas</p>
-          <small>{{ protein.consumed }}/{{ protein.target }} g</small>
-          <ion-progress-bar color="success" [value]="protein.consumed / protein.target"></ion-progress-bar>
-        </div>
-        <div>
-          <p>Grasas</p>
-          <small>{{ fat.consumed }}/{{ fat.target }} g</small>
-          <ion-progress-bar color="warning" [value]="fat.consumed / fat.target"></ion-progress-bar>
-        </div>
+    <!-- Lugares -->
+    <ion-card button (click)="irA('lugares')">
+      <ion-icon name="location-outline" color="tertiary"></ion-icon>
+      <div>
+        <h3>Lugares</h3>
+        <p>Atracciones, paisajes y museos</p>
       </div>
+    </ion-card>
 
-    </ion-card-content>
-  </ion-card>
+    <!-- Gastronomía -->
+    <ion-card button (click)="irA('gastronomia')">
+      <ion-icon name="restaurant-outline" color="success"></ion-icon>
+      <div>
+        <h3>Gastronomía</h3>
+        <p>Restaurantes y bares</p>
+      </div>
+    </ion-card>
 
-  <!-- 🔹 Lista de comidas -->
-  <ion-list>
-    <ion-item *ngFor="let meal of meals">
-      <ion-avatar slot="start">
-        <img [src]="'assets/img/' + meal.icon + '.png'" alt="{{ meal.type }}">
-      </ion-avatar>
-      <ion-label>
-        <h3>{{ meal.type }}</h3>
-        <p>{{ meal.consumed }} / {{ meal.target }} kcal</p>
-      </ion-label>
-      <ion-button fill="clear" slot="end" (click)="addMeal(meal.type)">
-        <ion-icon name="add-circle" color="primary"></ion-icon>
-      </ion-button>
-    </ion-item>
-  </ion-list>
+    <!-- Recorridos -->
+    <ion-card button (click)="irA('recorridos')">
+      <ion-icon name="map-outline" color="primary"></ion-icon>
+      <div>
+        <h3>Recorridos</h3>
+        <p>Rutas y sugerencias</p>
+      </div>
+    </ion-card>
 
+  </div>
 </ion-content>
-
-
-
