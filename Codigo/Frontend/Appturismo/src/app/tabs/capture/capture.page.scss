@@ -1,22 +1,55 @@
-// Estilos básicos
-ion-content {
-  --background: #f8f9fa;
+// PALETA DE COLORES CON TU FONDO
+:root {
+  --fondo-principal: #b2e2f2;    // Tu color celeste
+  --tarjeta-blanca: #ffffff;      // Blanco puro
+  --texto-negro: #000000;         // Negro para texto
+  --texto-gris: #666666;          // Gris para texto secundario
+  --borde-suave: #d4f1f9;         // Borde celeste muy claro
+  --boton-primario: #87ceeb;      // Celeste para botones
+  --boton-hover: #6cb4d4;         // Celeste más oscuro para hover
 }
 
-// Sección de filtros
+// ESTILOS GENERALES
+ion-content {
+  --background: var(--fondo-principal);
+}
+
+ion-header {
+  ion-toolbar {
+    --background: var(--fondo-principal);
+    --color: var(--texto-negro);
+    --border-color: transparent;
+    
+    ion-title {
+      font-weight: 600;
+      color: var(--texto-negro);
+      
+      ion-icon {
+        color: var(--texto-negro);
+      }
+    }
+  }
+}
+
+// SECCIÓN DE FILTROS
 .filters-section {
   padding: 16px;
   
   .search-bar {
-    --background: white;
+    --background: var(--tarjeta-blanca);
     --border-radius: 12px;
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --color: var(--texto-negro);
+    --placeholder-color: var(--texto-gris);
     margin-bottom: 16px;
   }
   
   .filters-container {
-    background: white;
+    background: var(--tarjeta-blanca);
     border-radius: 16px;
     padding: 16px;
+    border: 2px solid var(--borde-suave);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     
     .chips-grid {
       display: flex;
@@ -26,14 +59,33 @@ ion-content {
       
       .filter-chip {
         margin: 0;
-        --background: transparent;
+        --background: var(--fondo-principal);
+        --color: var(--texto-negro);
+        font-weight: 500;
+        border: 1px solid var(--borde-suave);
         
-        &[color="primary"],
-        &[color="warning"],
-        &[color="success"],
+        &[color="primary"] {
+          --background: var(--boton-primario);
+          --color: var(--texto-negro);
+        }
+        
+        &[color="warning"] {
+          --background: #ffd966;
+          --color: var(--texto-negro);
+        }
+        
+        &[color="success"] {
+          --background: #90ee90;
+          --color: var(--texto-negro);
+        }
+        
         &[color="tertiary"] {
-          --background: var(--ion-color-base);
-          --color: white;
+          --background: #b19cd9;
+          --color: var(--texto-negro);
+        }
+        
+        &:active {
+          transform: scale(0.95);
         }
       }
     }
@@ -42,50 +94,103 @@ ion-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #e9ecef;
+      border-top: 1px solid var(--borde-suave);
       padding-top: 12px;
       
       .results-text {
         font-size: 14px;
-        color: #6c757d;
+        color: var(--texto-gris);
+        font-weight: 500;
       }
     }
   }
 }
 
-// Bienvenida
+// BIENVENIDA
 .welcome-section {
-  padding: 32px 16px;
+  padding: 40px 16px;
   
   .welcome-card {
     text-align: center;
     border-radius: 20px;
+    background: var(--tarjeta-blanca);
+    border: 2px solid var(--borde-suave);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    
+    ion-card-header {
+      ion-card-title {
+        color: var(--texto-negro);
+        font-weight: 600;
+      }
+      
+      ion-card-subtitle {
+        color: var(--texto-gris);
+      }
+    }
     
     .welcome-content {
       .welcome-icon {
-        font-size: 64px;
-        color: #4dabf7;
+        font-size: 72px;
+        color: var(--boton-primario);
         margin-bottom: 16px;
       }
       
       p {
-        color: #6c757d;
+        color: var(--texto-gris);
         margin-bottom: 24px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+      
+      ion-button {
+        --background: var(--boton-primario);
+        --color: var(--texto-negro);
+        --border-radius: 12px;
+        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        font-weight: 500;
+        
+        &:active {
+          --background: var(--boton-hover);
+          transform: scale(0.98);
+        }
       }
     }
   }
 }
 
-// Formulario
+// FORMULARIO
 .form-section {
   padding: 16px;
   
   .form-card {
     border-radius: 16px;
+    background: var(--tarjeta-blanca);
+    border: 2px solid var(--borde-suave);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    
+    ion-card-header {
+      ion-card-title {
+        color: var(--texto-negro);
+        font-weight: 600;
+      }
+    }
     
     .form-field {
+      --background: var(--tarjeta-blanca);
+      --border-color: var(--borde-suave);
       --border-radius: 12px;
       margin-bottom: 16px;
+      border: 1px solid var(--borde-suave);
+      
+      ion-label {
+        color: var(--texto-negro);
+        font-weight: 500;
+      }
+      
+      ion-input, ion-textarea, ion-select {
+        --color: var(--texto-negro);
+        --placeholder-color: var(--texto-gris);
+      }
     }
     
     .form-buttons {
@@ -93,103 +198,228 @@ ion-content {
       
       ion-button {
         margin-bottom: 12px;
+        --border-radius: 12px;
+        font-weight: 500;
+        
+        &:first-child {
+          --background: var(--boton-primario);
+          --color: var(--texto-negro);
+          
+          &:active {
+            --background: var(--boton-hover);
+          }
+        }
+        
+        &:last-child {
+          --background: transparent;
+          --color: var(--texto-gris);
+          --border-color: var(--borde-suave);
+        }
+        
+        &:active {
+          transform: scale(0.98);
+        }
       }
     }
   }
 }
 
-// Lista de lugares
+// LISTA DE LUGARES
 .list-section {
   padding: 16px;
   
   .list-card {
     border-radius: 16px;
+    background: var(--tarjeta-blanca);
+    border: 2px solid var(--borde-suave);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     
-    .counter {
-      color: #6c757d;
-      font-size: 0.9em;
-    }
-  }
-  
-  .place-item {
-    --padding-start: 0;
-    --inner-padding-end: 0;
-    --background: transparent;
-    margin-bottom: 12px;
-    
-    .place-content {
-      .place-name {
+    ion-card-header {
+      ion-card-title {
+        color: var(--texto-negro);
         font-weight: 600;
-        margin-bottom: 8px;
-        color: #212529;
+        
+        .counter {
+          color: var(--texto-gris);
+          font-size: 0.9em;
+          font-weight: normal;
+        }
+      }
+    }
+    
+    .place-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+      --background: transparent;
+      margin-bottom: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--tarjeta-blanca);
+      border: 1px solid var(--borde-suave);
+      transition: all 0.2s ease;
+      
+      &:active {
+        background: #f8fdff;
+        transform: scale(0.98);
       }
       
-      .place-info {
-        .category-badge {
+      .place-content {
+        .place-name {
+          font-weight: 600;
           margin-bottom: 8px;
+          color: var(--texto-negro);
+          font-size: 16px;
         }
         
-        .place-details {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
+        .place-info {
+          .category-badge {
+            margin-bottom: 8px;
+            --background: var(--boton-primario);
+            --color: var(--texto-negro);
+            font-weight: 500;
+          }
           
-          .detail {
+          .place-details {
             display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: #6c757d;
+            flex-wrap: wrap;
+            gap: 12px;
             
-            ion-icon {
-              font-size: 14px;
+            .detail {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 12px;
+              color: var(--texto-gris);
+              font-weight: 500;
+              
+              ion-icon {
+                font-size: 14px;
+              }
             }
           }
         }
+        
+        .place-description {
+          color: var(--texto-gris);
+          font-size: 14px;
+          margin-top: 8px;
+          line-height: 1.4;
+        }
       }
       
-      .place-description {
-        color: #495057;
-        font-size: 14px;
-        margin-top: 8px;
-        line-height: 1.4;
+      .place-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        ion-button {
+          --border-radius: 8px;
+          width: 36px;
+          height: 36px;
+          
+          &:first-child {
+            --background: var(--boton-primario);
+          }
+          
+          &:nth-child(2) {
+            --background: #ffd966;
+          }
+          
+          &:last-child {
+            --background: #ff9999;
+          }
+          
+          ion-icon {
+            color: var(--texto-negro);
+          }
+          
+          &:active {
+            transform: scale(0.9);
+          }
+        }
       }
-    }
-    
-    .place-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
     }
   }
 }
 
-// Estado vacío
+// ESTADO VACÍO
 .empty-section {
-  padding: 32px 16px;
+  padding: 40px 16px;
   
   .empty-content {
     text-align: center;
     
     .empty-icon {
-      font-size: 64px;
-      color: #adb5bd;
+      font-size: 72px;
+      color: var(--boton-primario);
       margin-bottom: 16px;
     }
     
     h3 {
-      color: #495057;
+      color: var(--texto-negro);
       margin-bottom: 8px;
+      font-weight: 600;
     }
     
     p {
-      color: #6c757d;
+      color: var(--texto-gris);
       margin-bottom: 20px;
+    }
+    
+    ion-button {
+      --background: var(--boton-primario);
+      --color: var(--texto-negro);
+      --border-radius: 12px;
+      
+      &:active {
+        --background: var(--boton-hover);
+      }
     }
   }
 }
 
-// Botón flotante
+// BOTÓN FLOTANTE
 ion-fab-button {
-  --box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
+  --background: var(--boton-primario);
+  --color: var(--texto-negro);
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  
+  &:active {
+    --background: var(--boton-hover);
+    transform: scale(0.95);
+  }
+}
+
+// LOADING
+ion-loading {
+  --spinner-color: var(--boton-primario);
+  --background: rgba(178, 226, 242, 0.9);
+}
+
+// EFECTOS ESPECIALES
+@keyframes gentlePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.welcome-card {
+  animation: gentlePulse 3s ease-in-out infinite;
+}
+
+// RESPONSIVE
+@media (max-width: 480px) {
+  .filters-section,
+  .form-section,
+  .list-section {
+    padding: 12px;
+  }
+  
+  .place-item {
+    padding: 12px !important;
+  }
+  
+  .welcome-section {
+    padding: 32px 12px;
+  }
 }
