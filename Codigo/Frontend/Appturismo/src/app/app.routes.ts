@@ -36,6 +36,10 @@ export const routes: Routes = [
       loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
      },
 
+     { path: 'gastronomia',
+        loadComponent: () => import('./tabs/gastronomia/gastronomia.page').then(m => m.GastronomiaPage)
+      },
+      
       {
         path: '',
         redirectTo: 'home',
