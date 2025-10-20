@@ -31,8 +31,8 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/stats/stats.page').then(m => m.StatsPage)
       },
       {
-        path: 'profile',
-        loadComponent: () => import('./tabs/profile/profile.page').then(m => m.ProfilePage)
+        path: 'gastronomia',
+        loadComponent: () => import('./tabs/gastronomia/gastronomia.page').then(m => m.GastronomiaPage)
       },
       {
         path: '',
