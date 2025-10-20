@@ -46,11 +46,26 @@ import {
   addOutline,
   closeCircleOutline,
   chatbubbleOutline,
-  star
+  star,
+  businessOutline,
+  libraryOutline,
+  leafOutline,
+  waterOutline,
+  restaurantOutline,
+  cafeOutline,
+  eyeOutline,
+  cartOutline
 } from 'ionicons/icons';
 
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
+
+// Constantes para nombres de tablas
+const TABLES = {
+  LUGARES: 'lugares',
+  LUGARES_RESENAS: 'lugares_resenas',
+  RESENAS: 'resenas'
+};
 
 export interface Lugar {
   id_lugares?: number;
@@ -80,7 +95,7 @@ export class CaptureService {
     };
     
     const { data, error } = await supabase
-      .from('Lugares')
+      .from(TABLES.LUGARES)
       .insert([lugarParaInsertar])
       .select()
       .single();
@@ -98,7 +113,7 @@ export class CaptureService {
     console.log('🔄 Obteniendo lugares...');
     
     const { data, error } = await supabase
-      .from('Lugares')
+      .from(TABLES.LUGARES)
       .select('*')
       .order('id_lugares', { ascending: false });
     
@@ -123,9 +138,8 @@ export class CaptureService {
 
   async obtenerEstadisticasResenas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
     try {
-      // SIN Ñ - MUCHO MÁS SIMPLE
       const { data: relaciones, error: errorRelaciones } = await supabase
-        .from('Lugares_Resenas')
+        .from(TABLES.LUGARES_RESENAS)
         .select('id_resenas')
         .eq('id_lugares', idLugar);
 
@@ -136,7 +150,7 @@ export class CaptureService {
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       
       const { data: resenas, error: errorResenas } = await supabase
-        .from('Resenas')
+        .from(TABLES.RESENAS)
         .select('puntuacion')
         .in('id_resenas', idsResenas);
 
@@ -161,7 +175,7 @@ export class CaptureService {
     const { totalResenas, promedioRating, ...camposEditables } = updates;
     
     const { data, error } = await supabase
-      .from('Lugares')
+      .from(TABLES.LUGARES)
       .update(camposEditables)
       .eq('id_lugares', id)
       .select()
@@ -180,7 +194,7 @@ export class CaptureService {
     
     // Primero eliminar las relaciones de reseñas
     const { error: errorRelaciones } = await supabase
-      .from('Lugares_Resenas')
+      .from(TABLES.LUGARES_RESENAS)
       .delete()
       .eq('id_lugares', id);
     
@@ -190,7 +204,7 @@ export class CaptureService {
     
     // Luego eliminar el lugar
     const { error } = await supabase
-      .from('Lugares')
+      .from(TABLES.LUGARES)
       .delete()
       .eq('id_lugares', id);
     
@@ -256,6 +270,46 @@ export class CapturePage implements OnInit {
   mostrarFormulario = false;
   isLoading = false;
 
+  // Mapeos para categorías
+  private categoriaIconMap: { [key: string]: string } = {
+    'Monumento': 'business-outline',
+    'Museo': 'library-outline',
+    'Parque': 'leaf-outline',
+    'Playa': 'water-outline',
+    'Restaurante': 'restaurant-outline',
+    'Cafetería': 'cafe-outline',
+    'Mirador': 'eye-outline',
+    'Histórico': 'time-outline',
+    'Shopping': 'cart-outline',
+    'Otro': 'location-outline'
+  };
+
+  private categoriaClassMap: { [key: string]: string } = {
+    'Monumento': 'monumento',
+    'Museo': 'museo',
+    'Parque': 'parque',
+    'Playa': 'playa',
+    'Restaurante': 'restaurante',
+    'Cafetería': 'cafeteria',
+    'Mirador': 'mirador',
+    'Histórico': 'historico',
+    'Shopping': 'shopping',
+    'Otro': 'otro'
+  };
+
+  private categoriaColorMap: { [key: string]: string } = {
+    'Monumento': 'warning',
+    'Museo': 'tertiary',
+    'Parque': 'success',
+    'Playa': 'info',
+    'Restaurante': 'danger',
+    'Cafetería': 'orange',
+    'Mirador': 'primary',
+    'Histórico': 'medium',
+    'Shopping': 'pink',
+    'Otro': 'dark'
+  };
+
   constructor() {
     addIcons({
       addCircleOutline, 
@@ -271,7 +325,15 @@ export class CapturePage implements OnInit {
       addOutline,
       closeCircleOutline,
       chatbubbleOutline,
-      star
+      star,
+      businessOutline,
+      libraryOutline,
+      leafOutline,
+      waterOutline,
+      restaurantOutline,
+      cafeOutline,
+      eyeOutline,
+      cartOutline
     });
   }
 
@@ -279,6 +341,7 @@ export class CapturePage implements OnInit {
     this.cargarLugares();
   }
 
+  // Métodos de UI
   abrirFormulario() {
     this.mostrarFormulario = true;
     this.lugarEditando = null;
@@ -306,6 +369,7 @@ export class CapturePage implements OnInit {
     });
   }
 
+  // Métodos de datos
   async cargarLugares() {
     if (this.isLoading) return;
     
@@ -313,11 +377,10 @@ export class CapturePage implements OnInit {
     
     try {
       this.lugares = await this.captureService.obtenerLugares();
-      this.isLoading = false;
-      
     } catch (error: any) {
-      this.isLoading = false;
       this.mostrarError('Error al cargar lugares: ' + error.message);
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -325,12 +388,8 @@ export class CapturePage implements OnInit {
     if (!this.validarFormulario()) return;
 
     try {
-      const loading = await this.loadingController.create({
-        message: 'Creando lugar...',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
+      const loading = await this.mostrarLoading('Creando lugar...');
+      
       await this.captureService.crearLugar(this.nuevoLugar);
       
       this.limpiarFormulario();
@@ -355,12 +414,8 @@ export class CapturePage implements OnInit {
     if (!this.lugarEditando || !this.validarFormularioEdicion()) return;
 
     try {
-      const loading = await this.loadingController.create({
-        message: 'Actualizando lugar...',
-        spinner: 'crescent'
-      });
-      await loading.present();
-
+      const loading = await this.mostrarLoading('Actualizando lugar...');
+      
       await this.captureService.actualizarLugar(this.lugarEditando.id_lugares!, this.lugarEditando);
       
       this.lugarEditando = null;
@@ -398,12 +453,8 @@ export class CapturePage implements OnInit {
           cssClass: 'danger-button',
           handler: async () => {
             try {
-              const loading = await this.loadingController.create({
-                message: 'Eliminando lugar...',
-                spinner: 'crescent'
-              });
-              await loading.present();
-
+              const loading = await this.mostrarLoading('Eliminando lugar...');
+              
               await this.captureService.eliminarLugar(id);
               await this.cargarLugares();
               
@@ -421,54 +472,24 @@ export class CapturePage implements OnInit {
     await alert.present();
   }
 
+  // Métodos de utilidad
   getCategoriaIcon(categoria: string): string {
-    const iconMap: { [key: string]: string } = {
-      'Monumento': 'business-outline',
-      'Museo': 'library-outline',
-      'Parque': 'leaf-outline',
-      'Playa': 'water-outline',
-      'Restaurante': 'restaurant-outline',
-      'Cafetería': 'cafe-outline',
-      'Mirador': 'eye-outline',
-      'Histórico': 'time-outline',
-      'Shopping': 'cart-outline',
-      'Otro': 'location-outline'
-    };
-    return iconMap[categoria] || 'location-outline';
+    return this.categoriaIconMap[categoria] || 'location-outline';
   }
 
   getCategoriaClass(categoria: string): string {
-    const classMap: { [key: string]: string } = {
-      'Monumento': 'monumento',
-      'Museo': 'museo',
-      'Parque': 'parque',
-      'Playa': 'playa',
-      'Restaurante': 'restaurante',
-      'Cafetería': 'cafeteria',
-      'Mirador': 'mirador',
-      'Histórico': 'historico',
-      'Shopping': 'shopping',
-      'Otro': 'otro'
-    };
-    return classMap[categoria] || 'otro';
+    return this.categoriaClassMap[categoria] || 'otro';
   }
 
   getCategoriaColor(categoria: string): string {
-    const colorMap: { [key: string]: string } = {
-      'Monumento': 'warning',
-      'Museo': 'tertiary',
-      'Parque': 'success',
-      'Playa': 'info',
-      'Restaurante': 'danger',
-      'Cafetería': 'orange',
-      'Mirador': 'primary',
-      'Histórico': 'medium',
-      'Shopping': 'pink',
-      'Otro': 'dark'
-    };
-    return colorMap[categoria] || 'medium';
+    return this.categoriaColorMap[categoria] || 'medium';
   }
 
+  trackByLugar(index: number, lugar: Lugar): number {
+    return lugar.id_lugares!;
+  }
+
+  // Métodos privados
   private validarFormulario(): boolean {
     if (!this.nuevoLugar.nombre?.trim()) {
       this.mostrarError('El nombre del lugar es obligatorio');
@@ -509,6 +530,15 @@ export class CapturePage implements OnInit {
     };
   }
 
+  private async mostrarLoading(mensaje: string): Promise<HTMLIonLoadingElement> {
+    const loading = await this.loadingController.create({
+      message: mensaje,
+      spinner: 'crescent'
+    });
+    await loading.present();
+    return loading;
+  }
+
   private async mostrarError(mensaje: string) {
     const toast = await this.toastController.create({
       message: mensaje,
@@ -534,9 +564,5 @@ export class CapturePage implements OnInit {
       icon: 'checkmark-circle-outline'
     });
     await toast.present();
-  }
-
-  trackByLugar(index: number, lugar: Lugar): number {
-    return lugar.id_lugares!;
   }
 }

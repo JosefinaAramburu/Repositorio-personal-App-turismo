@@ -11,6 +11,8 @@ ion-header {
       font-weight: 700;
       font-size: 1.2rem;
       color: #1e293b;
+      display: flex;
+      align-items: center;
       
       ion-icon {
         color: #3b82f6;
@@ -26,7 +28,7 @@ ion-header {
   
   ion-card {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: black;
+    color: white;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     
@@ -34,13 +36,13 @@ ion-header {
       padding-bottom: 8px;
       
       ion-card-title {
-        color: black;
+        color: white;
         font-weight: 700;
         font-size: 1.4rem;
       }
       
       ion-card-subtitle {
-        color: black;
+        color: rgba(255, 255, 255, 0.9);
         font-size: 0.9rem;
       }
     }
@@ -53,6 +55,7 @@ ion-header {
         font-size: 4rem;
         margin-bottom: 16px;
         opacity: 0.9;
+        color: white;
       }
       
       p {
@@ -60,29 +63,20 @@ ion-header {
         font-size: 1rem;
         opacity: 0.9;
         line-height: 1.5;
+        color: white;
       }
     }
   }
 }
 
-// 🔥🔥🔥 FORMULARIO - TEXTO NEGRO FORZADO 🔥🔥🔥
+// FORMULARIO
 .form-container {
   padding: 16px;
   animation: fadeIn 0.3s ease-in;
   
-  // FORZAR TEXTO NEGRO EN TODO EL FORMULARIO
-  * {
-    color: black !important;
-  }
-  
   .form-card {
     border-radius: 20px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    
-    // Forzar negro en toda la tarjeta del formulario
-    * {
-      color: black !important;
-    }
     
     .form-title {
       display: flex;
@@ -90,7 +84,7 @@ ion-header {
       gap: 8px;
       font-size: 1.3rem;
       font-weight: 700;
-      color: black !important;
+      color: #1e293b;
       
       ion-icon {
         color: #3b82f6;
@@ -99,7 +93,7 @@ ion-header {
     }
     
     ion-card-subtitle {
-      color: black !important;
+      color: #64748b;
       font-size: 0.9rem;
     }
   }
@@ -112,103 +106,18 @@ ion-header {
   
   .input-label {
     font-weight: 600;
-    color: black !important;
+    color: #1e293b;
     font-size: 0.9rem;
     margin-bottom: 8px;
   }
   
-  // 🔥 FORZAR NEGRO EN TODOS LOS INPUTS
   ion-input,
   ion-textarea,
   ion-select {
-    --color: black !important;
-    --placeholder-color: #6b7280 !important;
-    color: black !important;
-    font-weight: 600 !important;
-    
-    // Forzar en todas las partes posibles
-    &::part(input),
-    &::part(textarea),
-    &::part(native) {
-      color: black !important;
-      font-weight: 600 !important;
-    }
-    
-    // Cuando está enfocado - MÁS NEGRITA
-    &.ion-focused {
-      font-weight: 700 !important;
-      
-      &::part(input),
-      &::part(textarea),
-      &::part(native) {
-        font-weight: 700 !important;
-      }
-    }
-    
-    // Cuando tiene valor
-    &.has-value {
-      font-weight: 600 !important;
-      
-      &::part(input),
-      &::part(textarea),
-      &::part(native) {
-        font-weight: 600 !important;
-      }
-    }
+    --color: #1e293b;
+    --placeholder-color: #6b7280;
+    font-weight: 500;
   }
-  
-  // 🔥 FORZAR para inputs con datos existentes (edición)
-  ion-input[ng-reflect-model],
-  ion-textarea[ng-reflect-model],
-  ion-input[value],
-  ion-textarea[value] {
-    font-weight: 600 !important;
-    
-    &::part(input),
-    &::part(textarea),
-    &::part(native) {
-      font-weight: 600 !important;
-    }
-  }
-}
-
-// 🔥 FORZAR NEGRO EN TODOS LOS ION-ITEM DEL FORMULARIO
-.form-container ion-item {
-  --color: black !important;
-  
-  ion-label {
-    color: black !important;
-    font-weight: 600;
-  }
-  
-  // Cuando está enfocado (editando)
-  &.item-has-focus {
-    --background: #f8fafc;
-    
-    ion-label {
-      font-weight: 700 !important;
-      color: #3b82f6 !important;
-    }
-    
-    ion-input,
-    ion-textarea {
-      font-weight: 700 !important;
-      
-      &::part(input),
-      &::part(textarea),
-      &::part(native) {
-        font-weight: 700 !important;
-      }
-    }
-  }
-}
-
-// Placeholder (dejarlo gris para que no se confunda)
-ion-input::part(placeholder),
-ion-textarea::part(placeholder) {
-  color: #6b7280 !important;
-  font-weight: 500;
-  opacity: 0.8;
 }
 
 .form-buttons {
@@ -297,6 +206,8 @@ ion-textarea::part(placeholder) {
   &.museo { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
   &.parque { background: linear-gradient(135deg, #10b981, #059669); }
   &.playa { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+  &.restaurante { background: linear-gradient(135deg, #ef4444, #dc2626); }
+  &.cafeteria { background: linear-gradient(135deg, #f97316, #ea580c); }
   &.mirador { background: linear-gradient(135deg, #6366f1, #4f46e5); }
   &.historico { background: linear-gradient(135deg, #78716c, #57534e); }
   &.shopping { background: linear-gradient(135deg, #ec4899, #db2777); }
@@ -331,7 +242,8 @@ ion-textarea::part(placeholder) {
         align-items: center;
         gap: 6px;
         font-size: 0.8rem;
-        color: black;
+        color: #64748b;
+        margin-bottom: 4px;
         
         ion-icon {
           font-size: 0.9rem;
@@ -394,32 +306,6 @@ ion-fab-button {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-// ESTADOS VACÍOS
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  
-  .empty-icon {
-    font-size: 4rem;
-    color: #cbd5e1;
-    margin-bottom: 20px;
-  }
-  
-  h3 {
-    color: #64748b;
-    margin-bottom: 12px;
-    font-weight: 600;
-    font-size: 1.2rem;
-  }
-  
-  p {
-    color: black;
-    font-size: 0.95rem;
-    margin: 0;
-    line-height: 1.5;
   }
 }
 
