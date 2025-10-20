@@ -30,7 +30,12 @@ export const routes: Routes = [
         path: 'stats',
         loadComponent: () => import('./tabs/stats/stats.page').then(m => m.StatsPage)
       },
-    
+
+    {
+     path: 'perfil',
+      loadComponent: () => import('./tabs/perfil/perfil.page').then(m => m.PerfilPage)
+     },
+
       {
         path: '',
         redirectTo: 'home',
