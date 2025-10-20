@@ -1,425 +1,196 @@
-// PALETA DE COLORES CON TU FONDO
+// PALETA DE COLORES - TEMA CLARO
 :root {
-  --fondo-principal: #b2e2f2;    // Tu color celeste
-  --tarjeta-blanca: #ffffff;      // Blanco puro
-  --texto-negro: #000000;         // Negro para texto
-  --texto-gris: #666666;          // Gris para texto secundario
-  --borde-suave: #d4f1f9;         // Borde celeste muy claro
-  --boton-primario: #87ceeb;      // Celeste para botones
-  --boton-hover: #6cb4d4;         // Celeste más oscuro para hover
+  --fondo-principal: #b2e2f2;
+  --tarjeta-blanca: #ffffff;
+  --texto-negro: #000000;
+  --texto-gris: #666666;
+  --borde-suave: #d4f1f9;
+  --boton-primario: #87ceeb;
+  --boton-hover: #6cb4d4;
 }
 
-// ESTILOS GENERALES
+// FONDO PRINCIPAL - FORZAR CELESTE
 ion-content {
-  --background: var(--fondo-principal);
+  --background: var(--fondo-principal) !important;
+  background: var(--fondo-principal) !important;
 }
 
+// HEADER CON FONDO CELESTE
 ion-header {
   ion-toolbar {
-    --background: var(--fondo-principal);
+    --background: var(--fondo-principal) !important;
+    background: var(--fondo-principal) !important;
     --color: var(--texto-negro);
     --border-color: transparent;
     
     ion-title {
+      color: var(--texto-negro) !important;
       font-weight: 600;
-      color: var(--texto-negro);
       
       ion-icon {
-        color: var(--texto-negro);
+        color: var(--texto-negro) !important;
       }
-    }
-  }
-}
-
-// SECCIÓN DE FILTROS
-.filters-section {
-  padding: 16px;
-  
-  .search-bar {
-    --background: var(--tarjeta-blanca);
-    --border-radius: 12px;
-    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --color: var(--texto-negro);
-    --placeholder-color: var(--texto-gris);
-    margin-bottom: 16px;
-  }
-  
-  .filters-container {
-    background: var(--tarjeta-blanca);
-    border-radius: 16px;
-    padding: 16px;
-    border: 2px solid var(--borde-suave);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    
-    .chips-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-      
-      .filter-chip {
-        margin: 0;
-        --background: var(--fondo-principal);
-        --color: var(--texto-negro);
-        font-weight: 500;
-        border: 1px solid var(--borde-suave);
-        
-        &[color="primary"] {
-          --background: var(--boton-primario);
-          --color: var(--texto-negro);
-        }
-        
-        &[color="warning"] {
-          --background: #ffd966;
-          --color: var(--texto-negro);
-        }
-        
-        &[color="success"] {
-          --background: #90ee90;
-          --color: var(--texto-negro);
-        }
-        
-        &[color="tertiary"] {
-          --background: #b19cd9;
-          --color: var(--texto-negro);
-        }
-        
-        &:active {
-          transform: scale(0.95);
-        }
-      }
-    }
-    
-    .results-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--borde-suave);
-      padding-top: 12px;
-      
-      .results-text {
-        font-size: 14px;
-        color: var(--texto-gris);
-        font-weight: 500;
-      }
-    }
-  }
-}
-
-// BIENVENIDA
-.welcome-section {
-  padding: 40px 16px;
-  
-  .welcome-card {
-    text-align: center;
-    border-radius: 20px;
-    background: var(--tarjeta-blanca);
-    border: 2px solid var(--borde-suave);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    
-    ion-card-header {
-      ion-card-title {
-        color: var(--texto-negro);
-        font-weight: 600;
-      }
-      
-      ion-card-subtitle {
-        color: var(--texto-gris);
-      }
-    }
-    
-    .welcome-content {
-      .welcome-icon {
-        font-size: 72px;
-        color: var(--boton-primario);
-        margin-bottom: 16px;
-      }
-      
-      p {
-        color: var(--texto-gris);
-        margin-bottom: 24px;
-        font-size: 16px;
-        line-height: 1.5;
-      }
-      
-      ion-button {
-        --background: var(--boton-primario);
-        --color: var(--texto-negro);
-        --border-radius: 12px;
-        --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        font-weight: 500;
-        
-        &:active {
-          --background: var(--boton-hover);
-          transform: scale(0.98);
-        }
-      }
-    }
-  }
-}
-
-// FORMULARIO
-.form-section {
-  padding: 16px;
-  
-  .form-card {
-    border-radius: 16px;
-    background: var(--tarjeta-blanca);
-    border: 2px solid var(--borde-suave);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    
-    ion-card-header {
-      ion-card-title {
-        color: var(--texto-negro);
-        font-weight: 600;
-      }
-    }
-    
-    .form-field {
-      --background: var(--tarjeta-blanca);
-      --border-color: var(--borde-suave);
-      --border-radius: 12px;
-      margin-bottom: 16px;
-      border: 1px solid var(--borde-suave);
-      
-      ion-label {
-        color: var(--texto-negro);
-        font-weight: 500;
-      }
-      
-      ion-input, ion-textarea, ion-select {
-        --color: var(--texto-negro);
-        --placeholder-color: var(--texto-gris);
-      }
-    }
-    
-    .form-buttons {
-      margin-top: 24px;
-      
-      ion-button {
-        margin-bottom: 12px;
-        --border-radius: 12px;
-        font-weight: 500;
-        
-        &:first-child {
-          --background: var(--boton-primario);
-          --color: var(--texto-negro);
-          
-          &:active {
-            --background: var(--boton-hover);
-          }
-        }
-        
-        &:last-child {
-          --background: transparent;
-          --color: var(--texto-gris);
-          --border-color: var(--borde-suave);
-        }
-        
-        &:active {
-          transform: scale(0.98);
-        }
-      }
-    }
-  }
-}
-
-// LISTA DE LUGARES
-.list-section {
-  padding: 16px;
-  
-  .list-card {
-    border-radius: 16px;
-    background: var(--tarjeta-blanca);
-    border: 2px solid var(--borde-suave);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    
-    ion-card-header {
-      ion-card-title {
-        color: var(--texto-negro);
-        font-weight: 600;
-        
-        .counter {
-          color: var(--texto-gris);
-          font-size: 0.9em;
-          font-weight: normal;
-        }
-      }
-    }
-    
-    .place-item {
-      --padding-start: 0;
-      --inner-padding-end: 0;
-      --background: transparent;
-      margin-bottom: 12px;
-      padding: 16px;
-      border-radius: 12px;
-      background: var(--tarjeta-blanca);
-      border: 1px solid var(--borde-suave);
-      transition: all 0.2s ease;
-      
-      &:active {
-        background: #f8fdff;
-        transform: scale(0.98);
-      }
-      
-      .place-content {
-        .place-name {
-          font-weight: 600;
-          margin-bottom: 8px;
-          color: var(--texto-negro);
-          font-size: 16px;
-        }
-        
-        .place-info {
-          .category-badge {
-            margin-bottom: 8px;
-            --background: var(--boton-primario);
-            --color: var(--texto-negro);
-            font-weight: 500;
-          }
-          
-          .place-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            
-            .detail {
-              display: flex;
-              align-items: center;
-              gap: 4px;
-              font-size: 12px;
-              color: var(--texto-gris);
-              font-weight: 500;
-              
-              ion-icon {
-                font-size: 14px;
-              }
-            }
-          }
-        }
-        
-        .place-description {
-          color: var(--texto-gris);
-          font-size: 14px;
-          margin-top: 8px;
-          line-height: 1.4;
-        }
-      }
-      
-      .place-actions {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        
-        ion-button {
-          --border-radius: 8px;
-          width: 36px;
-          height: 36px;
-          
-          &:first-child {
-            --background: var(--boton-primario);
-          }
-          
-          &:nth-child(2) {
-            --background: #ffd966;
-          }
-          
-          &:last-child {
-            --background: #ff9999;
-          }
-          
-          ion-icon {
-            color: var(--texto-negro);
-          }
-          
-          &:active {
-            transform: scale(0.9);
-          }
-        }
-      }
-    }
-  }
-}
-
-// ESTADO VACÍO
-.empty-section {
-  padding: 40px 16px;
-  
-  .empty-content {
-    text-align: center;
-    
-    .empty-icon {
-      font-size: 72px;
-      color: var(--boton-primario);
-      margin-bottom: 16px;
-    }
-    
-    h3 {
-      color: var(--texto-negro);
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-    
-    p {
-      color: var(--texto-gris);
-      margin-bottom: 20px;
     }
     
     ion-button {
-      --background: var(--boton-primario);
-      --color: var(--texto-negro);
-      --border-radius: 12px;
-      
-      &:active {
-        --background: var(--boton-hover);
-      }
+      --color: var(--texto-negro) !important;
     }
+  }
+}
+
+// CONTENEDORES PRINCIPALES CON FONDO CELESTE
+.filters-section,
+.welcome-section,
+.form-section,
+.list-section,
+.empty-section {
+  background: var(--fondo-principal) !important;
+  padding: 16px;
+}
+
+// TARJETAS BLANCAS
+ion-card {
+  --background: var(--tarjeta-blanca) !important;
+  background: var(--tarjeta-blanca) !important;
+  color: var(--texto-negro) !important;
+  border-radius: 16px;
+  border: 2px solid var(--borde-suave);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  
+  ion-card-header {
+    ion-card-title {
+      color: var(--texto-negro) !important;
+      font-weight: 600;
+    }
+    
+    ion-card-subtitle {
+      color: var(--texto-gris) !important;
+    }
+  }
+  
+  ion-card-content {
+    color: var(--texto-negro) !important;
+  }
+}
+
+// ITEMS EN FORMULARIOS
+ion-item {
+  --background: var(--tarjeta-blanca) !important;
+  background: var(--tarjeta-blanca) !important;
+  --color: var(--texto-negro) !important;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--borde-suave);
+  
+  ion-label {
+    color: var(--texto-negro) !important;
+    font-weight: 500;
+  }
+  
+  ion-input, ion-textarea, ion-select {
+    --color: var(--texto-negro) !important;
+    --placeholder-color: var(--texto-gris) !important;
+  }
+}
+
+// SEARCHBAR BLANCO
+ion-searchbar {
+  --background: var(--tarjeta-blanca) !important;
+  --color: var(--texto-negro) !important;
+  --placeholder-color: var(--texto-gris) !important;
+  --icon-color: var(--texto-negro) !important;
+  border-radius: 12px;
+}
+
+// CHIPS CON COLOR
+ion-chip {
+  --background: var(--boton-primario) !important;
+  --color: var(--texto-negro) !important;
+  font-weight: 500;
+  border: 1px solid var(--borde-suave);
+}
+
+// BADGES CON COLOR
+ion-badge {
+  --background: var(--boton-primario) !important;
+  --color: var(--texto-negro) !important;
+  font-weight: 500;
+}
+
+// BOTONES CON COLOR
+ion-button {
+  --background: var(--boton-primario) !important;
+  --color: var(--texto-negro) !important;
+  font-weight: 500;
+  
+  &[fill="outline"] {
+    --background: transparent !important;
+    --border-color: var(--borde-suave) !important;
+    --color: var(--texto-gris) !important;
   }
 }
 
 // BOTÓN FLOTANTE
 ion-fab-button {
-  --background: var(--boton-primario);
-  --color: var(--texto-negro);
+  --background: var(--boton-primario) !important;
+  --color: var(--texto-negro) !important;
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+// ITEMS DE LA LISTA
+.place-item {
+  background: var(--tarjeta-blanca) !important;
+  border: 1px solid var(--borde-suave) !important;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
   
-  &:active {
-    --background: var(--boton-hover);
-    transform: scale(0.95);
+  .place-name {
+    color: var(--texto-negro) !important;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .place-description {
+    color: var(--texto-gris) !important;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  
+  .detail {
+    color: var(--texto-gris) !important;
+    font-size: 12px;
+    font-weight: 500;
   }
 }
 
-// LOADING
-ion-loading {
-  --spinner-color: var(--boton-primario);
-  --background: rgba(178, 226, 242, 0.9);
+// CONTENEDOR DE FILTROS
+.filters-container {
+  background: var(--tarjeta-blanca) !important;
+  border-radius: 16px;
+  padding: 16px;
+  border: 2px solid var(--borde-suave);
 }
 
-// EFECTOS ESPECIALES
-@keyframes gentlePulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+// EFECTOS AL TOCAR
+.place-item:active,
+ion-chip:active,
+ion-button:active {
+  transform: scale(0.98);
 }
 
-.welcome-card {
-  animation: gentlePulse 3s ease-in-out infinite;
+ion-fab-button:active {
+  transform: scale(0.95);
 }
 
 // RESPONSIVE
 @media (max-width: 480px) {
   .filters-section,
+  .welcome-section,
   .form-section,
-  .list-section {
+  .list-section,
+  .empty-section {
     padding: 12px;
-  }
-  
-  .place-item {
-    padding: 12px !important;
-  }
-  
-  .welcome-section {
-    padding: 32px 12px;
   }
 }
