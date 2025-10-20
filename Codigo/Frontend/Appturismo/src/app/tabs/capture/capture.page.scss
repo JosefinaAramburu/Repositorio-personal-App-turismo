@@ -1,39 +1,25 @@
-// PALETA DE COLORES - TEMA CLARO
-:root {
-  --fondo-principal: #b2e2f2;
-  --tarjeta-blanca: #ffffff;
-  --texto-negro: #000000;
-  --texto-gris: #666666;
-  --borde-suave: #d4f1f9;
-  --boton-primario: #87ceeb;
-  --boton-hover: #6cb4d4;
-}
-
-// FONDO PRINCIPAL - FORZAR CELESTE
+// FONDO PRINCIPAL - CELESTE
 ion-content {
-  --background: var(--fondo-principal) !important;
-  background: var(--fondo-principal) !important;
+  background: #b2e2f2 !important;
 }
 
 // HEADER CON FONDO CELESTE
 ion-header {
   ion-toolbar {
-    --background: var(--fondo-principal) !important;
-    background: var(--fondo-principal) !important;
-    --color: var(--texto-negro);
-    --border-color: transparent;
+    background: #b2e2f2 !important;
+    color: #000000;
     
     ion-title {
-      color: var(--texto-negro) !important;
+      color: #000000 !important;
       font-weight: 600;
       
       ion-icon {
-        color: var(--texto-negro) !important;
+        color: #000000 !important;
       }
     }
     
     ion-button {
-      --color: var(--texto-negro) !important;
+      color: #000000 !important;
     }
   }
 }
@@ -44,122 +30,116 @@ ion-header {
 .form-section,
 .list-section,
 .empty-section {
-  background: var(--fondo-principal) !important;
+  background: #b2e2f2 !important;
   padding: 16px;
 }
 
 // TARJETAS BLANCAS
 ion-card {
-  --background: var(--tarjeta-blanca) !important;
-  background: var(--tarjeta-blanca) !important;
-  color: var(--texto-negro) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
   border-radius: 16px;
-  border: 2px solid var(--borde-suave);
+  border: 2px solid #d4f1f9;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   
   ion-card-header {
     ion-card-title {
-      color: var(--texto-negro) !important;
+      color: #000000 !important;
       font-weight: 600;
     }
     
     ion-card-subtitle {
-      color: var(--texto-gris) !important;
+      color: #666666 !important;
     }
   }
   
   ion-card-content {
-    color: var(--texto-negro) !important;
+    color: #000000 !important;
   }
 }
 
 // ITEMS EN FORMULARIOS
 ion-item {
-  --background: var(--tarjeta-blanca) !important;
-  background: var(--tarjeta-blanca) !important;
-  --color: var(--texto-negro) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
   margin-bottom: 16px;
   border-radius: 12px;
-  border: 1px solid var(--borde-suave);
+  border: 1px solid #d4f1f9;
   
   ion-label {
-    color: var(--texto-negro) !important;
+    color: #000000 !important;
     font-weight: 500;
   }
   
   ion-input, ion-textarea, ion-select {
-    --color: var(--texto-negro) !important;
-    --placeholder-color: var(--texto-gris) !important;
+    color: #000000 !important;
   }
 }
 
 // SEARCHBAR BLANCO
 ion-searchbar {
-  --background: var(--tarjeta-blanca) !important;
-  --color: var(--texto-negro) !important;
-  --placeholder-color: var(--texto-gris) !important;
-  --icon-color: var(--texto-negro) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
   border-radius: 12px;
 }
 
 // CHIPS CON COLOR
 ion-chip {
-  --background: var(--boton-primario) !important;
-  --color: var(--texto-negro) !important;
+  background: #87ceeb !important;
+  color: #000000 !important;
   font-weight: 500;
-  border: 1px solid var(--borde-suave);
+  border: 1px solid #d4f1f9;
 }
 
 // BADGES CON COLOR
 ion-badge {
-  --background: var(--boton-primario) !important;
-  --color: var(--texto-negro) !important;
+  background: #87ceeb !important;
+  color: #000000 !important;
   font-weight: 500;
 }
 
 // BOTONES CON COLOR
 ion-button {
-  --background: var(--boton-primario) !important;
-  --color: var(--texto-negro) !important;
+  background: #87ceeb !important;
+  color: #000000 !important;
   font-weight: 500;
   
   &[fill="outline"] {
-    --background: transparent !important;
-    --border-color: var(--borde-suave) !important;
-    --color: var(--texto-gris) !important;
+    background: transparent !important;
+    border-color: #d4f1f9 !important;
+    color: #666666 !important;
   }
 }
 
 // BOTÓN FLOTANTE
 ion-fab-button {
-  --background: var(--boton-primario) !important;
-  --color: var(--texto-negro) !important;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background: #87ceeb !important;
+  color: #000000 !important;
 }
 
 // ITEMS DE LA LISTA
 .place-item {
-  background: var(--tarjeta-blanca) !important;
-  border: 1px solid var(--borde-suave) !important;
+  background: #ffffff !important;
+  border: 1px solid #d4f1f9 !important;
   border-radius: 12px;
   margin-bottom: 12px;
   padding: 16px;
   
   .place-name {
-    color: var(--texto-negro) !important;
+    color: #000000 !important;
     font-weight: 600;
     font-size: 16px;
     margin-bottom: 8px;
   }
   
   .place-description {
-    color: var(--texto-gris) !important;
+    color: #666666 !important;
     font-size: 14px;
     line-height: 1.4;
   }
   
   .detail {
-    color: var(--texto-gris) !important;
+    color: #666666 !important;
     font-size: 12px;
     font-weight: 500;
   }
@@ -167,10 +147,10 @@ ion-fab-button {
 
 // CONTENEDOR DE FILTROS
 .filters-container {
-  background: var(--tarjeta-blanca) !important;
+  background: #ffffff !important;
   border-radius: 16px;
   padding: 16px;
-  border: 2px solid var(--borde-suave);
+  border: 2px solid #d4f1f9;
 }
 
 // EFECTOS AL TOCAR
