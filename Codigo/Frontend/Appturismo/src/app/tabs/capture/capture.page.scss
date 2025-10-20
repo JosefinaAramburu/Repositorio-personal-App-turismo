@@ -1,371 +1,195 @@
-// VARIABLES
-:root {
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --card-radius: 20px;
-  --item-radius: 16px;
-  --transition: all 0.3s ease;
-}
-
-// MIXINS REUTILIZABLES
-@mixin card-style {
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  margin: 0;
-}
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin gradient-icon($gradient) {
-  background: $gradient;
-  @include flex-center;
-  
-  ion-icon {
-    color: white;
-    font-size: 1.4rem;
-  }
-}
-
-// CATEGORÍAS - GRADIENTES DEFINIDOS
-$categorias: (
-  'monumento': linear-gradient(135deg, #f59e0b, #d97706),
-  'museo': linear-gradient(135deg, #8b5cf6, #7c3aed),
-  'parque': linear-gradient(135deg, #10b981, #059669),
-  'playa': linear-gradient(135deg, #06b6d4, #0891b2),
-  'restaurante': linear-gradient(135deg, #ef4444, #dc2626),
-  'cafeteria': linear-gradient(135deg, #f97316, #ea580c),
-  'mirador': linear-gradient(135deg, #6366f1, #4f46e5),
-  'historico': linear-gradient(135deg, #78716c, #57534e),
-  'shopping': linear-gradient(135deg, #ec4899, #db2777),
-  'otro': linear-gradient(135deg, #6b7280, #4b5563)
-);
-
-// GENERAR CLASES DE CATEGORÍAS AUTOMÁTICAMENTE
-@each $nombre, $gradiente in $categorias {
-  .#{$nombre} {
-    @include gradient-icon($gradiente);
-  }
-}
-
-// ESTILOS BASE
+// Estilos básicos
 ion-content {
-  --background: #f8fafc;
+  --background: #f8f9fa;
 }
 
-ion-header {
-  ion-toolbar {
-    --background: #ffffff;
-    
-    ion-title {
-      font-weight: 700;
-      @include flex-center;
-      gap: 8px;
-      
-      ion-icon {
-        color: #3b82f6;
-      }
-    }
-  }
-}
-
-// COMPONENTES REUTILIZABLES
-.card-container {
+// Sección de filtros
+.filters-section {
   padding: 16px;
   
-  ion-card {
-    @include card-style;
-  }
-}
-
-.section-title {
-  @include flex-center;
-  gap: 8px;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 8px;
-  
-  ion-icon {
-    color: #3b82f6;
-  }
-}
-
-// ESTADÍSTICAS
-.stats-container {
-  @extend .card-container;
-  
-  .stats-card {
-    background: var(--primary-gradient);
-    color: white;
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      
-      .stat-item {
-        @include flex-center;
-        gap: 12px;
-        padding: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        
-        .stat-icon {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-          @include flex-center;
-        }
-        
-        .stat-number {
-          font-size: 1.3rem;
-          font-weight: 700;
-        }
-        
-        .stat-label {
-          font-size: 0.75rem;
-          opacity: 0.9;
-        }
-      }
-    }
-  }
-}
-
-// FILTROS
-.filters-container {
-  @extend .card-container;
-  padding-bottom: 8px;
-  
-  ion-searchbar {
-    --background: #f1f5f9;
+  .search-bar {
+    --background: white;
     --border-radius: 12px;
     margin-bottom: 16px;
   }
   
-  .categories-segment {
-    --background: #f1f5f9;
-    margin-bottom: 12px;
-  }
-  
-  .chips-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-}
-
-// LUGARES DESTACADOS
-.featured-container {
-  @extend .card-container;
-  padding-top: 8px;
-  
-  .featured-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+  .filters-container {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
     
-    .featured-item {
-      background: white;
-      border-radius: var(--item-radius);
-      padding: 16px;
-      text-align: center;
-      transition: var(--transition);
-      border: 1px solid #f1f5f9;
-      position: relative;
+    .chips-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
       
-      .featured-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        margin: 0 auto 8px auto;
+      .filter-chip {
+        margin: 0;
+        --background: transparent;
+        
+        &[color="primary"],
+        &[color="warning"],
+        &[color="success"],
+        &[color="tertiary"] {
+          --background: var(--ion-color-base);
+          --color: white;
+        }
       }
+    }
+    
+    .results-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #e9ecef;
+      padding-top: 12px;
       
-      .featured-name {
-        font-size: 0.85rem;
-        font-weight: 700;
-        margin: 0 0 4px 0;
+      .results-text {
+        font-size: 14px;
+        color: #6c757d;
       }
     }
   }
 }
 
-// BIENVENIDA
-.welcome-card {
-  @extend .card-container;
+// Bienvenida
+.welcome-section {
+  padding: 32px 16px;
   
-  ion-card {
-    background: var(--primary-gradient);
-    color: white;
+  .welcome-card {
     text-align: center;
+    border-radius: 20px;
     
-    .welcome-icon {
-      font-size: 4rem;
+    .welcome-content {
+      .welcome-icon {
+        font-size: 64px;
+        color: #4dabf7;
+        margin-bottom: 16px;
+      }
+      
+      p {
+        color: #6c757d;
+        margin-bottom: 24px;
+      }
+    }
+  }
+}
+
+// Formulario
+.form-section {
+  padding: 16px;
+  
+  .form-card {
+    border-radius: 16px;
+    
+    .form-field {
+      --border-radius: 12px;
       margin-bottom: 16px;
     }
-  }
-}
-
-// FORMULARIO
-.form-container {
-  @extend .card-container;
-  
-  .form-item {
-    --border-radius: 12px;
-    margin-bottom: 16px;
     
-    .input-label {
-      font-weight: 600;
-      @include flex-center;
-      gap: 6px;
-    }
-  }
-  
-  .form-buttons {
-    margin-top: 24px;
-    
-    ion-button {
-      margin-bottom: 12px;
-      height: 50px;
-      font-weight: 600;
+    .form-buttons {
+      margin-top: 24px;
+      
+      ion-button {
+        margin-bottom: 12px;
+      }
     }
   }
 }
 
-// LISTA PRINCIPAL
-.list-container {
-  @extend .card-container;
-  padding-top: 8px;
+// Lista de lugares
+.list-section {
+  padding: 16px;
   
-  .counter {
-    color: #64748b;
-    font-weight: 500;
+  .list-card {
+    border-radius: 16px;
+    
+    .counter {
+      color: #6c757d;
+      font-size: 0.9em;
+    }
+  }
+  
+  .place-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --background: transparent;
+    margin-bottom: 12px;
+    
+    .place-content {
+      .place-name {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #212529;
+      }
+      
+      .place-info {
+        .category-badge {
+          margin-bottom: 8px;
+        }
+        
+        .place-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          
+          .detail {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #6c757d;
+            
+            ion-icon {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+      
+      .place-description {
+        color: #495057;
+        font-size: 14px;
+        margin-top: 8px;
+        line-height: 1.4;
+      }
+    }
+    
+    .place-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
   }
 }
 
-.place-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  margin-bottom: 12px;
-  border-radius: var(--item-radius);
-  background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transition: var(--transition);
+// Estado vacío
+.empty-section {
+  padding: 32px 16px;
   
-  .place-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    margin: 16px;
-    margin-right: 12px;
-  }
-  
-  .place-content {
-    padding: 16px 16px 16px 0;
+  .empty-content {
+    text-align: center;
     
-    .place-name {
-      font-size: 1.1rem;
-      font-weight: 700;
+    .empty-icon {
+      font-size: 64px;
+      color: #adb5bd;
+      margin-bottom: 16px;
+    }
+    
+    h3 {
+      color: #495057;
       margin-bottom: 8px;
     }
     
-    .category-badge {
-      font-size: 0.7rem;
-      font-weight: 600;
-      border-radius: 20px;
-    }
-    
-    .place-details {
-      .detail-item {
-        @include flex-center;
-        gap: 6px;
-        font-size: 0.8rem;
-        color: #64748b;
-      }
-    }
-    
-    .place-description {
-      color: #475569;
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-  }
-  
-  .action-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding-right: 12px;
-    
-    ion-button {
-      width: 40px;
-      height: 40px;
+    p {
+      color: #6c757d;
+      margin-bottom: 20px;
     }
   }
 }
 
-// ESTADOS ESPECIALES
-.empty-state {
-  @extend .card-container;
-  text-align: center;
-  
-  .empty-icon {
-    font-size: 4rem;
-    color: #cbd5e1;
-    margin-bottom: 16px;
-  }
-}
-
-// BOTÓN FLOTANTE
+// Botón flotante
 ion-fab-button {
-  --box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
-}
-
-// LOADING
-ion-loading {
-  --spinner-color: #3b82f6;
-}
-
-// ANIMACIONES BÁSICAS
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  animation: fadeIn 0.4s ease-out;
-}
-
-// RESPONSIVE
-@media (max-width: 480px) {
-  .card-container {
-    padding: 12px;
-  }
-  
-  .featured-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-  
-  .place-icon {
-    width: 44px;
-    height: 44px;
-    margin: 12px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-// ESTADOS INTERACTIVOS
-.place-item:active,
-.featured-item:active {
-  transform: scale(0.98);
-}
-
-ion-fab-button:active {
-  transform: scale(0.95);
+  --box-shadow: 0 4px 16px rgba(0, 123, 255, 0.3);
 }

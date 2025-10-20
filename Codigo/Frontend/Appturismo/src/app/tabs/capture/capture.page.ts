@@ -2,81 +2,23 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
-  IonContent, 
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonButtons,
-  IonButton,
-  IonCard, 
-  IonCardHeader, 
-  IonCardTitle, 
-  IonCardSubtitle,
-  IonCardContent, 
-  IonItem, 
-  IonLabel, 
-  IonInput, 
-  IonList,
-  IonTextarea,
-  IonIcon,
-  IonBadge,
-  IonFab,
-  IonFabButton,
-  IonSelect,
-  IonSelectOption,
-  IonLoading,
-  IonChip,
-  IonSearchbar,
-  IonSegment,
-  IonSegmentButton,
-  AlertController, 
-  LoadingController,
-  ToastController,
-  NavController
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
+  IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+  IonItem, IonLabel, IonInput, IonList, IonTextarea, IonIcon, IonBadge,
+  IonFab, IonFabButton, IonSelect, IonSelectOption, IonLoading,
+  IonChip, IonSearchbar,
+  AlertController, LoadingController, ToastController, NavController
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
 import { 
-  addCircleOutline, 
-  createOutline, 
-  locationOutline, 
-  mapOutline,
-  saveOutline,
-  checkmarkOutline,
-  closeOutline,
-  timeOutline,
-  trashOutline,
-  refreshOutline,
-  addOutline,
-  closeCircleOutline,
-  chatbubbleOutline,
-  star,
-  businessOutline,
-  libraryOutline,
-  leafOutline,
-  waterOutline,
-  restaurantOutline,
-  cafeOutline,
-  eyeOutline,
-  cartOutline,
-  filterOutline,
-  searchOutline,
-  trendingUpOutline,
-  trophyOutline,
-  heartOutline
+  add, create, location, map, save, checkmark, close,
+  time, trash, refresh, chatbubble, star, filter, search
 } from 'ionicons/icons';
 
-import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// Constantes para nombres de tablas (EXACTAMENTE como están en tu SQL)
-const TABLES = {
-  LUGARES: 'lugares',
-  LUGARES_RESENAS: 'lugares_resenas',
-  RESENAS: 'resenas',
-  DESTINO: 'destino'
-};
-
+// Interfaces simples
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
@@ -84,244 +26,8 @@ export interface Lugar {
   categoria: string;
   descripcion: string;
   horario: string;
-  // Estos no están en la tabla, se calculan
   totalResenas: number;
   promedioRating: number;
-}
-
-export interface Estadisticas {
-  totalLugares: number;
-  totalResenas: number;
-  promedioGeneral: number;
-  categoriaPopular: string;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
-export class CaptureService {
-  
-  async crearLugar(lugar: Lugar): Promise<any> {
-    console.log('🔄 Creando lugar:', lugar);
-    
-    // Solo los campos que existen en tu tabla 'lugares'
-    const lugarParaInsertar = {
-      id_destino: lugar.id_destino,
-      nombre: lugar.nombre.trim(),
-      categoria: lugar.categoria,
-      descripcion: lugar.descripcion.trim(),
-      horario: lugar.horario.trim()
-      // NO incluir totalResenas, promedioRating ni fecha_creacion
-    };
-    
-    const { data, error } = await supabase
-      .from(TABLES.LUGARES)
-      .insert([lugarParaInsertar])
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('❌ Error creando lugar:', error);
-      throw new Error(`Error al crear lugar: ${error.message}`);
-    }
-    
-    console.log('✅ Lugar creado:', data);
-    return data;
-  }
-
-  async obtenerLugares(filtroCategoria?: string, busqueda?: string): Promise<Lugar[]> {
-    console.log('🔄 Obteniendo lugares...');
-    
-    let query = supabase
-      .from(TABLES.LUGARES)
-      .select('*'); // Solo campos existentes
-
-    // Aplicar filtros si existen
-    if (filtroCategoria && filtroCategoria !== 'todos') {
-      query = query.eq('categoria', filtroCategoria);
-    }
-
-    if (busqueda && busqueda.trim()) {
-      query = query.or(`nombre.ilike.%${busqueda}%,descripcion.ilike.%${busqueda}%`);
-    }
-
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error('❌ Error obteniendo lugares:', error);
-      throw new Error(`Error al obtener lugares: ${error.message}`);
-    }
-    
-    // Calcular estadísticas de reseñas para cada lugar
-    const lugaresConResenas = await Promise.all(
-      (data || []).map(async (lugar) => {
-        const estadisticas = await this.obtenerEstadisticasResenas(lugar.id_lugares!);
-        return {
-          ...lugar,
-          totalResenas: estadisticas.totalResenas || 0,
-          promedioRating: estadisticas.promedioRating || 0
-        };
-      })
-    );
-    
-    return lugaresConResenas;
-  }
-
-  async obtenerEstadisticas(): Promise<Estadisticas> {
-    try {
-      // Total de lugares
-      const { count: totalLugares, error: errorLugares } = await supabase
-        .from(TABLES.LUGARES)
-        .select('*', { count: 'exact', head: true });
-
-      // Total de reseñas (de la tabla resenas)
-      const { count: totalResenas, error: errorResenas } = await supabase
-        .from(TABLES.RESENAS)
-        .select('*', { count: 'exact', head: true });
-
-      // Promedio general de todas las reseñas
-      const { data: todasResenas, error: errorTodasResenas } = await supabase
-        .from(TABLES.RESENAS)
-        .select('puntuacion');
-
-      const promedioGeneral = todasResenas && todasResenas.length > 0 
-        ? Number((todasResenas.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0) / todasResenas.length).toFixed(1))
-        : 0;
-
-      // Categoría más popular
-      const { data: categorias, error: errorCategorias } = await supabase
-        .from(TABLES.LUGARES)
-        .select('categoria');
-
-      let categoriaPopular = 'No hay datos';
-      if (categorias && categorias.length > 0) {
-        const categoriaCount = categorias.reduce((acc, lugar) => {
-          acc[lugar.categoria] = (acc[lugar.categoria] || 0) + 1;
-          return acc;
-        }, {} as { [key: string]: number });
-
-        categoriaPopular = Object.keys(categoriaCount).reduce((a, b) => 
-          categoriaCount[a] > categoriaCount[b] ? a : b
-        );
-      }
-
-      return {
-        totalLugares: totalLugares || 0,
-        totalResenas: totalResenas || 0,
-        promedioGeneral,
-        categoriaPopular
-      };
-    } catch (error) {
-      console.error('Error obteniendo estadísticas:', error);
-      return {
-        totalLugares: 0,
-        totalResenas: 0,
-        promedioGeneral: 0,
-        categoriaPopular: 'No hay datos'
-      };
-    }
-  }
-
-  async obtenerEstadisticasResenas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
-    try {
-      // Obtener las reseñas relacionadas con este lugar
-      const { data: relaciones, error: errorRelaciones } = await supabase
-        .from(TABLES.LUGARES_RESENAS)
-        .select('id_resenas')
-        .eq('id_lugares', idLugar);
-
-      if (errorRelaciones || !relaciones || relaciones.length === 0) {
-        return { totalResenas: 0, promedioRating: 0 };
-      }
-
-      const idsResenas = relaciones.map(rel => rel.id_resenas);
-      
-      // Obtener las reseñas específicas
-      const { data: resenas, error: errorResenas } = await supabase
-        .from(TABLES.RESENAS)
-        .select('puntuacion')
-        .in('id_resenas', idsResenas);
-
-      if (errorResenas || !resenas) {
-        return { totalResenas: 0, promedioRating: 0 };
-      }
-
-      const totalResenas = resenas.length;
-      const sumaRatings = resenas.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0);
-      const promedioRating = totalResenas > 0 ? Number((sumaRatings / totalResenas).toFixed(1)) : 0;
-
-      return { totalResenas, promedioRating };
-    } catch (error) {
-      console.error('Error calculando estadísticas:', error);
-      return { totalResenas: 0, promedioRating: 0 };
-    }
-  }
-
-  async actualizarLugar(id: number, updates: Partial<Lugar>): Promise<any> {
-    console.log('🔄 Actualizando lugar', id, updates);
-    
-    // Solo campos editables que existen en la tabla
-    const { totalResenas, promedioRating, ...camposEditables } = updates;
-    
-    // Limpiar campos antes de actualizar
-    if (camposEditables.nombre) camposEditables.nombre = camposEditables.nombre.trim();
-    if (camposEditables.descripcion) camposEditables.descripcion = camposEditables.descripcion.trim();
-    if (camposEditables.horario) camposEditables.horario = camposEditables.horario.trim();
-    
-    const { data, error } = await supabase
-      .from(TABLES.LUGARES)
-      .update(camposEditables)
-      .eq('id_lugares', id)
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('❌ Error actualizando lugar:', error);
-      throw new Error(`Error al actualizar lugar: ${error.message}`);
-    }
-    
-    return data;
-  }
-
-  async eliminarLugar(id: number): Promise<void> {
-    console.log('🔄 Eliminando lugar', id);
-    
-    // Primero eliminar las relaciones de reseñas
-    const { error: errorRelaciones } = await supabase
-      .from(TABLES.LUGARES_RESENAS)
-      .delete()
-      .eq('id_lugares', id);
-    
-    if (errorRelaciones) {
-      console.error('❌ Error eliminando relaciones de reseñas:', errorRelaciones);
-    }
-    
-    // Luego eliminar el lugar
-    const { error } = await supabase
-      .from(TABLES.LUGARES)
-      .delete()
-      .eq('id_lugares', id);
-    
-    if (error) {
-      console.error('❌ Error eliminando lugar:', error);
-      throw new Error(`Error al eliminar lugar: ${error.message}`);
-    }
-  }
-
-  // Método para obtener el destino por defecto
-  async obtenerDestinoPorDefecto(): Promise<number> {
-    const { data, error } = await supabase
-      .from(TABLES.DESTINO)
-      .select('id_destino')
-      .limit(1);
-    
-    if (error || !data || data.length === 0) {
-      console.error('Error obteniendo destino por defecto');
-      return 1; // Valor por defecto
-    }
-    
-    return data[0].id_destino;
-  }
 }
 
 @Component({
@@ -330,50 +36,27 @@ export class CaptureService {
   styleUrls: ['./capture.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonButtons,
-    IonButton,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    IonItem,
-    IonLabel,
-    IonInput,
-    IonList,
-    IonTextarea,
-    IonIcon,
-    IonBadge,
-    IonFab,
-    IonFabButton,
-    IonSelect,
-    IonSelectOption,
-    IonLoading,
-    IonChip,
-    IonSearchbar,
-    IonSegment,
-    IonSegmentButton
-  ],
-  providers: [CaptureService]
+    CommonModule, FormsModule,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
+    IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+    IonItem, IonLabel, IonInput, IonList, IonTextarea, IonIcon, IonBadge,
+    IonFab, IonFabButton, IonSelect, IonSelectOption, IonLoading,
+    IonChip, IonSearchbar
+  ]
 })
 export class CapturePage implements OnInit {
-  private captureService = inject(CaptureService);
   private alertController = inject(AlertController);
   private loadingController = inject(LoadingController);
   private toastController = inject(ToastController);
   private navCtrl = inject(NavController);
 
-  // Estados
+  // Datos principales
   lugares: Lugar[] = [];
   lugaresFiltrados: Lugar[] = [];
+  
+  // Para formularios
   nuevoLugar: Lugar = {
-    id_destino: 1, // Valor por defecto
+    id_destino: 1,
     nombre: '',
     categoria: '',
     descripcion: '',
@@ -381,174 +64,62 @@ export class CapturePage implements OnInit {
     totalResenas: 0,
     promedioRating: 0
   };
+  
   lugarEditando: Lugar | null = null;
   mostrarFormulario = false;
   isLoading = false;
 
-  // Filtros y búsqueda
+  // Filtros
   terminoBusqueda = '';
   categoriaFiltro = 'todos';
-  mostrarEstadisticas = false;
-  estadisticas: Estadisticas = {
-    totalLugares: 0,
-    totalResenas: 0,
-    promedioGeneral: 0,
-    categoriaPopular: ''
-  };
 
-  // Categorías disponibles (basadas en tus opciones)
+  // Categorías disponibles
   categorias = [
-    { valor: 'todos', label: 'Todos', icon: 'location-outline' },
-    { valor: 'Monumento', label: 'Monumentos', icon: 'business-outline' },
-    { valor: 'Museo', label: 'Museos', icon: 'library-outline' },
-    { valor: 'Parque', label: 'Parques', icon: 'leaf-outline' },
-    { valor: 'Playa', label: 'Playas', icon: 'water-outline' },
-    { valor: 'Restaurante', label: 'Restaurantes', icon: 'restaurant-outline' },
-    { valor: 'Cafetería', label: 'Cafeterías', icon: 'cafe-outline' },
-    { valor: 'Mirador', label: 'Miradores', icon: 'eye-outline' },
-    { valor: 'Histórico', label: 'Históricos', icon: 'time-outline' },
-    { valor: 'Shopping', label: 'Shopping', icon: 'cart-outline' },
-    { valor: 'Otro', label: 'Otros', icon: 'location-outline' }
+    { valor: 'todos', label: 'Todos' },
+    { valor: 'Monumento', label: 'Monumentos' },
+    { valor: 'Museo', label: 'Museos' },
+    { valor: 'Parque', label: 'Parques' },
+    { valor: 'Playa', label: 'Playas' },
+    { valor: 'Mirador', label: 'Miradores' },
+    { valor: 'Histórico', label: 'Históricos' },
+    { valor: 'Shopping', label: 'Shopping' },
+    { valor: 'Otro', label: 'Otros' }
   ];
-
-  // Mapeos para categorías
-  private categoriaIconMap: { [key: string]: string } = {
-    'Monumento': 'business-outline',
-    'Museo': 'library-outline',
-    'Parque': 'leaf-outline',
-    'Playa': 'water-outline',
-    'Restaurante': 'restaurant-outline',
-    'Cafetería': 'cafe-outline',
-    'Mirador': 'eye-outline',
-    'Histórico': 'time-outline',
-    'Shopping': 'cart-outline',
-    'Otro': 'location-outline'
-  };
-
-  private categoriaClassMap: { [key: string]: string } = {
-    'Monumento': 'monumento',
-    'Museo': 'museo',
-    'Parque': 'parque',
-    'Playa': 'playa',
-    'Restaurante': 'restaurante',
-    'Cafetería': 'cafeteria',
-    'Mirador': 'mirador',
-    'Histórico': 'historico',
-    'Shopping': 'shopping',
-    'Otro': 'otro'
-  };
-
-  private categoriaColorMap: { [key: string]: string } = {
-    'Monumento': 'warning',
-    'Museo': 'tertiary',
-    'Parque': 'success',
-    'Playa': 'info',
-    'Restaurante': 'danger',
-    'Cafetería': 'orange',
-    'Mirador': 'primary',
-    'Histórico': 'medium',
-    'Shopping': 'pink',
-    'Otro': 'dark'
-  };
 
   constructor() {
     addIcons({
-      addCircleOutline, 
-      createOutline, 
-      locationOutline, 
-      mapOutline,
-      saveOutline,
-      checkmarkOutline,
-      closeOutline,
-      timeOutline,
-      trashOutline,
-      refreshOutline,
-      addOutline,
-      closeCircleOutline,
-      chatbubbleOutline,
-      star,
-      businessOutline,
-      libraryOutline,
-      leafOutline,
-      waterOutline,
-      restaurantOutline,
-      cafeOutline,
-      eyeOutline,
-      cartOutline,
-      filterOutline,
-      searchOutline,
-      trendingUpOutline,
-      trophyOutline,
-      heartOutline
+      add, create, location, map, save, checkmark, close,
+      time, trash, refresh, chatbubble, star, filter, search
     });
   }
 
   async ngOnInit() {
-    await this.cargarDatosIniciales();
+    await this.cargarLugares();
   }
 
-  async cargarDatosIniciales() {
-    // Obtener el destino por defecto primero
-    try {
-      const idDestino = await this.captureService.obtenerDestinoPorDefecto();
-      this.nuevoLugar.id_destino = idDestino;
-    } catch (error) {
-      console.error('Error obteniendo destino por defecto:', error);
-    }
-
-    await Promise.all([
-      this.cargarLugares(),
-      this.cargarEstadisticas()
-    ]);
-  }
-
-  // Métodos de UI
-  abrirFormulario() {
-    this.mostrarFormulario = true;
-    this.lugarEditando = null;
-    this.limpiarFormulario();
-  }
-
-  cerrarFormulario() {
-    this.mostrarFormulario = false;
-    this.lugarEditando = null;
-    this.limpiarFormulario();
-  }
-
-  toggleEstadisticas() {
-    this.mostrarEstadisticas = !this.mostrarEstadisticas;
-    if (this.mostrarEstadisticas) {
-      this.cargarEstadisticas();
-    }
-  }
-
-  verResenas(lugar: Lugar) {
-    if (!lugar.id_lugares) {
-      this.mostrarError('No se puede acceder a las reseñas de este lugar');
-      return;
-    }
-
-    this.navCtrl.navigateForward('/tabs/health', {
-      queryParams: {
-        id: lugar.id_lugares,
-        lugar: lugar.nombre,
-        categoria: lugar.categoria
-      }
-    });
-  }
-
-  // Métodos de datos
+  // 🔄 CARGAR DATOS
   async cargarLugares() {
-    if (this.isLoading) return;
-    
     this.isLoading = true;
     
     try {
-      this.lugares = await this.captureService.obtenerLugares(
-        this.categoriaFiltro !== 'todos' ? this.categoriaFiltro : undefined,
-        this.terminoBusqueda.trim() || undefined
+      // Obtener lugares de Supabase
+      const { data, error } = await supabase
+        .from('lugares')
+        .select('*')
+        .order('id_lugares', { ascending: false });
+
+      if (error) throw error;
+
+      // Calcular reseñas para cada lugar
+      this.lugares = await Promise.all(
+        (data || []).map(async (lugar) => {
+          const stats = await this.calcularEstadisticas(lugar.id_lugares!);
+          return { ...lugar, ...stats };
+        })
       );
+
       this.aplicarFiltros();
+      
     } catch (error: any) {
       this.mostrarError('Error al cargar lugares: ' + error.message);
     } finally {
@@ -556,33 +127,58 @@ export class CapturePage implements OnInit {
     }
   }
 
-  async cargarEstadisticas() {
+  // 📊 CALCULAR ESTADÍSTICAS DE RESEÑAS
+  async calcularEstadisticas(idLugar: number): Promise<{totalResenas: number, promedioRating: number}> {
     try {
-      this.estadisticas = await this.captureService.obtenerEstadisticas();
-    } catch (error: any) {
-      console.error('Error cargando estadísticas:', error);
+      // Obtener reseñas relacionadas con este lugar
+      const { data: relaciones } = await supabase
+        .from('lugares_resenas')
+        .select('id_resenas')
+        .eq('id_lugares', idLugar);
+
+      if (!relaciones || relaciones.length === 0) {
+        return { totalResenas: 0, promedioRating: 0 };
+      }
+
+      const idsResenas = relaciones.map(rel => rel.id_resenas);
+      
+      // Obtener las reseñas
+      const { data: resenas } = await supabase
+        .from('resenas')
+        .select('puntuacion')
+        .in('id_resenas', idsResenas);
+
+      if (!resenas) return { totalResenas: 0, promedioRating: 0 };
+
+      const totalResenas = resenas.length;
+      const sumaRatings = resenas.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0);
+      const promedioRating = totalResenas > 0 ? Number((sumaRatings / totalResenas).toFixed(1)) : 0;
+
+      return { totalResenas, promedioRating };
+    } catch (error) {
+      return { totalResenas: 0, promedioRating: 0 };
     }
   }
 
+  // 🔍 FILTRAR Y BUSCAR
   aplicarFiltros() {
-    let lugaresFiltrados = [...this.lugares];
+    let resultados = [...this.lugares];
 
+    // Filtrar por búsqueda
     if (this.terminoBusqueda.trim()) {
-      const busqueda = this.terminoBusqueda.toLowerCase().trim();
-      lugaresFiltrados = lugaresFiltrados.filter(lugar =>
+      const busqueda = this.terminoBusqueda.toLowerCase();
+      resultados = resultados.filter(lugar =>
         lugar.nombre.toLowerCase().includes(busqueda) ||
-        (lugar.descripcion && lugar.descripcion.toLowerCase().includes(busqueda)) ||
-        lugar.categoria.toLowerCase().includes(busqueda)
+        (lugar.descripcion && lugar.descripcion.toLowerCase().includes(busqueda))
       );
     }
 
+    // Filtrar por categoría
     if (this.categoriaFiltro !== 'todos') {
-      lugaresFiltrados = lugaresFiltrados.filter(lugar => 
-        lugar.categoria === this.categoriaFiltro
-      );
+      resultados = resultados.filter(lugar => lugar.categoria === this.categoriaFiltro);
     }
 
-    this.lugaresFiltrados = lugaresFiltrados;
+    this.lugaresFiltrados = resultados;
   }
 
   onBuscarChange(event: any) {
@@ -590,8 +186,8 @@ export class CapturePage implements OnInit {
     this.aplicarFiltros();
   }
 
-  onCategoriaChange(event: any) {
-    this.categoriaFiltro = event.detail.value;
+  onCategoriaChange(categoria: string) {
+    this.categoriaFiltro = categoria;
     this.aplicarFiltros();
   }
 
@@ -601,19 +197,34 @@ export class CapturePage implements OnInit {
     this.aplicarFiltros();
   }
 
+  // ➕ CREAR LUGAR
   async crearLugar() {
-    if (!this.validarFormulario()) return;
+    if (!this.nuevoLugar.nombre.trim() || !this.nuevoLugar.categoria.trim()) {
+      this.mostrarError('Nombre y categoría son obligatorios');
+      return;
+    }
 
     try {
       const loading = await this.mostrarLoading('Creando lugar...');
       
-      await this.captureService.crearLugar(this.nuevoLugar);
-      
-      this.limpiarFormulario();
-      await this.cargarDatosIniciales();
-      this.mostrarFormulario = false;
-      
+      const { data, error } = await supabase
+        .from('lugares')
+        .insert([{
+          id_destino: this.nuevoLugar.id_destino,
+          nombre: this.nuevoLugar.nombre.trim(),
+          categoria: this.nuevoLugar.categoria,
+          descripcion: this.nuevoLugar.descripcion.trim(),
+          horario: this.nuevoLugar.horario.trim()
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
       await loading.dismiss();
+      this.mostrarFormulario = false;
+      this.limpiarFormulario();
+      await this.cargarLugares();
       this.mostrarExito('¡Lugar creado exitosamente!');
       
     } catch (error: any) {
@@ -622,24 +233,34 @@ export class CapturePage implements OnInit {
     }
   }
 
+  // ✏️ EDITAR LUGAR
   editarLugar(lugar: Lugar) {
     this.lugarEditando = { ...lugar };
     this.mostrarFormulario = true;
   }
 
   async guardarEdicion() {
-    if (!this.lugarEditando || !this.validarFormularioEdicion()) return;
+    if (!this.lugarEditando) return;
 
     try {
       const loading = await this.mostrarLoading('Actualizando lugar...');
       
-      await this.captureService.actualizarLugar(this.lugarEditando.id_lugares!, this.lugarEditando);
-      
-      this.lugarEditando = null;
-      this.mostrarFormulario = false;
-      await this.cargarDatosIniciales();
-      
+      const { error } = await supabase
+        .from('lugares')
+        .update({
+          nombre: this.lugarEditando.nombre.trim(),
+          categoria: this.lugarEditando.categoria,
+          descripcion: this.lugarEditando.descripcion.trim(),
+          horario: this.lugarEditando.horario.trim()
+        })
+        .eq('id_lugares', this.lugarEditando.id_lugares);
+
+      if (error) throw error;
+
       await loading.dismiss();
+      this.mostrarFormulario = false;
+      this.lugarEditando = null;
+      await this.cargarLugares();
       this.mostrarExito('¡Lugar actualizado exitosamente!');
       
     } catch (error: any) {
@@ -654,28 +275,29 @@ export class CapturePage implements OnInit {
     this.limpiarFormulario();
   }
 
+  // 🗑️ ELIMINAR LUGAR
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
       header: '¿Eliminar lugar?',
-      message: 'Esta acción eliminará el lugar y todas sus reseñas. No se puede deshacer.',
+      message: 'Esta acción no se puede deshacer.',
       buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary'
-        },
+        { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Eliminar',
           role: 'destructive',
-          cssClass: 'danger-button',
           handler: async () => {
             try {
               const loading = await this.mostrarLoading('Eliminando lugar...');
               
-              await this.captureService.eliminarLugar(id);
-              await this.cargarDatosIniciales();
+              // Primero eliminar relaciones de reseñas
+              await supabase.from('lugares_resenas').delete().eq('id_lugares', id);
               
+              // Luego eliminar el lugar
+              const { error } = await supabase.from('lugares').delete().eq('id_lugares', id);
+              if (error) throw error;
+
               await loading.dismiss();
+              await this.cargarLugares();
               this.mostrarExito('¡Lugar eliminado exitosamente!');
               
             } catch (error: any) {
@@ -689,71 +311,34 @@ export class CapturePage implements OnInit {
     await alert.present();
   }
 
-  // Métodos de utilidad
-  getCategoriaIcon(categoria: string): string {
-    return this.categoriaIconMap[categoria] || 'location-outline';
-  }
-
-  getCategoriaClass(categoria: string): string {
-    return this.categoriaClassMap[categoria] || 'otro';
-  }
-
-  getCategoriaColor(categoria: string): string {
-    return this.categoriaColorMap[categoria] || 'medium';
-  }
-
-  getLugaresDestacados(): Lugar[] {
-    return this.lugaresFiltrados
-      .filter(lugar => lugar.promedioRating >= 4)
-      .slice(0, 3);
-  }
-
-  trackByLugar(index: number, lugar: Lugar): number {
-    return lugar.id_lugares!;
-  }
-
-  // Métodos privados
-  private validarFormulario(): boolean {
-    if (!this.nuevoLugar.nombre?.trim()) {
-      this.mostrarError('El nombre del lugar es obligatorio');
-      return false;
-    }
+  // 👁️ VER RESEÑAS
+  verResenas(lugar: Lugar) {
+    if (!lugar.id_lugares) return;
     
-    if (!this.nuevoLugar.categoria?.trim()) {
-      this.mostrarError('La categoría del lugar es obligatoria');
-      return false;
-    }
-
-    if (this.nuevoLugar.nombre.trim().length < 2) {
-      this.mostrarError('El nombre debe tener al menos 2 caracteres');
-      return false;
-    }
-    
-    return true;
+    this.navCtrl.navigateForward('/tabs/health', {
+      queryParams: {
+        id: lugar.id_lugares,
+        lugar: lugar.nombre,
+        categoria: lugar.categoria
+      }
+    });
   }
 
-  private validarFormularioEdicion(): boolean {
-    if (!this.lugarEditando?.nombre?.trim()) {
-      this.mostrarError('El nombre del lugar es obligatorio');
-      return false;
-    }
-    
-    if (!this.lugarEditando?.categoria?.trim()) {
-      this.mostrarError('La categoría del lugar es obligatoria');
-      return false;
-    }
+  // 🎨 MÉTODOS DE UI
+  abrirFormulario() {
+    this.mostrarFormulario = true;
+    this.lugarEditando = null;
+  }
 
-    if (this.lugarEditando.nombre.trim().length < 2) {
-      this.mostrarError('El nombre debe tener al menos 2 caracteres');
-      return false;
-    }
-    
-    return true;
+  cerrarFormulario() {
+    this.mostrarFormulario = false;
+    this.lugarEditando = null;
+    this.limpiarFormulario();
   }
 
   private limpiarFormulario() {
     this.nuevoLugar = {
-      id_destino: this.nuevoLugar.id_destino, // Mantener el destino
+      id_destino: 1,
       nombre: '',
       categoria: '',
       descripcion: '',
@@ -763,12 +348,28 @@ export class CapturePage implements OnInit {
     };
   }
 
-  private async mostrarLoading(mensaje: string): Promise<HTMLIonLoadingElement> {
-    const loading = await this.loadingController.create({
-      message: mensaje,
-      spinner: 'crescent',
-      duration: 15000
-    });
+  // 🎯 MÉTODOS DE AYUDA
+  getCategoriaColor(categoria: string): string {
+    const colores: { [key: string]: string } = {
+      'Monumento': 'warning',
+      'Museo': 'tertiary', 
+      'Parque': 'success',
+      'Playa': 'info',
+      'Mirador': 'primary',
+      'Histórico': 'medium',
+      'Shopping': 'pink',
+      'Otro': 'dark'
+    };
+    return colores[categoria] || 'medium';
+  }
+
+  trackByLugar(index: number, lugar: Lugar): number {
+    return lugar.id_lugares!;
+  }
+
+  // 💬 MENSAJES AL USUARIO
+  private async mostrarLoading(mensaje: string) {
+    const loading = await this.loadingController.create({ message: mensaje });
     await loading.present();
     return loading;
   }
@@ -778,13 +379,7 @@ export class CapturePage implements OnInit {
       message: mensaje,
       duration: 4000,
       color: 'danger',
-      position: 'top',
-      buttons: [
-        {
-          icon: 'close-circle-outline',
-          role: 'cancel'
-        }
-      ]
+      position: 'top'
     });
     await toast.present();
   }
@@ -794,8 +389,7 @@ export class CapturePage implements OnInit {
       message: mensaje,
       duration: 3000,
       color: 'success',
-      position: 'top',
-      icon: 'checkmark-circle-outline'
+      position: 'top'
     });
     await toast.present();
   }
