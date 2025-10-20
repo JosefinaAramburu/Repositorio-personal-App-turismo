@@ -1,3 +1,57 @@
+// VARIABLES
+:root {
+  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --card-radius: 20px;
+  --item-radius: 16px;
+  --transition: all 0.3s ease;
+}
+
+// MIXINS REUTILIZABLES
+@mixin card-style {
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  margin: 0;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin gradient-icon($gradient) {
+  background: $gradient;
+  @include flex-center;
+  
+  ion-icon {
+    color: white;
+    font-size: 1.4rem;
+  }
+}
+
+// CATEGORÍAS - GRADIENTES DEFINIDOS
+$categorias: (
+  'monumento': linear-gradient(135deg, #f59e0b, #d97706),
+  'museo': linear-gradient(135deg, #8b5cf6, #7c3aed),
+  'parque': linear-gradient(135deg, #10b981, #059669),
+  'playa': linear-gradient(135deg, #06b6d4, #0891b2),
+  'restaurante': linear-gradient(135deg, #ef4444, #dc2626),
+  'cafeteria': linear-gradient(135deg, #f97316, #ea580c),
+  'mirador': linear-gradient(135deg, #6366f1, #4f46e5),
+  'historico': linear-gradient(135deg, #78716c, #57534e),
+  'shopping': linear-gradient(135deg, #ec4899, #db2777),
+  'otro': linear-gradient(135deg, #6b7280, #4b5563)
+);
+
+// GENERAR CLASES DE CATEGORÍAS AUTOMÁTICAMENTE
+@each $nombre, $gradiente in $categorias {
+  .#{$nombre} {
+    @include gradient-icon($gradiente);
+  }
+}
+
+// ESTILOS BASE
 ion-content {
   --background: #f8fafc;
 }
@@ -5,359 +59,313 @@ ion-content {
 ion-header {
   ion-toolbar {
     --background: #ffffff;
-    --border-color: transparent;
     
     ion-title {
       font-weight: 700;
-      font-size: 1.2rem;
-      color: #1e293b;
-      display: flex;
-      align-items: center;
+      @include flex-center;
+      gap: 8px;
       
       ion-icon {
         color: #3b82f6;
-        margin-right: 8px;
       }
     }
   }
 }
 
-// TARJETA DE BIENVENIDA
-.welcome-card {
+// COMPONENTES REUTILIZABLES
+.card-container {
   padding: 16px;
   
   ion-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    @include card-style;
+  }
+}
+
+.section-title {
+  @include flex-center;
+  gap: 8px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+  
+  ion-icon {
+    color: #3b82f6;
+  }
+}
+
+// ESTADÍSTICAS
+.stats-container {
+  @extend .card-container;
+  
+  .stats-card {
+    background: var(--primary-gradient);
     color: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     
-    ion-card-header {
-      padding-bottom: 8px;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       
-      ion-card-title {
-        color: white;
-        font-weight: 700;
-        font-size: 1.4rem;
-      }
-      
-      ion-card-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.9rem;
+      .stat-item {
+        @include flex-center;
+        gap: 12px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        
+        .stat-icon {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          @include flex-center;
+        }
+        
+        .stat-number {
+          font-size: 1.3rem;
+          font-weight: 700;
+        }
+        
+        .stat-label {
+          font-size: 0.75rem;
+          opacity: 0.9;
+        }
       }
     }
+  }
+}
+
+// FILTROS
+.filters-container {
+  @extend .card-container;
+  padding-bottom: 8px;
+  
+  ion-searchbar {
+    --background: #f1f5f9;
+    --border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .categories-segment {
+    --background: #f1f5f9;
+    margin-bottom: 12px;
+  }
+  
+  .chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+// LUGARES DESTACADOS
+.featured-container {
+  @extend .card-container;
+  padding-top: 8px;
+  
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
     
-    .welcome-content {
+    .featured-item {
+      background: white;
+      border-radius: var(--item-radius);
+      padding: 16px;
       text-align: center;
-      padding: 8px 0;
+      transition: var(--transition);
+      border: 1px solid #f1f5f9;
+      position: relative;
       
-      .welcome-icon {
-        font-size: 4rem;
-        margin-bottom: 16px;
-        opacity: 0.9;
-        color: white;
+      .featured-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        margin: 0 auto 8px auto;
       }
       
-      p {
-        margin-bottom: 20px;
-        font-size: 1rem;
-        opacity: 0.9;
-        line-height: 1.5;
-        color: white;
+      .featured-name {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin: 0 0 4px 0;
       }
+    }
+  }
+}
+
+// BIENVENIDA
+.welcome-card {
+  @extend .card-container;
+  
+  ion-card {
+    background: var(--primary-gradient);
+    color: white;
+    text-align: center;
+    
+    .welcome-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
     }
   }
 }
 
 // FORMULARIO
 .form-container {
-  padding: 16px;
-  animation: fadeIn 0.3s ease-in;
+  @extend .card-container;
   
-  .form-card {
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  .form-item {
+    --border-radius: 12px;
+    margin-bottom: 16px;
     
-    .form-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #1e293b;
-      
-      ion-icon {
-        color: #3b82f6;
-        font-size: 1.4rem;
-      }
+    .input-label {
+      font-weight: 600;
+      @include flex-center;
+      gap: 6px;
     }
+  }
+  
+  .form-buttons {
+    margin-top: 24px;
     
-    ion-card-subtitle {
-      color: #64748b;
-      font-size: 0.9rem;
+    ion-button {
+      margin-bottom: 12px;
+      height: 50px;
+      font-weight: 600;
     }
   }
 }
 
-.form-item {
-  --border-radius: 12px;
-  --background: #ffffff;
-  margin-bottom: 16px;
+// LISTA PRINCIPAL
+.list-container {
+  @extend .card-container;
+  padding-top: 8px;
   
-  .input-label {
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-  }
-  
-  ion-input,
-  ion-textarea,
-  ion-select {
-    --color: #1e293b;
-    --placeholder-color: #6b7280;
+  .counter {
+    color: #64748b;
     font-weight: 500;
   }
-}
-
-.form-buttons {
-  margin-top: 24px;
-  
-  .submit-button, .cancel-button {
-    margin-bottom: 12px;
-    --border-radius: 12px;
-    height: 50px;
-    font-weight: 600;
-  }
-}
-
-// LISTA DE LUGARES
-.list-container {
-  padding: 16px;
-  
-  .list-card {
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    
-    .list-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: #1e293b;
-      
-      ion-icon {
-        color: #3b82f6;
-        font-size: 1.4rem;
-      }
-    }
-    
-    ion-card-subtitle {
-      color: #64748b;
-      font-size: 0.9rem;
-    }
-  }
-}
-
-.places-list {
-  background: transparent;
-  padding: 0;
 }
 
 .place-item {
   --padding-start: 0;
   --inner-padding-end: 0;
-  --background: transparent;
-  margin-bottom: 16px;
-  border-radius: 16px;
+  margin-bottom: 12px;
+  border-radius: var(--item-radius);
   background: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-  border: 1px solid #f1f5f9;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: var(--transition);
   
-  &:last-child {
-    margin-bottom: 0;
+  .place-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    margin: 16px;
+    margin-right: 12px;
   }
   
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-}
-
-.place-icon {
-  width: 50px;
-  height: 50px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 16px;
-  margin-right: 12px;
-  
-  ion-icon {
-    font-size: 1.4rem;
-    color: white;
-  }
-  
-  // Colores por categoría
-  &.monumento { background: linear-gradient(135deg, #f59e0b, #d97706); }
-  &.museo { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-  &.parque { background: linear-gradient(135deg, #10b981, #059669); }
-  &.playa { background: linear-gradient(135deg, #06b6d4, #0891b2); }
-  &.restaurante { background: linear-gradient(135deg, #ef4444, #dc2626); }
-  &.cafeteria { background: linear-gradient(135deg, #f97316, #ea580c); }
-  &.mirador { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-  &.historico { background: linear-gradient(135deg, #78716c, #57534e); }
-  &.shopping { background: linear-gradient(135deg, #ec4899, #db2777); }
-  &.otro { background: linear-gradient(135deg, #6b7280, #4b5563); }
-}
-
-.place-content {
-  padding: 16px 16px 16px 0;
-  
-  .place-name {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-  
-  .place-meta {
-    margin-bottom: 8px;
+  .place-content {
+    padding: 16px 16px 16px 0;
+    
+    .place-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
     
     .category-badge {
       font-size: 0.7rem;
       font-weight: 600;
-      padding: 4px 10px;
       border-radius: 20px;
-      margin-bottom: 8px;
     }
     
     .place-details {
       .detail-item {
-        display: flex;
-        align-items: center;
+        @include flex-center;
         gap: 6px;
         font-size: 0.8rem;
         color: #64748b;
-        margin-bottom: 4px;
-        
-        ion-icon {
-          font-size: 0.9rem;
-          color: #94a3b8;
-        }
       }
+    }
+    
+    .place-description {
+      color: #475569;
+      font-size: 0.9rem;
+      line-height: 1.4;
     }
   }
   
-  .place-description {
-    color: #475569;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    margin: 0;
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-right: 12px;
+    
+    ion-button {
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0 12px 0 0;
+// ESTADOS ESPECIALES
+.empty-state {
+  @extend .card-container;
+  text-align: center;
   
-  .action-btn {
-    --padding-start: 8px;
-    --padding-end: 8px;
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-    height: 40px;
-    width: 40px;
-    
-    ion-icon {
-      font-size: 1.1rem;
-    }
+  .empty-icon {
+    font-size: 4rem;
+    color: #cbd5e1;
+    margin-bottom: 16px;
   }
 }
 
 // BOTÓN FLOTANTE
 ion-fab-button {
-  --box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-  
-  ion-icon {
-    font-size: 1.4rem;
-  }
-}
-
-// BOTÓN DE RECARGAR
-.reload-button {
-  margin-top: 20px;
-  --border-radius: 12px;
-  font-weight: 600;
-}
-
-// ANIMACIONES
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  --box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
 // LOADING
 ion-loading {
   --spinner-color: #3b82f6;
-  --background: rgba(255, 255, 255, 0.9);
-  --backdrop-opacity: 0.6;
+}
+
+// ANIMACIONES BÁSICAS
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
 }
 
 // RESPONSIVE
 @media (max-width: 480px) {
-  .form-container,
-  .list-container,
-  .welcome-card {
+  .card-container {
     padding: 12px;
+  }
+  
+  .featured-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
   
   .place-icon {
     width: 44px;
     height: 44px;
     margin: 12px;
-    margin-right: 10px;
-    
-    ion-icon {
-      font-size: 1.2rem;
-    }
   }
   
-  .place-content {
-    padding: 12px 12px 12px 0;
-  }
-  
-  .action-buttons {
-    flex-direction: row;
-    
-    .action-btn {
-      height: 36px;
-      width: 36px;
-    }
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-// EFECTOS HOVER (para dispositivos con hover)
-@media (hover: hover) {
-  .place-item:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-  }
-  
-  ion-fab-button:hover {
-    --box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
-    transform: scale(1.05);
-  }
+// ESTADOS INTERACTIVOS
+.place-item:active,
+.featured-item:active {
+  transform: scale(0.98);
+}
+
+ion-fab-button:active {
+  transform: scale(0.95);
 }

@@ -5,6 +5,9 @@
       Lugares Turísticos
     </ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="toggleEstadisticas()" fill="clear" color="tertiary">
+        <ion-icon name="trending-up-outline" slot="icon-only"></ion-icon>
+      </ion-button>
       <ion-button (click)="cargarLugares()" fill="clear">
         <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
       </ion-button>
@@ -20,19 +23,176 @@
     </ion-fab-button>
   </ion-fab>
 
+  <!-- ESTADÍSTICAS -->
+  <div *ngIf="mostrarEstadisticas && !mostrarFormulario" class="stats-container">
+    <ion-card class="stats-card">
+      <ion-card-header>
+        <ion-card-title class="stats-title">
+          <ion-icon name="trophy-outline"></ion-icon>
+          Estadísticas
+        </ion-card-title>
+        <ion-card-subtitle>Resumen de tu actividad</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon total-lugares">
+              <ion-icon name="location-outline"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ estadisticas.totalLugares }}</div>
+              <div class="stat-label">Lugares</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-icon total-resenas">
+              <ion-icon name="chatbubble-outline"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ estadisticas.totalResenas }}</div>
+              <div class="stat-label">Reseñas</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-icon promedio">
+              <ion-icon name="star"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-number">{{ estadisticas.promedioGeneral }}</div>
+              <div class="stat-label">Rating Prom.</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-icon popular">
+              <ion-icon name="heart-outline"></ion-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-category">{{ estadisticas.categoriaPopular }}</div>
+              <div class="stat-label">Más Popular</div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+  <div *ngIf="!mostrarFormulario && lugares.length > 0" class="filters-container">
+    <ion-card class="filters-card">
+      <ion-card-content>
+        <!-- BARRA DE BÚSQUEDA -->
+        <ion-searchbar 
+          [(ngModel)]="terminoBusqueda"
+          (ionInput)="onBuscarChange($event)"
+          placeholder="Buscar lugares..."
+          animated="true"
+          class="custom-searchbar">
+        </ion-searchbar>
+
+        <!-- FILTROS POR CATEGORÍA -->
+        <div class="categories-section">
+          <div class="section-header">
+            <ion-icon name="filter-outline"></ion-icon>
+            <span>Filtrar por categoría</span>
+          </div>
+          
+          <ion-segment [(ngModel)]="categoriaFiltro" (ionChange)="onCategoriaChange($event)" value="todos" class="categories-segment">
+            <ion-segment-button value="todos" class="segment-btn">
+              <ion-label>Todos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Monumento" class="segment-btn">
+              <ion-label>Monumentos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Museo" class="segment-btn">
+              <ion-label>Museos</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="Parque" class="segment-btn">
+              <ion-label>Parques</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+
+          <!-- CHIPS PARA CATEGORÍAS ADICIONALES -->
+          <div class="chips-container">
+            <ion-chip 
+              *ngFor="let cat of categorias.slice(4)" 
+              [outline]="categoriaFiltro !== cat.valor"
+              [color]="categoriaFiltro === cat.valor ? getCategoriaColor(cat.valor) : 'medium'"
+              (click)="categoriaFiltro = cat.valor; onCategoriaChange($event)"
+              class="category-chip">
+              <ion-icon [name]="cat.icon"></ion-icon>
+              <ion-label>{{ cat.label }}</ion-label>
+            </ion-chip>
+          </div>
+
+          <!-- CONTADOR DE RESULTADOS -->
+          <div class="results-info">
+            <span class="results-count">
+              {{ lugaresFiltrados.length }} de {{ lugares.length }} lugares
+            </span>
+            <ion-button *ngIf="terminoBusqueda || categoriaFiltro !== 'todos'" 
+                       fill="clear" size="small" color="medium" 
+                       (click)="limpiarFiltros()">
+              <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+              Limpiar
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- LUGARES DESTACADOS -->
+  <div *ngIf="!mostrarFormulario && getLugaresDestacados().length > 0" class="featured-container">
+    <ion-card class="featured-card">
+      <ion-card-header>
+        <ion-card-title class="featured-title">
+          <ion-icon name="star" color="warning"></ion-icon>
+          Lugares Destacados
+        </ion-card-title>
+        <ion-card-subtitle>Los mejor calificados por la comunidad</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="featured-grid">
+          <div *ngFor="let lugar of getLugaresDestacados()" class="featured-item" (click)="verResenas(lugar)">
+            <div class="featured-badge">
+              <ion-icon name="star" color="warning"></ion-icon>
+              <span>{{ lugar.promedioRating }}</span>
+            </div>
+            <div class="featured-icon" [class]="getCategoriaClass(lugar.categoria)">
+              <ion-icon [name]="getCategoriaIcon(lugar.categoria)"></ion-icon>
+            </div>
+            <div class="featured-content">
+              <h3 class="featured-name">{{ lugar.nombre }}</h3>
+              <p class="featured-category">{{ lugar.categoria }}</p>
+              <div class="featured-reviews">
+                <ion-icon name="chatbubble-outline"></ion-icon>
+                <span>{{ lugar.totalResenas }} reseñas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
   <!-- TARJETA DE BIENVENIDA -->
   <div *ngIf="!mostrarFormulario && lugares.length === 0" class="welcome-card">
     <ion-card>
       <ion-card-header>
-        <ion-card-title>¡Bienvenido!</ion-card-title>
-        <ion-card-subtitle>Comienza agregando tu primer lugar turístico</ion-card-subtitle>
+        <ion-card-title>¡Bienvenido a tu Guía Turística!</ion-card-title>
+        <ion-card-subtitle>Comienza explorando y agregando lugares increíbles</ion-card-subtitle>
       </ion-card-header>
       
       <ion-card-content>
         <div class="welcome-content">
           <ion-icon name="map-outline" class="welcome-icon"></ion-icon>
-          <p>Descubre y comparte los mejores lugares de tu ciudad</p>
-          <ion-button expand="block" (click)="abrirFormulario()" color="primary">
+          <p>Descubre, comparte y explora los mejores lugares turísticos. Crea tu propia colección de sitios favoritos.</p>
+          <ion-button expand="block" (click)="abrirFormulario()" color="primary" size="large" class="welcome-button">
             <ion-icon name="add-circle-outline" slot="start"></ion-icon>
             Agregar Primer Lugar
           </ion-button>
@@ -47,35 +207,118 @@
       <ion-card-header>
         <ion-card-title class="form-title">
           <ion-icon [name]="lugarEditando ? 'create-outline' : 'add-circle-outline'"></ion-icon>
-          {{ lugarEditando ? 'Editar Lugar' : 'Nuevo Lugar' }}
+          {{ lugarEditando ? 'Editar Lugar' : 'Nuevo Lugar Turístico' }}
         </ion-card-title>
         <ion-card-subtitle>
-          {{ lugarEditando ? 'Modifica la información del lugar' : 'Comparte un nuevo lugar con la comunidad' }}
+          {{ lugarEditando ? 'Actualiza la información del lugar' : 'Comparte un nuevo descubrimiento con la comunidad' }}
         </ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
         <!-- Formulario para NUEVO lugar -->
         <div *ngIf="!lugarEditando">
-          <ion-item class="form-item" fill="outline">
+          <ion-item class="form-item" fill="outline" lines="none">
             <ion-label position="stacked" class="input-label">
+              <ion-icon name="pricetag-outline" slot="start"></ion-icon>
               Nombre del lugar *
             </ion-label>
             <ion-input 
               [(ngModel)]="nuevoLugar.nombre"
-              placeholder="Ej: Torre Eiffel, Playa Principal..."
-              required>
+              placeholder="Ej: Torre Eiffel, Playa Principal, Museo Nacional..."
+              required
+              class="custom-input">
             </ion-input>
           </ion-item>
 
-          <ion-item class="form-item" fill="outline">
+          <ion-item class="form-item" fill="outline" lines="none">
             <ion-label position="stacked" class="input-label">
+              <ion-icon name="grid-outline" slot="start"></ion-icon>
               Categoría *
             </ion-label>
             <ion-select 
               [(ngModel)]="nuevoLugar.categoria" 
               placeholder="Selecciona una categoría"
-              interface="action-sheet">
+              interface="action-sheet"
+              class="custom-select">
+              <ion-select-option value="Monumento">🏛️ Monumento Histórico</ion-select-option>
+              <ion-select-option value="Museo">🖼️ Museo & Galería</ion-select-option>
+              <ion-select-option value="Parque">🌳 Parque Natural</ion-select-option>
+              <ion-select-option value="Playa">🏖️ Playa & Costa</ion-select-option>
+              <ion-select-option value="Restaurante">🍽️ Restaurante</ion-select-option>
+              <ion-select-option value="Cafetería">☕ Cafetería</ion-select-option>
+              <ion-select-option value="Mirador">🌄 Mirador Panorámico</ion-select-option>
+              <ion-select-option value="Histórico">🏰 Sitio Histórico</ion-select-option>
+              <ion-select-option value="Shopping">🛍️ Centro Comercial</ion-select-option>
+              <ion-select-option value="Otro">🔹 Otro Tipo</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="form-item" fill="outline" lines="none">
+            <ion-label position="stacked" class="input-label">
+              <ion-icon name="document-text-outline" slot="start"></ion-icon>
+              Descripción
+            </ion-label>
+            <ion-textarea 
+              [(ngModel)]="nuevoLugar.descripcion"
+              placeholder="Describe qué hace especial este lugar, qué actividades se pueden hacer, recomendaciones..."
+              rows="4"
+              autoGrow="true"
+              class="custom-textarea">
+            </ion-textarea>
+          </ion-item>
+
+          <ion-item class="form-item" fill="outline" lines="none">
+            <ion-label position="stacked" class="input-label">
+              <ion-icon name="time-outline" slot="start"></ion-icon>
+              Horario de atención
+            </ion-label>
+            <ion-input 
+              [(ngModel)]="nuevoLugar.horario"
+              placeholder="Ej: Lunes a Viernes 9:00 - 18:00, 24 horas, Solo fines de semana..."
+              class="custom-input">
+            </ion-input>
+          </ion-item>
+
+          <div class="form-buttons">
+            <ion-button expand="block" (click)="crearLugar()" 
+                       [disabled]="!nuevoLugar.nombre.trim() || !nuevoLugar.categoria.trim()"
+                       color="primary" class="submit-button" size="large">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              {{ lugares.length === 0 ? 'Crear Mi Primer Lugar' : 'Guardar Lugar' }}
+            </ion-button>
+            
+            <ion-button expand="block" fill="outline" color="medium" (click)="cerrarFormulario()" class="cancel-button">
+              <ion-icon name="close-outline" slot="start"></ion-icon>
+              Cancelar
+            </ion-button>
+          </div>
+        </div>
+
+        <!-- Formulario para EDITAR lugar -->
+        <div *ngIf="lugarEditando">
+          <ion-item class="form-item" fill="outline" lines="none">
+            <ion-label position="stacked" class="input-label">
+              <ion-icon name="pricetag-outline" slot="start"></ion-icon>
+              Nombre del lugar *
+            </ion-label>
+            <ion-input 
+              [(ngModel)]="lugarEditando.nombre"
+              placeholder="Ingresa el nombre del lugar"
+              required
+              class="custom-input">
+            </ion-input>
+          </ion-item>
+
+          <ion-item class="form-item" fill="outline" lines="none">
+            <ion-label position="stacked" class="input-label">
+              <ion-icon name="grid-outline" slot="start"></ion-icon>
+              Categoría *
+            </ion-label>
+            <ion-select 
+              [(ngModel)]="lugarEditando.categoria" 
+              placeholder="Selecciona una categoría"
+              interface="action-sheet"
+              class="custom-select">
               <ion-select-option value="Monumento">🏛️ Monumento</ion-select-option>
               <ion-select-option value="Museo">🖼️ Museo</ion-select-option>
               <ion-select-option value="Parque">🌳 Parque</ion-select-option>
@@ -89,101 +332,36 @@
             </ion-select>
           </ion-item>
 
-          <ion-item class="form-item" fill="outline">
+          <ion-item class="form-item" fill="outline" lines="none">
             <ion-label position="stacked" class="input-label">
-              Descripción
-            </ion-label>
-            <ion-textarea 
-              [(ngModel)]="nuevoLugar.descripcion"
-              placeholder="Describe qué hace especial este lugar..."
-              rows="4"
-              autoGrow="true">
-            </ion-textarea>
-          </ion-item>
-
-          <ion-item class="form-item" fill="outline">
-            <ion-label position="stacked" class="input-label">
-              Horario
-            </ion-label>
-            <ion-input 
-              [(ngModel)]="nuevoLugar.horario"
-              placeholder="Ej: 9:00 - 18:00, 24 horas, Lun-Vie 8:00-17:00">
-            </ion-input>
-          </ion-item>
-
-          <div class="form-buttons">
-            <ion-button expand="block" (click)="crearLugar()" 
-                       [disabled]="!nuevoLugar.nombre.trim() || !nuevoLugar.categoria.trim()"
-                       color="primary" class="submit-button">
-              <ion-icon name="save-outline" slot="start"></ion-icon>
-              {{ lugares.length === 0 ? 'Crear Primer Lugar' : 'Agregar Lugar' }}
-            </ion-button>
-            
-            <ion-button expand="block" fill="outline" color="medium" (click)="cerrarFormulario()" class="cancel-button">
-              <ion-icon name="close-outline" slot="start"></ion-icon>
-              Cancelar
-            </ion-button>
-          </div>
-        </div>
-
-        <!-- Formulario para EDITAR lugar -->
-        <div *ngIf="lugarEditando">
-          <ion-item class="form-item" fill="outline">
-            <ion-label position="stacked" class="input-label">
-              Nombre del lugar *
-            </ion-label>
-            <ion-input 
-              [(ngModel)]="lugarEditando.nombre"
-              placeholder="Ingresa el nombre del lugar"
-              required>
-            </ion-input>
-          </ion-item>
-
-          <ion-item class="form-item" fill="outline">
-            <ion-label position="stacked" class="input-label">
-              Categoría *
-            </ion-label>
-            <ion-select 
-              [(ngModel)]="lugarEditando.categoria" 
-              placeholder="Selecciona una categoría"
-              interface="action-sheet">
-              <ion-select-option value="Monumento">🏛️ Monumento</ion-select-option>
-              <ion-select-option value="Museo">🖼️ Museo</ion-select-option>
-              <ion-select-option value="Parque">🌳 Parque</ion-select-option>
-              <ion-select-option value="Playa">🏖️ Playa</ion-select-option>
-              <ion-select-option value="Mirador">🌄 Mirador</ion-select-option>
-              <ion-select-option value="Histórico">🏰 Histórico</ion-select-option>
-              <ion-select-option value="Shopping">🛍️ Shopping</ion-select-option>
-              <ion-select-option value="Otro">🔹 Otro</ion-select-option>
-            </ion-select>
-          </ion-item>
-
-          <ion-item class="form-item" fill="outline">
-            <ion-label position="stacked" class="input-label">
+              <ion-icon name="document-text-outline" slot="start"></ion-icon>
               Descripción
             </ion-label>
             <ion-textarea 
               [(ngModel)]="lugarEditando.descripcion"
               placeholder="Describe el lugar..."
               rows="4"
-              autoGrow="true">
+              autoGrow="true"
+              class="custom-textarea">
             </ion-textarea>
           </ion-item>
 
-          <ion-item class="form-item" fill="outline">
+          <ion-item class="form-item" fill="outline" lines="none">
             <ion-label position="stacked" class="input-label">
+              <ion-icon name="time-outline" slot="start"></ion-icon>
               Horario
             </ion-label>
             <ion-input 
               [(ngModel)]="lugarEditando.horario"
-              placeholder="Ej: 9:00 - 18:00">
+              placeholder="Ej: 9:00 - 18:00"
+              class="custom-input">
             </ion-input>
           </ion-item>
 
           <div class="form-buttons">
             <ion-button expand="block" (click)="guardarEdicion()" 
                        [disabled]="!lugarEditando.nombre.trim() || !lugarEditando.categoria.trim()"
-                       color="success" class="submit-button">
+                       color="success" class="submit-button" size="large">
               <ion-icon name="checkmark-outline" slot="start"></ion-icon>
               Guardar Cambios
             </ion-button>
@@ -199,26 +377,29 @@
   </div>
 
   <!-- LISTA DE LUGARES -->
-  <div *ngIf="!mostrarFormulario && lugares.length > 0" class="list-container">
+  <div *ngIf="!mostrarFormulario && lugaresFiltrados.length > 0" class="list-container">
     <ion-card class="list-card">
       <ion-card-header>
         <ion-card-title class="list-title">
           <ion-icon name="location-outline"></ion-icon>
-          Lugares Guardados ({{ lugares.length }})
+          {{ lugaresFiltrados.length === lugares.length ? 'Todos los Lugares' : 'Lugares Filtrados' }}
+          <span class="counter">({{ lugaresFiltrados.length }})</span>
         </ion-card-title>
         <ion-card-subtitle>
-          Explora todos los lugares agregados
+          {{ lugaresFiltrados.length === lugares.length ? 
+              'Tu colección completa de lugares turísticos' : 
+              'Resultados de tu búsqueda' }}
         </ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
-        <ion-list class="places-list">
-          <ion-item *ngFor="let lugar of lugares; trackBy: trackByLugar" class="place-item" lines="none">
+        <ion-list class="places-list" lines="none">
+          <ion-item *ngFor="let lugar of lugaresFiltrados; trackBy: trackByLugar" class="place-item">
             <div class="place-icon" [class]="getCategoriaClass(lugar.categoria)">
               <ion-icon [name]="getCategoriaIcon(lugar.categoria)"></ion-icon>
             </div>
             
-            <ion-label class="place-content">
+            <ion-label class="place-content" (click)="verResenas(lugar)">
               <h2 class="place-name">{{ lugar.nombre }}</h2>
               
               <div class="place-meta">
@@ -232,16 +413,14 @@
                     <span>{{ lugar.horario }}</span>
                   </div>
                   
-                  <!-- CONTADOR DE RESEÑAS - CORREGIDO -->
-                  <div class="detail-item" *ngIf="lugar.totalResenas && lugar.totalResenas > 0">
+                  <div class="detail-item" *ngIf="lugar.totalResenas > 0">
                     <ion-icon name="chatbubble-outline" color="primary"></ion-icon>
                     <span>{{ lugar.totalResenas }} reseña{{ lugar.totalResenas !== 1 ? 's' : '' }}</span>
                   </div>
                   
-                  <!-- PUNTAJE PROMEDIO - CORREGIDO -->
-                  <div class="detail-item" *ngIf="lugar.promedioRating && lugar.promedioRating > 0">
+                  <div class="detail-item" *ngIf="lugar.promedioRating > 0">
                     <ion-icon name="star" color="warning"></ion-icon>
-                    <span>{{ (lugar.promedioRating || 0).toFixed(1) }}</span>
+                    <span>{{ lugar.promedioRating.toFixed(1) }}</span>
                   </div>
                 </div>
               </div>
@@ -250,7 +429,6 @@
             </ion-label>
             
             <div class="action-buttons" slot="end">
-              <!-- BOTÓN PARA VER RESEÑAS -->
               <ion-button fill="clear" color="primary" (click)="verResenas(lugar)" size="small" class="action-btn" 
                          [disabled]="!lugar.id_lugares">
                 <ion-icon name="chatbubble-outline"></ion-icon>
@@ -265,12 +443,23 @@
             </div>
           </ion-item>
         </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-        <!-- Botón de recargar -->
-        <ion-button expand="block" fill="outline" (click)="cargarLugares()" class="reload-button">
-          <ion-icon name="refresh-outline" slot="start"></ion-icon>
-          Actualizar Lista
-        </ion-button>
+  <!-- ESTADO VACÍO CON FILTROS -->
+  <div *ngIf="!mostrarFormulario && lugares.length > 0 && lugaresFiltrados.length === 0" class="empty-state">
+    <ion-card>
+      <ion-card-content>
+        <div class="empty-content">
+          <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+          <h3>No se encontraron lugares</h3>
+          <p>No hay resultados que coincidan con tu búsqueda "{{ terminoBusqueda }}"</p>
+          <ion-button fill="outline" (click)="limpiarFiltros()">
+            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+            Limpiar filtros
+          </ion-button>
+        </div>
       </ion-card-content>
     </ion-card>
   </div>
@@ -278,7 +467,7 @@
   <!-- LOADING -->
   <ion-loading 
     [isOpen]="isLoading" 
-    message="Cargando..."
+    message="Cargando lugares turísticos..."
     spinner="crescent">
   </ion-loading>
 </ion-content>
