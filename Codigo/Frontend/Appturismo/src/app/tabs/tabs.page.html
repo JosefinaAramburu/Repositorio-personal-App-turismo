@@ -12,9 +12,9 @@
       <img src="assets/img/bar-chart-sharp.svg" alt="Stats" style="width: 24px; height: 24px;" /> 
     </ion-tab-button>
 
-    <!-- Tab para gastronomía con ruta única -->
-    <ion-tab-button tab="gastronomia" [routerLink]="['/tabs/gastronomia']">
-      <img src="assets/img/restaurant-outline.svg" alt="Gastronomía" style="width: 24px; height: 24px;" /> 
+    <ion-tab-button (click)="logoutDirect()" tab="profile">
+      <img src="assets/img/log-out-outline.svg" alt="Logout" style="width: 24px; height: 24px;" /> 
     </ion-tab-button>
+
   </ion-tab-bar>
 </ion-tabs>
