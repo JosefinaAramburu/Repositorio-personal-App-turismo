@@ -1,8 +1,108 @@
-ion-card {
-    margin-bottom: 20px;
-  }
-  
-  ion-button {
-    margin-top: 20px;
-  }
-  
+.titulo { margin: 16px; font-size: 26px; font-weight: 800; }
+.buscador { margin: 0 16px 8px; }
+.seccion { margin: 12px 16px 8px; font-weight: 700; font-size: 18px; }
+
+
+.grid-gastro {
+ display: flex;
+ flex-direction: column;
+ gap: 10px;
+ padding: 0 12px;
+}
+
+
+.card-gastro{
+ display: flex;
+ align-items: center;
+ gap: 12px;
+ padding: 12px;
+ background: #fff;
+ border-radius: 14px;
+ width: 100%;
+ text-align: left;
+ box-shadow: 0 2px 8px rgba(0,0,0,.08);
+ border: 1px solid rgba(0,0,0,.04);
+}
+
+
+.icono{
+ width: 56px;
+ height: 56px;
+ border-radius: 16px;
+ display: grid;
+ place-items: center;
+
+
+ ion-icon{
+   width: 26px;
+   height: 26px;
+   color: #fff;
+   --ionicon-stroke-width: 40px;
+   display: block;
+ }
+}
+
+
+.icono--rest{ background:#d3544a; }
+.icono--bar{  background:#8e44ad; }
+.icono--local{ background:#27ae60; }
+.icono--ice{  background:#2980b9; }
+
+
+.texto{ flex:1; }
+.titulo-card{ font-weight:800; font-size:18px; line-height:1.1; }
+.subtitulo-card{ margin-top:4px; color:#666; }
+
+
+.chev{ color:#9aa0a6; font-size:20px; }
+.acciones{ padding:12px 16px; }
+.lista{ padding:0 4px; }
+.meta{ color:#5f6368; }
+.empty,.loading{ padding:32px 16px; text-align:center; color:#6b7280; }
+.mt{ margin-top:12px; }
+
+
+/* ---------- Estrellas (lista principal y reseñas) ---------- */
+.stars {
+ display: inline-flex;
+ gap: 2px;
+ line-height: 1;
+ vertical-align: middle;
+
+
+ /* versión con <ion-icon> (si usás ion-icon en la lista principal) */
+ ion-icon {
+   font-size: 18px;
+   color: #f59e0b;        /* dorado */
+ }
+
+
+ /* versión fallback con <span> (usada en reseñas) */
+ span {
+   font-size: 16px;
+   color: #cbd5e1;        /* gris: vacía */
+ }
+ .full {
+   color: #f59e0b;        /* dorado: llena */
+ }
+}
+
+
+.reviews-count { color:#6b7280; margin-left:4px; font-weight: 500; }
+
+
+/* Cabecera de cada reseña (estrellas + fecha) */
+.row-stars {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ margin: 0 0 4px 0;
+}
+
+
+/* Estrella individual si alguna vez la necesitás suelta */
+.star { font-size: 18px; color: #f59e0b; }
+
+
+
+

@@ -52,7 +52,6 @@ import {
 import { Injectable } from '@angular/core';
 import { supabase } from '../../supabase';
 
-// INTERFAZ MEJORADA
 export interface Lugar {
   id_lugares?: number;
   id_destino: number;
