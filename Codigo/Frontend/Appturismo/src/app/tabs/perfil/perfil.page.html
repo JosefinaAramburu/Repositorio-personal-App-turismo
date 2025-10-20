@@ -5,9 +5,30 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" class="perfil-content">
+
+  <!-- FOTO + NOMBRE -->
   <div class="perfil-info">
-    <img [src]="usuario.foto" alt="Foto de perfil" class="foto-perfil">
+    <img [src]="usuario.foto" alt="Foto de perfil" class="foto-perfil" />
     <h2>{{ usuario.nombre }}</h2>
     <p>{{ usuario.email }}</p>
   </div>
+
+  <!-- BOTONES -->
+  <div class="acciones">
+    <ion-button expand="block" color="primary" (click)="editarPerfil()">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      Editar perfil
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="medium" (click)="verResenas()">
+      <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
+      Mis reseñas
+    </ion-button>
+
+    <ion-button expand="block" color="danger" (click)="cerrarSesion()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Cerrar sesión
+    </ion-button>
+  </div>
+
 </ion-content>
