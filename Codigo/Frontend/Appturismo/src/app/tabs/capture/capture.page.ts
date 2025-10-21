@@ -2,6 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
+  IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
+  IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+  IonItem, IonLabel, IonInput, IonList, IonTextarea, IonIcon, IonBadge,
+  IonFab, IonFabButton, IonSelect, IonSelectOption, IonLoading,
+  IonChip, IonSearchbar, IonRefresher, IonRefresherContent, IonNote,
   AlertController, LoadingController, ToastController, NavController
 } from '@ionic/angular/standalone';
 
@@ -35,7 +40,12 @@ export interface Lugar {
   standalone: true,
   imports: [
     CommonModule, 
-    FormsModule
+    FormsModule,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
+    IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+    IonItem, IonLabel, IonInput, IonList, IonTextarea, IonIcon, IonBadge,
+    IonFab, IonFabButton, IonSelect, IonSelectOption, IonLoading,
+    IonChip, IonSearchbar, IonRefresher, IonRefresherContent, IonNote
   ]
 })
 export class CapturePage implements OnInit {
