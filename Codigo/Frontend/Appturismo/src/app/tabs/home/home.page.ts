@@ -42,7 +42,7 @@ export class HomePage {
   irA(tab: string) {
     switch (tab) {
       case 'eventos':
-        this.navCtrl.navigateForward('/tabs/eventos');
+        this.navCtrl.navigateForward('/tabs/stats');
         break;
       case 'lugares':
         this.navCtrl.navigateForward('/tabs/capture');
