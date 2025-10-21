@@ -19,7 +19,7 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,  // ← ESTE ES IMPORTANTE
+    CommonModule,  
     IonContent,
     IonHeader,
     IonTitle,
@@ -44,7 +44,7 @@ export class HomePage {
     console.log('🔍 Navegando a:', tab);
     
     switch (tab) {
-      case 'stats':
+      case 'eventos':
         console.log('Eventos → /tabs/stats');
         this.navCtrl.navigateRoot('/tabs/stats');
         break;
