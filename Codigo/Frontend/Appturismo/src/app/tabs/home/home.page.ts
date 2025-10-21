@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   IonContent,
   IonHeader,
@@ -18,6 +19,7 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./home.page.scss'],
   standalone: true,
   imports: [
+    CommonModule,  // ← ESTE ES IMPORTANTE
     IonContent,
     IonHeader,
     IonTitle,
@@ -36,23 +38,28 @@ export class HomePage {
 
   buscarDestino() {
     console.log('Destino buscado:', this.pais);
-    // En el futuro podés conectar esto con Supabase
   }
 
-irA(tab: string) {
-  switch (tab) {
-    case 'eventos':
-      this.navCtrl.navigateRoot('/tabs/stats');
-      break;
-    case 'lugares':
-      this.navCtrl.navigateRoot('/tabs/capture');
-      break;
-    case 'gastronomia':
-      this.navCtrl.navigateRoot('/tabs/gastronomia');
-      break;
-    case 'recorridos':
-      this.navCtrl.navigateRoot('/tabs/recorridos');
-      break;
+  irA(tab: string) {
+    console.log('🔍 Navegando a:', tab);
+    
+    switch (tab) {
+      case 'eventos':
+        console.log('Eventos → /tabs/stats');
+        this.navCtrl.navigateRoot('/tabs/stats');
+        break;
+      case 'lugares':
+        console.log('Lugares → /tabs/capture');
+        this.navCtrl.navigateRoot('/tabs/capture');
+        break;
+      case 'gastronomia':
+        console.log('Gastronomia → /tabs/gastronomia');
+        this.navCtrl.navigateRoot('/tabs/gastronomia');
+        break;
+      case 'recorridos':
+        console.log('Recorridos → /tabs/recorridos');
+        this.navCtrl.navigateRoot('/tabs/recorridos');
+        break;
+    }
   }
-}
 }
