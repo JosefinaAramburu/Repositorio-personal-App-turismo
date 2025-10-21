@@ -1,19 +1,29 @@
 <ion-tabs>
   <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="home" [routerLink]="['/tabs/home']">
-      <img src="https://static.vecteezy.com/system/resources/previews/012/528/164/non_2x/home-icon-house-icon-illustration-perfect-for-all-project-vector.jpg" alt="Home" style="width: 24px; height: 24px;" />
+
+    <!-- 🏠 HOME -->
+    <ion-tab-button [routerLink]="['/tabs/home']">
+      <img
+        src="https://static.vecteezy.com/system/resources/previews/012/528/164/non_2x/home-icon-house-icon-illustration-perfect-for-all-project-vector.jpg"
+        alt="Inicio"
+        style="width: 24px; height: 24px;" />
     </ion-tab-button>
 
-     <ion-tab-button [routerLink]="['/tabs/perfil']">
-      <img 
+    <!-- 👤 PERFIL -->
+    <ion-tab-button [routerLink]="['/tabs/perfil']">
+      <img
         src="https://e7.pngegg.com/pngimages/858/581/png-clipart-profile-icon-user-computer-icons-system-chinese-wind-title-column-miscellaneous-service.png"
         alt="Perfil"
         style="width: 24px; height: 24px;" />
     </ion-tab-button>
- 
-    <ion-tab-button (click)="logoutDirect()" tab="profile">
-      <img src="assets/img/log-out-outline.svg" alt="Logout" style="width: 24px; height: 24px;" /> 
 
+    <!-- 🚪 LOGOUT -->
+    <ion-tab-button (click)="logoutDirect()">
+      <img
+        src="assets/img/log-out-outline.svg"
+        alt="Cerrar sesión"
+        style="width: 24px; height: 24px;" />
     </ion-tab-button>
 
-  </ion-tab-bar
+  </ion-tab-bar>
+</ion-tabs>
