@@ -1,118 +1,91 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { createClient } from '@supabase/supabase-js';
+import {
+  IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader,
+  IonCardTitle, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonList, IonIcon,
+  IonRange, IonFab, IonFabButton, IonLoading, ToastController
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { add, close, star, starOutline, save, chatbubble, trash, refresh } from 'ionicons/icons';
+import { supabase } from '../../supabase';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-health',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './health.page.html',
-  styleUrls: ['./health.page.scss']
+  styleUrls: ['./health.page.scss'],
+  standalone: true,
+  imports: [
+    CommonModule, FormsModule,
+    IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader,
+    IonCardTitle, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonList, IonIcon,
+    IonRange, IonFab, IonFabButton, IonLoading
+  ]
 })
 export class HealthPage implements OnInit {
   resenas: any[] = [];
   cargando = false;
   mostrarFormulario = false;
+  idLugar!: number;
 
-  nuevaResena = {
-    titulo: '',
-    contenido: '',
-    calificacion: 5
-  };
+  nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
 
-  private supabase = createClient(
-    'https://xqznsyyloofllzkywohl.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxem5zeXlsb29mbGx6a3l3b2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMDk4MTksImV4cCI6MjA3MDY4NTgxOX0.rqIz8miQTNRPLWuNXE4LDwCQY2UT-f6IgRBaChszeOk'
-  );
+  private toastController = inject(ToastController);
+
+  constructor(private route: ActivatedRoute) {
+    addIcons({ add, close, star, starOutline, save, chatbubble, trash, refresh });
+  }
 
   async ngOnInit() {
-    await this.cargarResenas();
+    this.route.queryParams.subscribe(async (params) => {
+      this.idLugar = Number(params['id']);
+      await this.cargarResenas();
+    });
   }
 
   async cargarResenas() {
+    this.cargando = true;
     try {
-      console.log('🔄 Cargando reseñas desde Supabase...');
-      
-      const { data, error } = await this.supabase
+      const { data, error } = await supabase
         .from('resenas')
         .select('*')
         .order('fecha', { ascending: false });
 
-      if (error) {
-        console.error('❌ Error cargando reseñas:', error);
-        return;
-      }
-
+      if (error) throw error;
       this.resenas = data || [];
-      console.log('✅ Reseñas cargadas:', this.resenas);
-
-    } catch (error) {
-      console.error('❌ Error general:', error);
+    } catch (err) {
+      this.mostrarToast('Error al cargar reseñas', 'danger');
+    } finally {
+      this.cargando = false;
     }
   }
 
   async probarAgregarResena() {
-    console.log('🎯 MÉTODO probarAgregarResena LLAMADO');
-    console.log('📝 Datos en el formulario:', this.nuevaResena);
-    
-    if (this.cargando) {
-      console.log('⏳ Ya está cargando...');
-      return;
-    }
-
     if (!this.nuevaResena.titulo || !this.nuevaResena.contenido) {
-      console.log('❌ Faltan datos en el formulario');
-      alert('Por favor completa todos los campos');
+      this.mostrarToast('Completa todos los campos', 'warning');
       return;
     }
-
     this.cargando = true;
-    console.log('🔄 Iniciando proceso de agregar...');
-
     await this.agregarResena();
   }
 
   async agregarResena() {
     try {
-      console.log('🔄 Agregando reseña a Supabase...');
-
-      const datosParaSupabase = {
-        texto: (this.nuevaResena.titulo ? this.nuevaResena.titulo + ': ' : '') + this.nuevaResena.contenido,
+      const datos = {
+        texto: `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`,
         puntuacion: this.nuevaResena.calificacion,
         fecha: new Date().toISOString().split('T')[0],
         id_usuario: 1
       };
-
-      console.log('📤 Enviando a Supabase:', datosParaSupabase);
-
-      const { data, error } = await this.supabase
-        .from('resenas')
-        .insert([datosParaSupabase])
-        .select();
-
-      console.log('📡 Respuesta de Supabase - data:', data);
-      console.log('📡 Respuesta de Supabase - error:', error);
-
-      if (error) {
-        console.error('❌ Error de Supabase:', error);
-        alert('Error: ' + error.message);
-        return;
-      }
-
-      console.log('✅ Reseña agregada, recargando lista...');
+      const { error } = await supabase.from('resenas').insert([datos]);
+      if (error) throw error;
+      this.mostrarToast('Reseña agregada correctamente', 'success');
       await this.cargarResenas();
-
-      // Limpiar y cerrar
       this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
       this.mostrarFormulario = false;
-
-      console.log('🎉 Reseña agregada exitosamente!');
-      alert('Reseña agregada correctamente!');
-
-    } catch (error) {
-      console.error('❌ Error general:', error);
-      alert('Error al agregar reseña');
+    } catch (err) {
+      this.mostrarToast('Error al agregar reseña', 'danger');
     } finally {
       this.cargando = false;
     }
@@ -120,23 +93,21 @@ export class HealthPage implements OnInit {
 
   async eliminarResena(id: number) {
     try {
-      console.log('🔄 Eliminando reseña...');
-
-      const { error } = await this.supabase
-        .from('resenas')
-        .delete()
-        .eq('id_resenas', id);
-
-      if (error) {
-        console.error('❌ Error eliminando reseña:', error);
-        return;
-      }
-
+      await supabase.from('resenas').delete().eq('id_resenas', id);
+      this.mostrarToast('Reseña eliminada', 'success');
       await this.cargarResenas();
-      console.log('✅ Reseña eliminada:', id);
-
-    } catch (error) {
-      console.error('❌ Error general:', error);
+    } catch {
+      this.mostrarToast('Error al eliminar reseña', 'danger');
     }
+  }
+
+  private async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2500,
+      color,
+      position: 'top'
+    });
+    await toast.present();
   }
 }

@@ -1,141 +1,96 @@
-<div class="resenas-container">
-  <h2>Reseñas</h2>
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      <ion-icon name="chatbubble" slot="start"></ion-icon>
+      Reseñas del Lugar
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cargarResenas()" fill="clear">
+        <ion-icon name="refresh" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-  <!-- Botón para mostrar formulario -->
-  <div class="boton-agregar-container">
-    <button 
-      *ngIf="!mostrarFormulario"
-      (click)="mostrarFormulario = true" 
-      class="btn-mostrar-formulario"
-    >
-      + Agregar Nueva Reseña
-    </button>
-  </div>
+<ion-content [fullscreen]="true">
+  <!-- AGREGAR NUEVA RESEÑA -->
+  <ion-card *ngIf="mostrarFormulario">
+    <ion-card-header>
+      <ion-card-title>Nueva Reseña</ion-card-title>
+    </ion-card-header>
 
-  <!-- Formulario -->
-  <div *ngIf="mostrarFormulario" class="agregar-resena">
-    <div class="form-header">
-      <h3>Agregar Nueva Reseña</h3>
-      <button 
-        (click)="mostrarFormulario = false" 
-        class="btn-cerrar"
-        type="button"
-      >
-        ×
-      </button>
-    </div>
-    
-    <div>
-      <!-- Título -->
-      <div class="form-group">
-        <label for="titulo">Título:</label>
-        <input 
-          type="text" 
-          id="titulo"
-          name="titulo" 
-          [(ngModel)]="nuevaResena.titulo" 
-          required
-          class="form-input"
-          placeholder="Ej: Excelente experiencia"
-        >
-      </div>
+    <ion-card-content>
+      <ion-item fill="outline">
+        <ion-label position="stacked">Título</ion-label>
+        <ion-input [(ngModel)]="nuevaResena.titulo" placeholder="Ej: Muy buena experiencia"></ion-input>
+      </ion-item>
 
-      <!-- Contenido -->
-      <div class="form-group">
-        <label for="contenido">Contenido:</label>
-        <textarea 
-          id="contenido"
-          name="contenido" 
-          [(ngModel)]="nuevaResena.contenido" 
-          required
-          rows="4"
-          class="form-textarea"
-          placeholder="Describe tu experiencia..."
-        ></textarea>
-      </div>
+      <ion-item fill="outline">
+        <ion-label position="stacked">Contenido</ion-label>
+        <ion-textarea [(ngModel)]="nuevaResena.contenido" placeholder="Escribe tu opinión..."></ion-textarea>
+      </ion-item>
 
-      <!-- Calificación -->
-      <div class="form-group">
-        <label for="calificacion">Calificación: {{ nuevaResena.calificacion }}/5</label>
-        <div class="calificacion-input">
-          <input 
-            type="range" 
-            id="calificacion"
-            name="calificacion" 
-            [(ngModel)]="nuevaResena.calificacion" 
-            min="1" 
-            max="5" 
-            required
-            class="form-range"
-          >
-          <div class="estrellas-preview">
-            {{ '★'.repeat(nuevaResena.calificacion) }}{{ '☆'.repeat(5 - nuevaResena.calificacion) }}
-          </div>
-        </div>
-      </div>
+      <ion-item fill="outline">
+        <ion-label position="stacked">Puntuación ({{ nuevaResena.calificacion }}/5)</ion-label>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="nuevaResena.calificacion">
+          <ion-icon slot="start" name="star-outline"></ion-icon>
+          <ion-icon slot="end" name="star"></ion-icon>
+        </ion-range>
+      </ion-item>
 
-      <!-- Botones -->
       <div class="form-buttons">
-        <button 
-          type="button"
-          (click)="probarAgregarResena()"
-          class="btn-submit"
-          [disabled]="cargando || !nuevaResena.titulo || !nuevaResena.contenido"
-        >
-          {{ cargando ? 'Agregando...' : 'Agregar Reseña' }}
-        </button>
-        
-        <button 
-          type="button" 
-          (click)="mostrarFormulario = false"
-          class="btn-cancelar"
-        >
+        <ion-button expand="block" (click)="probarAgregarResena()" [disabled]="cargando">
+          <ion-icon name="save" slot="start"></ion-icon>
+          {{ cargando ? 'Agregando...' : 'Guardar Reseña' }}
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" color="medium" (click)="mostrarFormulario = false">
+          <ion-icon name="close" slot="start"></ion-icon>
           Cancelar
-        </button>
+        </ion-button>
       </div>
-    </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- BOTÓN FLOTANTE PARA AGREGAR -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!mostrarFormulario">
+    <ion-fab-button (click)="mostrarFormulario = true" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- LISTA DE RESEÑAS -->
+  <ion-card *ngIf="resenas.length > 0">
+    <ion-card-header>
+      <ion-card-title>Reseñas ({{ resenas.length }})</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-list lines="none">
+        <ion-item *ngFor="let r of resenas">
+          <ion-label>
+            <h2>{{ r.texto?.split(':')[0] }}</h2>
+            <p>{{ r.texto?.split(':')[1] }}</p>
+            <div class="estrellas">
+              <ion-icon *ngFor="let s of [1,2,3,4,5]" [name]="s <= r.puntuacion ? 'star' : 'star-outline'" color="warning"></ion-icon>
+              <span class="fecha">{{ r.fecha | date:'mediumDate' }}</span>
+            </div>
+          </ion-label>
+          <ion-button fill="clear" color="danger" slot="end" (click)="eliminarResena(r.id_resenas)">
+            <ion-icon name="trash"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- SIN RESEÑAS -->
+  <div *ngIf="!resenas.length && !mostrarFormulario" class="empty-state">
+    <ion-icon name="chatbubble-outline" class="empty-icon"></ion-icon>
+    <h3>No hay reseñas aún</h3>
+    <ion-button fill="outline" (click)="mostrarFormulario = true">Agregar Reseña</ion-button>
   </div>
 
-  <!-- Lista de reseñas -->
-  <div class="lista-resenas">
-    <h3>Reseñas Existentes ({{ resenas.length }})</h3>
-
-    <div *ngIf="resenas.length === 0" class="sin-resenas">
-      <p>No hay reseñas aún. ¡Sé el primero en agregar una!</p>
-      <button 
-        (click)="mostrarFormulario = true" 
-        class="btn-primera-resena"
-      >
-        Agregar Primera Reseña
-      </button>
-    </div>
-
-    <div *ngIf="resenas.length > 0" class="resenas-grid">
-      <div *ngFor="let resena of resenas" class="resena-card">
-        <div class="resena-header">
-          <h4 class="resena-titulo">{{ resena.texto?.split(':')[0] }}</h4>
-          <button 
-            (click)="eliminarResena(resena.id_resenas)" 
-            class="btn-eliminar"
-            title="Eliminar reseña"
-          >
-            ×
-          </button>
-        </div>
-        
-        <div class="calificacion-resena">
-          <span class="estrellas">
-            {{ '★'.repeat(resena.puntuacion) }}{{ '☆'.repeat(5 - resena.puntuacion) }}
-          </span>
-          <span class="puntuacion">({{ resena.puntuacion }}/5)</span>
-        </div>
-        
-        <p class="contenido-resena">{{ resena.texto?.split(':')[1] }}</p>
-        
-        <div class="fecha-resena">
-          {{ resena.fecha | date:'medium' }}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+  <!-- LOADING -->
+  <ion-loading [isOpen]="cargando" message="Procesando..."></ion-loading>
+</ion-content>
