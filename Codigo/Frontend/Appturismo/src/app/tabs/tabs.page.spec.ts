@@ -1,17 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TabsPage } from './tabs.page';
+import { StatsPage } from './stats.page';
 
-describe('TabsPage', () => {
-  let component: TabsPage;
-  let fixture: ComponentFixture<TabsPage>;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(TabsPage);
+describe('StatsPage', () => {
+  let component: StatsPage;
+  let fixture: ComponentFixture<StatsPage>;
+
+
+  beforeEach(async(() => {
+    fixture = TestBed.createComponent(StatsPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }));
+
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
+
+
+
+

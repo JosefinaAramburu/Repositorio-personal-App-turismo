@@ -1,21 +1,45 @@
-<ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="home" [routerLink]="['/tabs/home']">
-      <img src="https://static.vecteezy.com/system/resources/previews/012/528/164/non_2x/home-icon-house-icon-illustration-perfect-for-all-project-vector.jpg" alt="Home" style="width: 24px; height: 24px;" />
-    </ion-tab-button>
-
-     <ion-tab-button [routerLink]="['/tabs/perfil']">
-      <img 
-        src="https://e7.pngegg.com/pngimages/858/581/png-clipart-profile-icon-user-computer-icons-system-chinese-wind-title-column-miscellaneous-service.png"
-        alt="Perfil"
-        style="width: 24px; height: 24px;" />
-    </ion-tab-button>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Eventos</ion-title>
+  </ion-toolbar>
+</ion-header>
 
 
-    <ion-tab-button (click)="logoutDirect()" tab="profile">
-      <img src="assets/img/log-out-outline.svg" alt="Logout" style="width: 24px; height: 24px;" /> 
+<ion-content class="ion-padding">
 
-    </ion-tab-button>
 
-  </ion-tab-bar>
-</ion-tabs>
+  <!-- Buscador -->
+  <ion-searchbar [(ngModel)]="filtro" placeholder="Buscar eventos..." (ionInput)="aplicarFiltro()"></ion-searchbar>
+
+
+  <h2 class="titulo-seccion">Eventos</h2>
+
+
+  <!-- Listado de eventos -->
+  <ion-list>
+    <ion-item *ngFor="let e of eventosFiltrados" lines="none">
+      <ion-card class="evento-card">
+        <ion-item lines="none">
+          <ion-icon
+            [name]="getIcon(e.tipo_de_evento)"
+            slot="start"
+            class="evento-icono"
+            [style.color]="getIconColor(e.tipo_de_evento)">
+          </ion-icon>
+          <ion-label>
+            <h2 class="evento-titulo">{{ e.nombre }}</h2>
+            <p class="evento-fecha">
+              {{ formatFecha(e.fecha_de_inicio) }}
+              <span *ngIf="e.fecha_fin"> - {{ formatFecha(e.fecha_fin) }}</span>
+            </p>
+            <p class="evento-lugar" *ngIf="e.destino?.nombre_ciudad">{{ e.destino?.nombre_ciudad }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+
+</ion-content>
+
+
