@@ -289,12 +289,6 @@ export class CapturePage implements OnInit {
     }
   }
 
-  cancelarEdicion() {
-    this.lugarEditando = null;
-    this.mostrarFormulario = false;
-    this.limpiarFormulario();
-  }
-
   // 🗑️ ELIMINAR LUGAR CON CONFIRMACIÓN
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
