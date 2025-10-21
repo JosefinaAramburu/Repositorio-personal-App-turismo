@@ -56,10 +56,6 @@ export class HomePage {
         console.log('Gastronomia → /tabs/gastronomia');
         this.navCtrl.navigateRoot('/tabs/gastronomia');
         break;
-      case 'recorridos':
-        console.log('Recorridos → /tabs/recorridos');
-        this.navCtrl.navigateRoot('/tabs/recorridos');
-        break;
-    }
-  }
+     }
+   }
 }
