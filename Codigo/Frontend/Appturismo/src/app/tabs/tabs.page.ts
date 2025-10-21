@@ -23,8 +23,6 @@ import {
     IonTabs,
     IonTabBar,
     IonTabButton,
-    IonIcon,
-    IonLabel
   ]
 })
 
