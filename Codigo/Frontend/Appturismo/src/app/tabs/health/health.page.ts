@@ -1,113 +1,332 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader,
-  IonCardTitle, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonList, IonIcon,
-  IonRange, IonFab, IonFabButton, IonLoading, ToastController
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { add, close, star, starOutline, save, chatbubble, trash, refresh } from 'ionicons/icons';
-import { supabase } from '../../supabase';
-import { ActivatedRoute } from '@angular/router';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+interface Resena {
+  id_resenas: number;
+  texto: string;
+  puntuacion: number;
+  fecha: string;
+  id_usuario: number | null;
+}
+
+interface NuevaResena {
+  titulo: string;
+  contenido: string;
+  calificacion: number;
+}
 
 @Component({
   selector: 'app-health',
-  templateUrl: './health.page.html',
-  styleUrls: ['./health.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule, FormsModule,
-    IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardContent, IonCardHeader,
-    IonCardTitle, IonItem, IonLabel, IonInput, IonTextarea, IonButton, IonList, IonIcon,
-    IonRange, IonFab, IonFabButton, IonLoading
-  ]
+  imports: [CommonModule, FormsModule],
+  templateUrl: './health.page.html',
+  styleUrls: ['./health.page.scss']
 })
-export class HealthPage implements OnInit {
-  resenas: any[] = [];
+export class HealthPage implements OnInit, OnDestroy {
+  // Estado de la aplicación
+  resenas: Resena[] = [];
+  resenasFiltradas: Resena[] = [];
   cargando = false;
+  cargandoResenas = false;
   mostrarFormulario = false;
-  idLugar!: number;
+  mostrarConfirmacionEliminar = false;
+  estrellasHover = 0;
 
-  nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
+  // Formulario
+  nuevaResena: NuevaResena = {
+    titulo: '',
+    contenido: '',
+    calificacion: 5
+  };
 
-  private toastController = inject(ToastController);
+  // Filtros y ordenamiento
+  filtroCalificacion = '0';
+  ordenamiento = 'fecha_desc';
+  paginaActual = 1;
+  itemsPorPagina = 6;
 
-  constructor(private route: ActivatedRoute) {
-    addIcons({ add, close, star, starOutline, save, chatbubble, trash, refresh });
+  // Eliminación
+  resenaAEliminar: Resena | null = null;
+
+  // Estadísticas
+  promedioCalificacion = 0;
+  distribucionCalificaciones: { [key: number]: number } = {};
+
+  private supabase: SupabaseClient;
+
+  constructor() {
+    this.supabase = createClient(
+      'https://xqznsyyloofllzkywohl.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxem5zeXlsb29mbGx6a3l3b2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMDk4MTksImV4cCI6MjA3MDY4NTgxOX0.rqIz8miQTNRPLWuNXE4LDwCQY2UT-f6IgRBaChszeOk'
+    );
   }
 
   async ngOnInit() {
-    this.route.queryParams.subscribe(async (params) => {
-      this.idLugar = Number(params['id']);
-      await this.cargarResenas();
-    });
+    await this.cargarResenas();
   }
 
+  ngOnDestroy() {
+    // Cleanup si es necesario
+  }
+
+  // ========== CARGAR DATOS ==========
   async cargarResenas() {
-    this.cargando = true;
+    this.cargandoResenas = true;
     try {
-      const { data, error } = await supabase
+      console.log('🔄 Cargando reseñas desde Supabase...');
+      
+      const { data, error } = await this.supabase
         .from('resenas')
         .select('*')
         .order('fecha', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Error cargando reseñas:', error);
+        throw error;
+      }
+
       this.resenas = data || [];
-    } catch (err) {
-      this.mostrarToast('Error al cargar reseñas', 'danger');
+      console.log('✅ Reseñas cargadas:', this.resenas.length);
+      
+      this.calcularEstadisticas();
+      this.aplicarFiltros();
+      
+    } catch (error) {
+      console.error('❌ Error general cargando reseñas:', error);
+      this.mostrarError('Error al cargar las reseñas');
     } finally {
-      this.cargando = false;
+      this.cargandoResenas = false;
     }
   }
 
-  async probarAgregarResena() {
-    if (!this.nuevaResena.titulo || !this.nuevaResena.contenido) {
-      this.mostrarToast('Completa todos los campos', 'warning');
+  // ========== ESTADÍSTICAS ==========
+  private calcularEstadisticas() {
+    if (this.resenas.length === 0) {
+      this.promedioCalificacion = 0;
+      this.distribucionCalificaciones = {};
       return;
     }
+
+    // Calcular promedio
+    const suma = this.resenas.reduce((acc, resena) => acc + resena.puntuacion, 0);
+    this.promedioCalificacion = suma / this.resenas.length;
+
+    // Calcular distribución
+    this.distribucionCalificaciones = {};
+    this.resenas.forEach(resena => {
+      this.distribucionCalificaciones[resena.puntuacion] = 
+        (this.distribucionCalificaciones[resena.puntuacion] || 0) + 1;
+    });
+  }
+
+  // ========== FILTROS Y ORDENAMIENTO ==========
+  aplicarFiltros() {
+    let resenasFiltradas = [...this.resenas];
+
+    // Aplicar filtro de calificación
+    if (this.filtroCalificacion !== '0') {
+      const calificacion = parseInt(this.filtroCalificacion);
+      resenasFiltradas = resenasFiltradas.filter(
+        resena => resena.puntuacion === calificacion
+      );
+    }
+
+    // Aplicar ordenamiento
+    resenasFiltradas.sort((a, b) => {
+      switch (this.ordenamiento) {
+        case 'fecha_desc':
+          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+        case 'fecha_asc':
+          return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+        case 'calificacion_desc':
+          return b.puntuacion - a.puntuacion;
+        case 'calificacion_asc':
+          return a.puntuacion - b.puntuacion;
+        default:
+          return 0;
+      }
+    });
+
+    this.resenasFiltradas = resenasFiltradas;
+    this.paginaActual = 1;
+  }
+
+  limpiarFiltros() {
+    this.filtroCalificacion = '0';
+    this.ordenamiento = 'fecha_desc';
+    this.aplicarFiltros();
+  }
+
+  // ========== PAGINACIÓN ==========
+  get totalPaginas(): number {
+    return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
+  }
+
+  get resenasPaginadas(): Resena[] {
+    const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
+    return this.resenasFiltradas.slice(startIndex, startIndex + this.itemsPorPagina);
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 1) {
+      this.paginaActual--;
+    }
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas) {
+      this.paginaActual++;
+    }
+  }
+
+  // ========== FORMULARIO ==========
+  esFormularioValido(): boolean {
+    return this.nuevaResena.titulo.trim().length > 0 && 
+           this.nuevaResena.contenido.trim().length > 0 &&
+           this.nuevaResena.calificacion >= 1 &&
+           this.nuevaResena.calificacion <= 5;
+  }
+
+  async probarAgregarResena() {
+    if (this.cargando || !this.esFormularioValido()) {
+      return;
+    }
+
     this.cargando = true;
     await this.agregarResena();
   }
 
   async agregarResena() {
     try {
-      const datos = {
+      console.log('🔄 Agregando reseña a Supabase...');
+
+      // Formatear datos según tu estructura de base de datos
+      const datosParaSupabase = {
         texto: `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`,
         puntuacion: this.nuevaResena.calificacion,
-        fecha: new Date().toISOString().split('T')[0],
-        id_usuario: 1
+        fecha: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+        id_usuario: null // Como permitiste NULL en tu ALTER TABLE
       };
-      const { error } = await supabase.from('resenas').insert([datos]);
-      if (error) throw error;
-      this.mostrarToast('Reseña agregada correctamente', 'success');
+
+      console.log('📤 Enviando a Supabase:', datosParaSupabase);
+
+      const { data, error } = await this.supabase
+        .from('resenas')
+        .insert([datosParaSupabase])
+        .select();
+
+      if (error) {
+        console.error('❌ Error de Supabase:', error);
+        this.mostrarError('Error al agregar reseña: ' + error.message);
+        return;
+      }
+
+      console.log('✅ Reseña agregada exitosamente:', data);
+      
+      // Recargar lista y resetear formulario
       await this.cargarResenas();
-      this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
-      this.mostrarFormulario = false;
-    } catch (err) {
-      this.mostrarToast('Error al agregar reseña', 'danger');
+      this.resetearFormulario();
+      this.cerrarModal();
+      
+      this.mostrarExito('Reseña agregada correctamente!');
+
+    } catch (error) {
+      console.error('❌ Error general:', error);
+      this.mostrarError('Error inesperado al agregar reseña');
     } finally {
       this.cargando = false;
     }
   }
 
-  async eliminarResena(id: number) {
+  private resetearFormulario() {
+    this.nuevaResena = {
+      titulo: '',
+      contenido: '',
+      calificacion: 5
+    };
+    this.estrellasHover = 0;
+  }
+
+  // ========== ELIMINACIÓN ==========
+  confirmarEliminacion(resena: Resena) {
+    this.resenaAEliminar = resena;
+    this.mostrarConfirmacionEliminar = true;
+  }
+
+  cancelarEliminacion() {
+    this.resenaAEliminar = null;
+    this.mostrarConfirmacionEliminar = false;
+  }
+
+  async eliminarResenaConfirmada() {
+    if (!this.resenaAEliminar) return;
+
     try {
-      await supabase.from('resenas').delete().eq('id_resenas', id);
-      this.mostrarToast('Reseña eliminada', 'success');
+      console.log('🔄 Eliminando reseña:', this.resenaAEliminar.id_resenas);
+
+      const { error } = await this.supabase
+        .from('resenas')
+        .delete()
+        .eq('id_resenas', this.resenaAEliminar.id_resenas);
+
+      if (error) {
+        console.error('❌ Error eliminando reseña:', error);
+        this.mostrarError('Error al eliminar reseña');
+        return;
+      }
+
+      console.log('✅ Reseña eliminada exitosamente');
       await this.cargarResenas();
-    } catch {
-      this.mostrarToast('Error al eliminar reseña', 'danger');
+      this.mostrarExito('Reseña eliminada correctamente');
+
+    } catch (error) {
+      console.error('❌ Error general eliminando:', error);
+      this.mostrarError('Error inesperado al eliminar reseña');
+    } finally {
+      this.cancelarEliminacion();
     }
   }
 
-  private async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2500,
-      color,
-      position: 'top'
-    });
-    await toast.present();
+  // ========== UTILIDADES ==========
+  obtenerTitulo(resena: Resena): string {
+    if (!resena.texto) return 'Sin título';
+    const partes = resena.texto.split(':');
+    return partes[0] || 'Sin título';
+  }
+
+  obtenerContenido(resena: Resena): string {
+    if (!resena.texto) return 'Sin contenido';
+    const partes = resena.texto.split(':');
+    return partes.slice(1).join(':').trim() || 'Sin contenido';
+  }
+
+  getTextoCalificacion(calificacion: number): string {
+    const textos = {
+      1: 'Muy mala',
+      2: 'Mala',
+      3: 'Regular',
+      4: 'Buena',
+      5: 'Excelente'
+    };
+    return textos[calificacion as keyof typeof textos] || 'Sin calificar';
+  }
+
+  // ========== MODALES ==========
+  cerrarModal() {
+    this.mostrarFormulario = false;
+    this.resetearFormulario();
+  }
+
+  // ========== NOTIFICACIONES ==========
+  private mostrarError(mensaje: string) {
+    // Puedes implementar un sistema de notificaciones más elegante
+    alert(`❌ ${mensaje}`);
+  }
+
+  private mostrarExito(mensaje: string) {
+    // Puedes implementar un sistema de notificaciones más elegante
+    alert(`✅ ${mensaje}`);
   }
 }
