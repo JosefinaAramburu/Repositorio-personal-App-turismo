@@ -264,11 +264,7 @@
               {{ lugar.categoria }}
             </ion-badge>
             
-            <!-- Rating destacado - SIN COLOR BINDING -->
-            <div *ngIf="lugar.promedioRating > 0" class="rating-badge">
-              <ion-icon name="star"></ion-icon>
-              <span>{{ lugar.promedioRating }}</span>
-            </div>
+      
           </div>
 
           <!-- Detalles secundarios -->
@@ -277,16 +273,7 @@
               <ion-icon name="time-outline"></ion-icon>
               {{ lugar.horario }}
             </span>
-            
-            <span class="detail" *ngIf="lugar.totalResenas > 0">
-              <ion-icon name="chatbubble-outline"></ion-icon>
-              {{ lugar.totalResenas }} {{ lugar.totalResenas === 1 ? 'reseña' : 'reseñas' }}
-            </span>
-            
-            <span class="detail" *ngIf="lugar.ultimaResena">
-              <ion-icon name="calendar-outline"></ion-icon>
-              {{ getRelativeTime(lugar.ultimaResena) }}
-            </span>
+       
           </div>
           
           <!-- Descripción -->

@@ -135,61 +135,73 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // 🔍 Cargar reseñas de un lugar específico
+  // 🔍 Cargar reseñas de un lugar específico - CORREGIDO
   private async cargarResenasDeLugar(lugarId: number) {
     console.log(`🔍 Buscando reseñas para lugar ID: ${lugarId}`);
     
-    // 1. Obtener los IDs de reseñas relacionadas con este lugar
-    const { data: relaciones, error: errorRelaciones } = await this.supabase
-      .from('lugares_resenas')
-      .select('id_resenas')
-      .eq('id_lugares', lugarId);
+    try {
+      // 1. Obtener los IDs de reseñas relacionadas con este lugar
+      const { data: relaciones, error: errorRelaciones } = await this.supabase
+        .from('lugares_resenas')
+        .select('id_resenas')
+        .eq('id_lugares', lugarId);
 
-    if (errorRelaciones) {
-      console.error('❌ Error cargando relaciones:', errorRelaciones);
-      throw errorRelaciones;
-    }
+      if (errorRelaciones) {
+        console.error('❌ Error cargando relaciones:', errorRelaciones);
+        throw errorRelaciones;
+      }
 
-    console.log(`📊 Relaciones encontradas:`, relaciones);
+      console.log(`📊 Relaciones encontradas:`, relaciones);
 
-    if (!relaciones || relaciones.length === 0) {
-      console.log('ℹ️ No hay reseñas para este lugar');
+      if (!relaciones || relaciones.length === 0) {
+        console.log('ℹ️ No hay reseñas para este lugar');
+        this.resenas = [];
+        return;
+      }
+
+      const idsResenas = relaciones.map(rel => rel.id_resenas);
+      
+      // 2. Obtener las reseñas usando los IDs
+      const { data: resenas, error: errorResenas } = await this.supabase
+        .from('resenas')
+        .select('*')
+        .in('id_resenas', idsResenas)
+        .order('fecha', { ascending: false });
+
+      if (errorResenas) {
+        console.error('❌ Error cargando reseñas:', errorResenas);
+        throw errorResenas;
+      }
+
+      this.resenas = resenas || [];
+      console.log(`✅ Reseñas cargadas para lugar ${lugarId}:`, this.resenas.length);
+
+    } catch (error) {
+      console.error('❌ Error en cargarResenasDeLugar:', error);
+      // Si hay error, mostrar reseñas vacías en lugar de fallar completamente
       this.resenas = [];
-      return;
     }
-
-    const idsResenas = relaciones.map(rel => rel.id_resenas);
-    
-    // 2. Obtener las reseñas usando los IDs
-    const { data: resenas, error: errorResenas } = await this.supabase
-      .from('resenas')
-      .select('*')
-      .in('id_resenas', idsResenas)
-      .order('fecha', { ascending: false });
-
-    if (errorResenas) {
-      console.error('❌ Error cargando reseñas:', errorResenas);
-      throw errorResenas;
-    }
-
-    this.resenas = resenas || [];
-    console.log(`✅ Reseñas cargadas para lugar ${lugarId}:`, this.resenas.length);
   }
 
   // 🌐 Cargar todas las reseñas
   private async cargarTodasLasResenas() {
-    const { data, error } = await this.supabase
-      .from('resenas')
-      .select('*')
-      .order('fecha', { ascending: false });
+    try {
+      const { data, error } = await this.supabase
+        .from('resenas')
+        .select('*')
+        .order('fecha', { ascending: false });
 
-    if (error) {
-      console.error('❌ Error cargando todas las reseñas:', error);
-      throw error;
+      if (error) {
+        console.error('❌ Error cargando todas las reseñas:', error);
+        throw error;
+      }
+
+      this.resenas = data || [];
+      console.log('✅ Todas las reseñas cargadas:', this.resenas.length);
+    } catch (error) {
+      console.error('❌ Error en cargarTodasLasResenas:', error);
+      this.resenas = [];
     }
-
-    this.resenas = data || [];
-    console.log('✅ Todas las reseñas cargadas:', this.resenas.length);
   }
 
   // ========== ESTADÍSTICAS ==========
