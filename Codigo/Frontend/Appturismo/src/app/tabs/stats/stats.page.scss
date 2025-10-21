@@ -1,41 +1,132 @@
-.titulo-seccion {
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
+.light-theme {
+  --background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
 }
 
 
-.evento-card {
-  width: 100%;
+ion-toolbar {
+  --background: #ffffff !important;
+  color: #1e293b !important;
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.custom-searchbar {
+  --background: #f3f4f6;
+  --color: #1f2937;
+  --placeholder-color: #6b7280;
+  --icon-color: #9ca3af;
+  margin-bottom: 10px;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  margin-bottom: 12px;
-  padding: 0;
 }
 
 
-.evento-icono {
-  font-size: 28px;
-  margin-right: 10px;
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 12px 16px;
+  color: #1e293b;
 }
 
 
-.evento-titulo {
-  font-weight: 600;
-  color: #222;
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 16px 20px;
 }
 
 
-.evento-fecha {
-  font-size: 0.9rem;
-  color: #666;
+.event-card {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  }
+
+
+  .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 14px;
+    flex-shrink: 0;
+
+
+    ion-icon {
+      color: white;
+      font-size: 1.6rem;
+    }
+  }
+
+
+  .info {
+    flex-grow: 1;
+
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+
+    .date {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+
+    .place {
+      font-size: 0.9rem;
+      color: #475569;
+      margin-top: 2px;
+    }
+  }
 }
 
 
-.evento-lugar {
-  font-size: 0.9rem;
-  color: #444;
+/* 🎨 Gradientes de color */
+.music .icon {
+  background: linear-gradient(135deg, #f97316, #ea580c);
 }
+.books .icon {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+.beer .icon {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+.festival .icon {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+
+/* 📱 Responsive */
+@media (max-width: 480px) {
+  .icon {
+    width: 44px;
+    height: 44px;
+  }
+  .info h3 {
+    font-size: 0.95rem;
+  }
+}
+
+
 
 

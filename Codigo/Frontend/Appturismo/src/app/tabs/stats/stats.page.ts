@@ -1,91 +1,83 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonTitle, 
-  IonToolbar,
-  IonSearchbar,
-  IonList,
-  IonItem,
-  IonCard,
-  IonIcon,
-  IonLabel
-} from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonLabel, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { DatabaseService } from '../../services/database';
+import { IonicModule, IonIcon } from '@ionic/angular';
+
+
+
 
 @Component({
   selector: 'app-stats',
   templateUrl: './stats.page.html',
   styleUrls: ['./stats.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule,
-    IonContent,
-    IonHeader, 
-    IonTitle, 
-    IonToolbar,
-    IonSearchbar,
-    IonList,
-    IonItem,
-    IonCard,
-    IonIcon,
-    IonLabel
-  ]
-})
+imports: [CommonModule, FormsModule, IonicModule]
+}
+)
 export class StatsPage implements OnInit {
-  eventos: any[] = [];
-  eventosFiltrados: any[] = [];
   filtro = '';
+  eventos = [
+    {
+      nombre: 'Concierto de música clásica',
+      tipo: 'Música',
+      fecha: 'jueves, 23 de mayo',
+      lugar: 'Palau de la Música Catalana',
+    },
+    {
+      nombre: 'Feria de libros',
+      tipo: 'Libros',
+      fecha: 'viernes, 24 al domingo, 26 de mayo',
+      lugar: 'Fira de Barcelona',
+    },
+    {
+      nombre: 'Fiesta de la cerveza',
+      tipo: 'Cerveza',
+      fecha: 'sábado, 25 de mayo',
+      lugar: 'Jardines de la Ciutadella',
+    },
+    {
+      nombre: 'Festival gastronómico',
+      tipo: 'Festival',
+      fecha: 'domingo, 26 de mayo',
+      lugar: 'Plaza Mayor',
+    },
+  ];
 
-  constructor(private db: DatabaseService) {}
 
-  async ngOnInit() {
-    await this.cargarEventos();
-  }
+  ngOnInit() {}
 
-  async cargarEventos() {
-    try {
-      // Usa el DatabaseService en lugar de supabase directo
-      this.eventos = await this.db.getEventosWithDestino();
-      this.eventosFiltrados = [...this.eventos];
-    } catch (err) {
-      console.error('Error cargando eventos:', err);
-    }
-  }
 
-  aplicarFiltro() {
-    const q = (this.filtro || '').toLowerCase();
-    this.eventosFiltrados = this.eventos.filter(e =>
-      (e.nombre || '').toLowerCase().includes(q) ||
-      (e.tipo_de_evento || '').toLowerCase().includes(q) ||
-      (e.destino?.nombre_ciudad || '').toLowerCase().includes(q)
+  eventosFiltrados() {
+    return this.eventos.filter(e =>
+      e.nombre.toLowerCase().includes(this.filtro.toLowerCase()) ||
+      e.tipo.toLowerCase().includes(this.filtro.toLowerCase())
     );
   }
 
-  formatFecha(fecha: string) {
-    if (!fecha) return '';
-    const d = new Date(fecha);
-    return d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+  getIcon(tipo: string): string {
+    const t = tipo.toLowerCase();
+    if (t.includes('música')) return 'musical-notes-outline';
+    if (t.includes('libro')) return 'book-outline';
+    if (t.includes('cerveza')) return 'beer-outline';
+    if (t.includes('festival')) return 'restaurant-outline';
+    // Alternativos (podés usarlos si agregás otros eventos)
+    if (t.includes('paseo')) return 'walk-outline';
+    if (t.includes('local')) return 'storefront-outline';
+    if (t.includes('fogón') || t.includes('noche')) return 'bonfire-outline';
+    return 'calendar-outline';
   }
 
-  getIcon(tipo: string) {
-    if (!tipo) return 'calendar';
-    const t = tipo.toLowerCase();
-    if (t.includes('música') || t.includes('musica')) return 'musical-notes';
-    if (t.includes('feria') || t.includes('libro')) return 'book';
-    if (t.includes('cerveza') || t.includes('fiesta')) return 'beer';
-    return 'calendar';
-  }
 
-  getIconColor(tipo: string) {
-    if (!tipo) return '#444';
+  getColor(tipo: string): string {
     const t = tipo.toLowerCase();
-    if (t.includes('música') || t.includes('musica')) return '#ff6b6b';
-    if (t.includes('feria') || t.includes('libro')) return '#6b6bff';
-    if (t.includes('cerveza') || t.includes('fiesta')) return '#3ddc84';
-    return '#444';
+    if (t.includes('música')) return 'music';
+    if (t.includes('libro')) return 'books';
+    if (t.includes('cerveza')) return 'beer';
+    if (t.includes('festival')) return 'festival';
+    return '';
   }
 }
+

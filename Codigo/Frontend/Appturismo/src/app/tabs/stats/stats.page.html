@@ -1,45 +1,46 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Eventos</ion-title>
+<ion-header [translucent]="true">
+  <ion-toolbar color="light">
+    <ion-title>
+      <ion-icon name="calendar-outline" slot="start"></ion-icon>
+      Eventos
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 
-<ion-content class="ion-padding">
+<ion-content class="light-theme ion-padding">
 
 
-  <!-- Buscador -->
-  <ion-searchbar [(ngModel)]="filtro" placeholder="Buscar eventos..." (ionInput)="aplicarFiltro()"></ion-searchbar>
+  <!-- 🔍 Buscador -->
+  <ion-searchbar
+    [(ngModel)]="filtro"
+    placeholder="Buscar eventos..."
+    show-clear-button="focus"
+    class="custom-searchbar">
+  </ion-searchbar>
 
 
-  <h2 class="titulo-seccion">Eventos</h2>
+  <!-- 📋 Título -->
+  <h2 class="section-title">Explorá los próximos eventos</h2>
 
 
-  <!-- Listado de eventos -->
-  <ion-list>
-    <ion-item *ngFor="let e of eventosFiltrados" lines="none">
-      <ion-card class="evento-card">
-        <ion-item lines="none">
-          <ion-icon
-            [name]="getIcon(e.tipo_de_evento)"
-            slot="start"
-            class="evento-icono"
-            [style.color]="getIconColor(e.tipo_de_evento)">
-          </ion-icon>
-          <ion-label>
-            <h2 class="evento-titulo">{{ e.nombre }}</h2>
-            <p class="evento-fecha">
-              {{ formatFecha(e.fecha_de_inicio) }}
-              <span *ngIf="e.fecha_fin"> - {{ formatFecha(e.fecha_fin) }}</span>
-            </p>
-            <p class="evento-lugar" *ngIf="e.destino?.nombre_ciudad">{{ e.destino?.nombre_ciudad }}</p>
-          </ion-label>
-        </ion-item>
-      </ion-card>
-    </ion-item>
-  </ion-list>
+  <!-- 🗓️ Lista de eventos -->
+  <div class="event-list">
+    <div *ngFor="let e of eventosFiltrados()" class="event-card">
+      <div class="icon" [ngClass]="getColor(e.tipo)">
+        <ion-icon [name]="getIcon(e.tipo)"></ion-icon>
+      </div>
+      <div class="info">
+        <h3>{{ e.nombre }}</h3>
+        <p class="date">{{ e.fecha }}</p>
+        <p class="place">{{ e.lugar }}</p>
+      </div>
+    </div>
+  </div>
 
 
 </ion-content>
+
+
 
 
