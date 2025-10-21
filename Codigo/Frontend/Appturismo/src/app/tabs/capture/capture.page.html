@@ -264,8 +264,8 @@
               {{ lugar.categoria }}
             </ion-badge>
             
-            <!-- Rating destacado -->
-            <div *ngIf="lugar.promedioRating > 0" class="rating-badge" [class]="getRatingColor(lugar.promedioRating)"></div>
+            <!-- Rating destacado - CORREGIDO -->
+            <div *ngIf="lugar.promedioRating > 0" class="rating-badge" [class]="getRatingColor(lugar.promedioRating)">
               <ion-icon name="star"></ion-icon>
               <span>{{ lugar.promedioRating }}</span>
             </div>
