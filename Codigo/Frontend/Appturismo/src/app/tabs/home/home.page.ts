@@ -44,7 +44,7 @@ export class HomePage {
     console.log('🔍 Navegando a:', tab);
     
     switch (tab) {
-      case 'eventos':
+      case 'stats':
         console.log('Eventos → /tabs/stats');
         this.navCtrl.navigateRoot('/tabs/stats');
         break;
