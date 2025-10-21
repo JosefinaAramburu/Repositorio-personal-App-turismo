@@ -39,20 +39,20 @@ export class HomePage {
     // En el futuro podés conectar esto con Supabase
   }
 
-  irA(tab: string) {
-    switch (tab) {
-      case 'eventos':
-        this.navCtrl.navigateForward('/tabs/stats');
-        break;
-      case 'lugares':
-        this.navCtrl.navigateForward('/tabs/capture');
-        break;
-      case 'gastronomia':
-        this.navCtrl.navigateForward('/tabs/gastronomia');
-        break;
-      case 'recorridos':
-        this.navCtrl.navigateForward('/tabs/recorridos');
-        break;
-    }
+irA(tab: string) {
+  switch (tab) {
+    case 'eventos':
+      this.navCtrl.navigateRoot('/tabs/stats');
+      break;
+    case 'lugares':
+      this.navCtrl.navigateRoot('/tabs/capture');
+      break;
+    case 'gastronomia':
+      this.navCtrl.navigateRoot('/tabs/gastronomia');
+      break;
+    case 'recorridos':
+      this.navCtrl.navigateRoot('/tabs/recorridos');
+      break;
   }
+}
 }
