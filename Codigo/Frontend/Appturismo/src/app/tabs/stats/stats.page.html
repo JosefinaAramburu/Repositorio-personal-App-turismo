@@ -1,13 +1,45 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>stats</ion-title>
+    <ion-title>Eventos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">stats</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+<ion-content class="ion-padding">
+
+
+  <!-- Buscador -->
+  <ion-searchbar [(ngModel)]="filtro" placeholder="Buscar eventos..." (ionInput)="aplicarFiltro()"></ion-searchbar>
+
+
+  <h2 class="titulo-seccion">Eventos</h2>
+
+
+  <!-- Listado de eventos -->
+  <ion-list>
+    <ion-item *ngFor="let e of eventosFiltrados" lines="none">
+      <ion-card class="evento-card">
+        <ion-item lines="none">
+          <ion-icon
+            [name]="getIcon(e.tipo_de_evento)"
+            slot="start"
+            class="evento-icono"
+            [style.color]="getIconColor(e.tipo_de_evento)">
+          </ion-icon>
+          <ion-label>
+            <h2 class="evento-titulo">{{ e.nombre }}</h2>
+            <p class="evento-fecha">
+              {{ formatFecha(e.fecha_de_inicio) }}
+              <span *ngIf="e.fecha_fin"> - {{ formatFecha(e.fecha_fin) }}</span>
+            </p>
+            <p class="evento-lugar" *ngIf="e.destino?.nombre_ciudad">{{ e.destino?.nombre_ciudad }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+
 </ion-content>
+
+

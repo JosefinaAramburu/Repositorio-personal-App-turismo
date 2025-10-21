@@ -1,41 +1,5 @@
-.titulo-seccion {
-  font-weight: 600;
-  font-size: 1.2rem;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
+ion-tab-bar {
+  --background: var(--ion-color-light);
+  --color-selected: var(--ion-color-primary);
+  --color: #555;
 }
-
-
-.evento-card {
-  width: 100%;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  margin-bottom: 12px;
-  padding: 0;
-}
-
-
-.evento-icono {
-  font-size: 28px;
-  margin-right: 10px;
-}
-
-
-.evento-titulo {
-  font-weight: 600;
-  color: #222;
-}
-
-
-.evento-fecha {
-  font-size: 0.9rem;
-  color: #666;
-}
-
-
-.evento-lugar {
-  font-size: 0.9rem;
-  color: #444;
-}
-
-
