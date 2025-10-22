@@ -27,7 +27,7 @@ export const routes: Routes = [
         loadComponent: () => import('./tabs/capture/capture.page').then(m => m.CapturePage)
       },
       {
-        path: 'stats',
+        path: 'eventos',
         loadComponent: () => import('./tabs/stats/stats.page').then(m => m.StatsPage)
       },
 
