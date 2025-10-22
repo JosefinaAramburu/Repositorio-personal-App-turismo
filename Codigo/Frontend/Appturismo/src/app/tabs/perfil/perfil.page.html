@@ -1,34 +1,126 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Mi perfil</ion-title>
-  </ion-toolbar>
+ <ion-toolbar>
+   <ion-title>Perfil</ion-title>
+   <ion-buttons slot="end">
+     <ion-button (click)="resetForm()" fill="clear">Restablecer</ion-button>
+   </ion-buttons>
+ </ion-toolbar>
 </ion-header>
 
+
 <ion-content [fullscreen]="true" class="perfil-content">
+ <ion-refresher slot="fixed" (ionRefresh)="reload($event)">
+   <ion-refresher-content></ion-refresher-content>
+ </ion-refresher>
 
-  <!-- FOTO + NOMBRE -->
-  <div class="perfil-info">
-    <img [src]="usuario.foto" alt="Foto de perfil" class="foto-perfil" />
-    <h2>{{ usuario.nombre }}</h2>
-    <p>{{ usuario.email }}</p>
-  </div>
 
-  <!-- BOTONES -->
-  <div class="acciones">
-    <ion-button expand="block" color="primary" (click)="editarPerfil()">
-      <ion-icon name="create-outline" slot="start"></ion-icon>
-      Editar perfil
-    </ion-button>
+ <!-- Avatar + Nombre -->
+ <div class="hero">
+   <div class="avatar-wrap">
+     <ion-avatar class="avatar">
+       <img [src]="form.avatar_preview || defaultAvatar" alt="avatar" />
+     </ion-avatar>
 
-    <ion-button expand="block" fill="outline" color="medium" (click)="verResenas()">
-      <ion-icon name="chatbubbles-outline" slot="start"></ion-icon>
-      Mis reseñas
-    </ion-button>
 
-    <ion-button expand="block" color="danger" (click)="cerrarSesion()">
-      <ion-icon name="log-out-outline" slot="start"></ion-icon>
-      Cerrar sesión
-    </ion-button>
-  </div>
+     <input
+       #fileInput
+       type="file"
+       accept="image/*"
+       hidden
+       (change)="onPickAvatar($event)"
+     />
 
+
+     <ion-button size="small" class="btn-edit" (click)="fileInput.click()">
+       <ion-icon name="camera-outline" slot="start"></ion-icon>
+       Cambiar
+     </ion-button>
+   </div>
+
+
+   <div class="name-block">
+     <ion-input
+       label="Nombre"
+       labelPlacement="stacked"
+       [(ngModel)]="form.nombre"
+       placeholder="Tu nombre"
+     ></ion-input>
+     <ion-input
+       label="Email"
+       labelPlacement="stacked"
+       [(ngModel)]="form.email"
+       placeholder="tu@email.com"
+       type="email"
+     ></ion-input>
+   </div>
+ </div>
+
+
+ <!-- Datos adicionales -->
+ <ion-list lines="inset" class="panel">
+   <ion-item>
+     <ion-input
+       label="País"
+       labelPlacement="stacked"
+       [(ngModel)]="form.pais"
+       placeholder="Argentina"
+     ></ion-input>
+   </ion-item>
+   <ion-item>
+     <ion-input
+       label="Ciudad"
+       labelPlacement="stacked"
+       [(ngModel)]="form.ciudad"
+       placeholder="Buenos Aires"
+     ></ion-input>
+   </ion-item>
+   <ion-item>
+     <ion-textarea
+       label="Bio"
+       labelPlacement="stacked"
+       [(ngModel)]="form.bio"
+       autoGrow="true"
+       placeholder="Contanos algo de vos…"
+     ></ion-textarea>
+   </ion-item>
+ </ion-list>
+
+
+ <!-- Preferencias -->
+ <ion-list lines="full" class="panel">
+   <ion-item>
+     <ion-label>Notificaciones</ion-label>
+     <ion-toggle [(ngModel)]="form.notificaciones"></ion-toggle>
+   </ion-item>
+   <ion-item>
+     <ion-label>Modo compacto</ion-label>
+     <ion-toggle [(ngModel)]="form.compacto"></ion-toggle>
+   </ion-item>
+ </ion-list>
+
+
+ <div class="actions">
+   <ion-button expand="block" [disabled]="saving" (click)="save()">
+     <ion-spinner *ngIf="saving" name="dots"></ion-spinner>
+     <span *ngIf="!saving">Guardar cambios</span>
+   </ion-button>
+   <ion-note *ngIf="lastSaved" color="medium">
+     Último guardado: {{ lastSaved | date:'medium' }}
+   </ion-note>
+ </div>
+
+
+ <div class="foot-hint">
+   <ion-icon name="information-circle-outline"></ion-icon>
+   <span>
+     Tus cambios se guardan localmente y, si configuraste Supabase, también en la
+     tabla <b>usuario</b> y el bucket <b>avatars</b>.
+   </span>
+ </div>
 </ion-content>
+
+
+
+
+
+

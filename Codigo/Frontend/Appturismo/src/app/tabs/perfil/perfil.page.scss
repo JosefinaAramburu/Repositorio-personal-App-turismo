@@ -1,45 +1,233 @@
+/* === Fondo general como Capture === */
 .perfil-content {
-  --background: #ffffff;
-  padding: 20px;
-  text-align: center;
+ --ion-background-color: #b2e2f2; /* mismo celeste de capture */
+ --background: #b2e2f2;
+ padding-bottom: 88px; /* espacio para la tabbar */
+}
+ion-title {
+     color: #000000 !important;
+     font-weight: 600;}
+/* === Cabecera tipo “tarjeta” ============================== */
+.hero {
+ display: grid;
+ grid-template-columns: 110px 1fr;
+ align-items: center;
+ gap: 16px;
+ padding: 16px;
+ margin: 12px;
+ background: #fff;
+ border-radius: 16px;
+ border: 1px solid rgba(0,0,0,.06);
+ box-shadow: 0 6px 18px rgba(0,0,0,.10);
 }
 
-.perfil-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 40px;
 
-  .foto-perfil {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    margin-bottom: 15px;
-  }
+/* Avatar + botón editar */
+.avatar-wrap {
+ position: relative;
+ display: grid;
+ place-items: center;
 
-  h2 {
-    font-weight: 600;
-    color: #111827;
-    margin: 0;
-  }
 
-  p {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin-top: 4px;
-  }
+ .avatar {
+   width: 96px;
+   height: 96px;
+   border: 3px solid #fff;
+   box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+   border-radius: 50%;
+   overflow: hidden;
+   background: #f8fafc;
+
+
+   img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     display: block;
+   }
+ }
+
+
+ .btn-edit {
+   margin-top: 10px;
+   --border-radius: 999px;
+   --padding-start: 12px;
+   --padding-end: 12px;
+   --background: #87ceeb;
+   --color: #fff;
+   box-shadow: 0 2px 10px rgba(19, 99, 223, .25);
+ }
 }
 
-.acciones {
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 
-  ion-button {
-    font-weight: 500;
-    border-radius: 10px;
-  }
+/* Nombre / inputs con estética capture */
+.name-block {
+ display: grid;
+ gap: 8px;
+
+
+ .title {
+   font-weight: 800;
+   font-size: 18px;
+   color: #0f172a;
+ }
+
+
+ ion-input, ion-textarea, ion-select {
+   --background: #fff;
+   --border-radius: 12px;
+   --highlight-color-focused: #87ceeb;
+   border: 1px solid rgba(0,0,0,.06);
+   padding: 6px 8px;
+   box-shadow: 0 2px 8px rgba(0,0,0,.04);
+ }
 }
+
+
+/* === Paneles como tarjetas de Capture ===================== */
+.panel {
+ margin: 12px;
+ border-radius: 16px;
+ overflow: hidden;
+ background: #fff;
+ border: 1px solid rgba(0,0,0,.06);
+ box-shadow: 0 6px 18px rgba(0,0,0,.10);
+
+
+ .panel-title {
+   padding: 14px 16px 6px;
+   font-weight: 800;
+   color: #0f172a;
+   font-size: 16px;
+ }
+
+
+ ion-item {
+   --background: #fff;
+   --padding-start: 16px;
+   --inner-padding-end: 12px;
+   --min-height: 48px;
+   --border-color: rgba(0,0,0,.04);
+   --detail-icon-color: #9aa0a6;
+   border-top: 1px solid rgba(0,0,0,.04);
+
+
+   &:first-of-type { border-top: 0; }
+ }
+
+
+ ion-note, .muted {
+   color: #6b7280;
+   font-size: 13px;
+ }
+}
+
+
+/* === Acciones (botones primarios) ========================= */
+.actions {
+ padding: 16px 12px 6px;
+ text-align: center;
+
+
+ ion-button {
+   --border-radius: 12px;
+   height: 44px;
+   --background: #87ceeb;
+   --background-activated: #87ceeb;
+   --color: #fff;
+   box-shadow: 0 6px 18px rgba(19,99,223,.24);
+ }
+
+
+ ion-note {
+   display: block;
+   margin-top: 8px;
+   color: #6b7280;
+ }
+}
+
+
+/* === Pie con hint ========================================= */
+.foot-hint {
+ margin: 8px 16px 24px;
+ display: flex;
+ gap: 8px;
+ align-items: flex-start;
+ color: #6b7280;
+
+
+ ion-icon {
+   font-size: 18px;
+   margin-top: 2px;
+   color: #9aa0a6;
+ }
+}
+
+
+/* === Listas al estilo Capture ============================== */
+.list-wrap { padding: 0 8px 8px; }
+
+
+.card-row {
+ background: #fff;
+ border: 1px solid rgba(0,0,0,.06);
+ border-radius: 16px;
+ box-shadow: 0 2px 10px rgba(0,0,0,.08);
+ padding: 14px 16px;
+ margin: 10px 8px;
+ display: grid;
+ grid-template-columns: 1fr auto;
+ align-items: center;
+ gap: 10px;
+
+
+ .title {
+   font-weight: 800; color: #0f172a; font-size: 16px;
+ }
+ .subtitle {
+   color: #6b7280; font-size: 13px; margin-top: 2px;
+ }
+
+
+ .actions-right {
+   display: inline-flex; gap: 8px; margin-left: auto;
+
+
+   ion-button {
+     --padding-start: 6px; --padding-end: 6px;
+     --border-radius: 10px;
+     height: 34px; width: 34px;
+     box-shadow: 0 2px 10px rgba(0,0,0,.08);
+   }
+ }
+}
+
+
+/* === FAB (si agregás algo desde perfil) ==================== */
+.fab-add {
+ position: fixed; right: 16px; bottom: 92px;
+ --background: #87ceeb;
+ --color: #fff;
+ box-shadow: 0 6px 18px rgba(19,99,223,.24);
+}
+
+
+/* === Helpers de títulos/secciones ========================== */
+.section-title {
+ margin: 10px 14px 4px;
+ font-size: 18px; font-weight: 800; color: #0f172a;
+}
+
+
+/* Responsivo leve */
+@media (min-width: 768px) {
+ .hero {
+   grid-template-columns: 120px 1fr;
+   padding: 20px;
+ }
+ .card-row { padding: 16px 18px; }
+}
+
+
+
+
