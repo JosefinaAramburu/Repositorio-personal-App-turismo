@@ -53,7 +53,7 @@ export class HealthPage implements OnInit, OnDestroy {
   filtroCalificacion = '0';
   ordenamiento = 'fecha_desc';
   paginaActual = 1;
-  itemsPorPagina = 6;
+  itemsPorPagina = 10; // Aumentado para mostrar más reseñas
 
   // Eliminación
   resenaAEliminar: Resena | null = null;
@@ -77,7 +77,7 @@ export class HealthPage implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.routeSub = this.route.queryParams.subscribe(params => {
-      console.log('Parámetros recibidos:', params);
+      console.log('📍 Parámetros recibidos:', params);
 
       if (params['lugarId']) {
         this.lugarId = parseInt(params['lugarId']);
@@ -86,7 +86,7 @@ export class HealthPage implements OnInit, OnDestroy {
         this.totalResenasLugar = parseInt(params['totalResenas']) || 0;
         this.promedioRatingLugar = parseFloat(params['promedioRating']) || 0;
 
-        console.log('Modo Lugar Específico:', {
+        console.log('🏛️ Modo Lugar Específico:', {
           lugarId: this.lugarId,
           lugarNombre: this.lugarNombre,
           categoria: this.lugarCategoria
@@ -94,7 +94,7 @@ export class HealthPage implements OnInit, OnDestroy {
       } else {
         this.lugarId = null;
         this.lugarNombre = '';
-        console.log('Modo Todas las Reseñas');
+        console.log('🌍 Modo Todas las Reseñas');
       }
 
       this.cargarResenas();
@@ -131,9 +131,9 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // Cargar reseñas de un lugar específico - CORREGIDO
+  // Cargar reseñas de un lugar específico - MEJORADO
   private async cargarResenasDeLugar(lugarId: number) {
-    console.log(`🔍 Buscando reseñas para lugar ID: ${lugarId}`);
+    console.log(`🔍 Buscando reseñas EXCLUSIVAS para lugar ID: ${lugarId}`);
 
     try {
       // 1. Obtener los IDs de reseñas relacionadas con este lugar
@@ -144,23 +144,24 @@ export class HealthPage implements OnInit, OnDestroy {
 
       if (errorRelaciones) {
         console.error('❌ Error cargando relaciones:', errorRelaciones);
-        // Si hay error, intentar cargar todas las reseñas
-        await this.cargarTodasLasResenas();
+        // Si hay error, mostrar solo reseñas vacías para este lugar
+        this.resenas = [];
+        console.log('⚠️ No se pudieron cargar relaciones, mostrando 0 reseñas para este lugar');
         return;
       }
 
-      console.log('📊 Relaciones encontradas:', relaciones);
+      console.log('📊 Relaciones encontradas para este lugar:', relaciones);
 
       if (!relaciones || relaciones.length === 0) {
-        console.log('ℹ️ No hay reseñas para este lugar');
+        console.log('ℹ️ No hay reseñas específicas para este lugar');
         this.resenas = [];
         return;
       }
 
       const idsResenas = relaciones.map(rel => rel.id_resenas);
-      console.log('📋 IDs de reseñas a cargar:', idsResenas);
+      console.log('📋 IDs de reseñas EXCLUSIVAS de este lugar:', idsResenas);
 
-      // 2. Obtener las reseñas usando los IDs
+      // 2. Obtener SOLO las reseñas de este lugar
       const { data: resenas, error: errorResenas } = await this.supabase
         .from('resenas')
         .select('*')
@@ -173,12 +174,11 @@ export class HealthPage implements OnInit, OnDestroy {
       }
 
       this.resenas = resenas || [];
-      console.log(`✅ Reseñas cargadas para lugar ${lugarId}:`, this.resenas.length);
+      console.log(`✅ Reseñas EXCLUSIVAS cargadas para lugar ${lugarId}:`, this.resenas.length);
 
     } catch (error) {
       console.error('❌ Error en cargarResenasDeLugar:', error);
-      // Fallback: cargar todas las reseñas
-      await this.cargarTodasLasResenas();
+      this.resenas = [];
     }
   }
 
@@ -260,18 +260,23 @@ export class HealthPage implements OnInit, OnDestroy {
 
   get resenasPaginadas(): Resena[] {
     const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
-    return this.resenasFiltradas.slice(startIndex, startIndex + this.itemsPorPagina);
+    const endIndex = startIndex + this.itemsPorPagina;
+    const paginated = this.resenasFiltradas.slice(startIndex, endIndex);
+    console.log(`📄 Página ${this.paginaActual}: mostrando ${paginated.length} de ${this.resenasFiltradas.length} reseñas`);
+    return paginated;
   }
 
   paginaAnterior() {
     if (this.paginaActual > 1) {
       this.paginaActual--;
+      console.log('⬅️ Yendo a página:', this.paginaActual);
     }
   }
 
   paginaSiguiente() {
     if (this.paginaActual < this.totalPaginas) {
       this.paginaActual++;
+      console.log('➡️ Yendo a página:', this.paginaActual);
     }
   }
 
@@ -324,7 +329,7 @@ export class HealthPage implements OnInit, OnDestroy {
 
       // 2. Si hay lugar específico, crear la relación
       if (this.lugarId && resenaCreada) {
-        console.log(`🔗 Creando relación: Lugar ${this.lugarId} - Reseña ${resenaCreada.id_resenas}`);
+        console.log(`🔗 Creando relación EXCLUSIVA: Lugar ${this.lugarId} - Reseña ${resenaCreada.id_resenas}`);
         
         const { error: errorRelacion } = await this.supabase
           .from('lugares_resenas')
@@ -334,15 +339,18 @@ export class HealthPage implements OnInit, OnDestroy {
           }]);
 
         if (errorRelacion) {
-          console.error('⚠️ Error creando relación (pero la reseña se creó):', errorRelacion);
-          // Continuar aunque falle la relación
+          console.error('❌ Error creando relación:', errorRelacion);
+          console.error('   - Detalles:', errorRelacion.details);
+          console.error('   - Hint:', errorRelacion.hint);
+          this.mostrarError('Error al vincular reseña con el lugar');
+          return;
         } else {
-          console.log('✅ Relación creada exitosamente');
+          console.log('✅ Relación EXCLUSIVA creada exitosamente');
         }
       }
 
       // 3. FORZAR recarga de reseñas
-      console.log('🔄 Forzando recarga de reseñas...');
+      console.log('🔄 Recargando reseñas...');
       await this.cargarResenas();
 
       // 4. Resetear y cerrar
@@ -384,12 +392,14 @@ export class HealthPage implements OnInit, OnDestroy {
     try {
       console.log('🗑️ Eliminando reseña:', this.resenaAEliminar.id_resenas);
 
-      // 1. Eliminar relaciones
-      if (this.lugarId) {
-        await this.supabase
-          .from('lugares_resenas')
-          .delete()
-          .eq('id_resenas', this.resenaAEliminar.id_resenas);
+      // 1. Eliminar relaciones primero
+      const { error: errorRelacion } = await this.supabase
+        .from('lugares_resenas')
+        .delete()
+        .eq('id_resenas', this.resenaAEliminar.id_resenas);
+
+      if (errorRelacion) {
+        console.error('⚠️ Error eliminando relación (continuando):', errorRelacion);
       }
 
       // 2. Eliminar la reseña
