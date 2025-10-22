@@ -193,10 +193,10 @@
       </button>
     </div>
 
-    <!-- Grid de reseñas - MEJORADO -->
+    <!-- Grid de reseñas - SIN TRACKBY -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length > 0" class="resenas-grid">
       <div 
-        *ngFor="let resena of resenasPaginadas; trackBy: trackByResenaId" 
+        *ngFor="let resena of resenasPaginadas" 
         class="resena-card"
         [class.resena-destacada]="resena.puntuacion === 5"
       >
@@ -235,7 +235,7 @@
       </div>
     </div>
 
-    <!-- Paginación - MEJORADA -->
+    <!-- Paginación -->
     <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="paginacion">
       <button 
         (click)="paginaAnterior()" 

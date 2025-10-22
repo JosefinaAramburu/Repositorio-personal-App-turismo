@@ -53,7 +53,7 @@ export class HealthPage implements OnInit, OnDestroy {
   filtroCalificacion = '0';
   ordenamiento = 'fecha_desc';
   paginaActual = 1;
-  itemsPorPagina = 10; // Aumentado para mostrar más reseñas
+  itemsPorPagina = 10;
 
   // Eliminación
   resenaAEliminar: Resena | null = null;
@@ -131,12 +131,11 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // Cargar reseñas de un lugar específico - MEJORADO
+  // Cargar reseñas de un lugar específico
   private async cargarResenasDeLugar(lugarId: number) {
     console.log(`🔍 Buscando reseñas EXCLUSIVAS para lugar ID: ${lugarId}`);
 
     try {
-      // 1. Obtener los IDs de reseñas relacionadas con este lugar
       const { data: relaciones, error: errorRelaciones } = await this.supabase
         .from('lugares_resenas')
         .select('id_resenas')
@@ -144,7 +143,6 @@ export class HealthPage implements OnInit, OnDestroy {
 
       if (errorRelaciones) {
         console.error('❌ Error cargando relaciones:', errorRelaciones);
-        // Si hay error, mostrar solo reseñas vacías para este lugar
         this.resenas = [];
         console.log('⚠️ No se pudieron cargar relaciones, mostrando 0 reseñas para este lugar');
         return;
@@ -161,7 +159,6 @@ export class HealthPage implements OnInit, OnDestroy {
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       console.log('📋 IDs de reseñas EXCLUSIVAS de este lugar:', idsResenas);
 
-      // 2. Obtener SOLO las reseñas de este lugar
       const { data: resenas, error: errorResenas } = await this.supabase
         .from('resenas')
         .select('*')
@@ -312,7 +309,6 @@ export class HealthPage implements OnInit, OnDestroy {
 
       console.log('📤 Enviando a Supabase:', datosParaSupabase);
 
-      // 1. Insertar la reseña y obtener el ID
       const { data: resenaCreada, error: errorResena } = await this.supabase
         .from('resenas')
         .insert([datosParaSupabase])
@@ -327,7 +323,6 @@ export class HealthPage implements OnInit, OnDestroy {
 
       console.log('✅ Reseña creada en Supabase:', resenaCreada);
 
-      // 2. Si hay lugar específico, crear la relación
       if (this.lugarId && resenaCreada) {
         console.log(`🔗 Creando relación EXCLUSIVA: Lugar ${this.lugarId} - Reseña ${resenaCreada.id_resenas}`);
         
@@ -349,11 +344,9 @@ export class HealthPage implements OnInit, OnDestroy {
         }
       }
 
-      // 3. FORZAR recarga de reseñas
       console.log('🔄 Recargando reseñas...');
       await this.cargarResenas();
 
-      // 4. Resetear y cerrar
       this.resetearFormulario();
       this.cerrarModal();
       this.mostrarExito('Reseña agregada correctamente!');
@@ -392,7 +385,6 @@ export class HealthPage implements OnInit, OnDestroy {
     try {
       console.log('🗑️ Eliminando reseña:', this.resenaAEliminar.id_resenas);
 
-      // 1. Eliminar relaciones primero
       const { error: errorRelacion } = await this.supabase
         .from('lugares_resenas')
         .delete()
@@ -402,7 +394,6 @@ export class HealthPage implements OnInit, OnDestroy {
         console.error('⚠️ Error eliminando relación (continuando):', errorRelacion);
       }
 
-      // 2. Eliminar la reseña
       const { error } = await this.supabase
         .from('resenas')
         .delete()
