@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+import { supabase } from '../../supabase';
 
 interface Resena {
   id_resenas: number;
@@ -62,17 +63,13 @@ export class HealthPage implements OnInit, OnDestroy {
   promedioCalificacion = 0;
   distribucionCalificaciones: { [key: number]: number } = {};
 
-  private supabase: SupabaseClient;
   private routeSub: any;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.supabase = createClient(
-      'https://xqznsyyloofllzkywohl.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhxem5zeXlsb29mbGx6a3l3b2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUxMDk4MTksImV4cCI6MjA3MDY4NTgxOX0.rqIz8miQTNRFLWuNXE4LDwCQY2UT-f6IgRBaChszeOk'
-    );
+    // ✅ ELIMINADO: No crear otro cliente Supabase, usar el importado
   }
 
   async ngOnInit() {
@@ -131,13 +128,13 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // Cargar reseñas de un lugar específico - MEJORADO
+  // Cargar reseñas de un lugar específico
   private async cargarResenasDeLugar(lugarId: number) {
     console.log(`🔍 Buscando reseñas para lugar ID: ${lugarId}`);
 
     try {
       // PRIMERO: Verificar si existen relaciones para este lugar
-      const { data: relaciones, error: errorRelaciones } = await this.supabase
+      const { data: relaciones, error: errorRelaciones } = await supabase
         .from('lugares_resenas')
         .select('id_resenas')
         .eq('id_lugares', lugarId);
@@ -161,7 +158,7 @@ export class HealthPage implements OnInit, OnDestroy {
       console.log('🆔 IDs de reseñas:', idsResenas);
 
       // TERCERO: Obtener las reseñas completas
-      const { data: resenas, error: errorResenas } = await this.supabase
+      const { data: resenas, error: errorResenas } = await supabase
         .from('resenas')
         .select('*')
         .in('id_resenas', idsResenas)
@@ -185,7 +182,7 @@ export class HealthPage implements OnInit, OnDestroy {
   private async cargarTodasLasResenas() {
     try {
       console.log('🌐 Cargando TODAS las reseñas...');
-      const { data, error } = await this.supabase
+      const { data, error } = await supabase
         .from('resenas')
         .select('*')
         .order('fecha', { ascending: false });
@@ -316,7 +313,7 @@ export class HealthPage implements OnInit, OnDestroy {
       console.log('📤 Enviando a Supabase:', datosParaSupabase);
 
       // PRIMERO: Crear la reseña
-      const { data: resenaCreada, error: errorResena } = await this.supabase
+      const { data: resenaCreada, error: errorResena } = await supabase
         .from('resenas')
         .insert([datosParaSupabase])
         .select()
@@ -334,7 +331,7 @@ export class HealthPage implements OnInit, OnDestroy {
       if (this.lugarId && resenaCreada) {
         console.log(`🔗 Creando relación: lugar ${this.lugarId} - reseña ${resenaCreada.id_resenas}`);
 
-        const { error: errorRelacion } = await this.supabase
+        const { error: errorRelacion } = await supabase
           .from('lugares_resenas')
           .insert([{
             id_lugares: this.lugarId,
@@ -343,11 +340,6 @@ export class HealthPage implements OnInit, OnDestroy {
 
         if (errorRelacion) {
           console.error('❌ Error creando relación:', errorRelacion);
-          console.log('📋 Detalles del error:', {
-            message: errorRelacion.message,
-            details: errorRelacion.details,
-            hint: errorRelacion.hint
-          });
           this.mostrarError('Error al vincular reseña con el lugar: ' + errorRelacion.message);
           return;
         } else {
@@ -398,7 +390,7 @@ export class HealthPage implements OnInit, OnDestroy {
       console.log('🗑️ Eliminando reseña:', this.resenaAEliminar.id_resenas);
 
       // Primero eliminar las relaciones
-      const { error: errorRelacion } = await this.supabase
+      const { error: errorRelacion } = await supabase
         .from('lugares_resenas')
         .delete()
         .eq('id_resenas', this.resenaAEliminar.id_resenas);
@@ -408,7 +400,7 @@ export class HealthPage implements OnInit, OnDestroy {
       }
 
       // Luego eliminar la reseña
-      const { error } = await this.supabase
+      const { error } = await supabase
         .from('resenas')
         .delete()
         .eq('id_resenas', this.resenaAEliminar.id_resenas);
