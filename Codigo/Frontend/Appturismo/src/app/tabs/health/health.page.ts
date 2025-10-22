@@ -25,7 +25,6 @@ interface NuevaResena {
   templateUrl: './health.page.html',
   styleUrls: ['./health.page.scss']
 })
-
 export class HealthPage implements OnInit, OnDestroy {
   // Estado de la aplicación
   resenas: Resena[] = [];
@@ -304,7 +303,7 @@ export class HealthPage implements OnInit, OnDestroy {
 
   async agregarResena() {
     try {
-      console.log('Agregando reseña...');
+      console.log('🔄 Agregando reseña...');
       
       // Combinar título y contenido en el campo texto
       const textoCompleto = `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`;
@@ -316,28 +315,31 @@ export class HealthPage implements OnInit, OnDestroy {
         id_usuario: null
       };
 
-      console.log('Creando reseña:', datosParaSupabase);
+      console.log('📤 Creando reseña:', datosParaSupabase);
 
+      // 🔥 CORRECCIÓN: Quita .single() y usa .select() directamente
       const { data: resenaCreada, error: errorResena } = await this.supabase
         .from('resenas')
         .insert([datosParaSupabase])
-        .select()
-        .single();
+        .select();  // ← QUITA .single()
 
       if (errorResena) {
-        console.error('Error creando reseña:', errorResena);
+        console.error('❌ Error creando reseña:', errorResena);
         this.mostrarError('Error al crear reseña: ' + errorResena.message);
         return;
       }
 
-      console.log('Reseña creada:', resenaCreada);
+      console.log('✅ Reseña creada:', resenaCreada);
 
-      // 2. Si estamos en modo lugar específico, crear la relación
-      if (this.lugarId && resenaCreada) {
-        await this.crearRelacionLugarResena(this.lugarId, resenaCreada.id_resenas);
+      // 🔥 CORRECCIÓN: Accede al primer elemento del array
+      if (this.lugarId && resenaCreada && resenaCreada.length > 0) {
+        const idResenaCreada = resenaCreada[0].id_resenas;
+        console.log('🔗 ID de reseña creada:', idResenaCreada);
+        
+        await this.crearRelacionLugarResena(this.lugarId, idResenaCreada);
       }
 
-      // 3. Recargar lista y resetear formulario
+      // Recargar lista y resetear formulario
       await this.cargarResenas();
       this.resetearFormulario();
       this.cerrarModal();
@@ -345,33 +347,37 @@ export class HealthPage implements OnInit, OnDestroy {
       this.mostrarExito('Reseña agregada correctamente!');
 
     } catch (error) {
-      console.error('Error general:', error);
+      console.error('❌ Error general:', error);
       this.mostrarError('Error inesperado al agregar reseña');
     } finally {
       this.cargando = false;
     }
   }
 
-  // Crear relación entre lugar y reseña
+  // Crear relación entre lugar y reseña - CORREGIDO
   private async crearRelacionLugarResena(lugarId: number, resenaId: number) {
     try {
-      console.log(`Creando relación: Lugar ${lugarId} - Reseña ${resenaId}`);
+      console.log(`🔗 Creando relación: Lugar ${lugarId} - Reseña ${resenaId}`);
 
-      const { error } = await this.supabase
+      // 🔥 CORRECCIÓN: Usa .select() sin .single()
+      const { data, error } = await this.supabase
         .from('lugares_resenas')
         .insert([{
           id_lugares: lugarId,
           id_resenas: resenaId
-        }]);
+        }])
+        .select();  // ← QUITA .single()
+
+      console.log('📥 Respuesta relación:', data);
 
       if (error) {
-        console.error('Error creando relación:', error);
+        console.error('❌ Error creando relación:', error);
         throw error;
       }
 
-      console.log('Relación creada exitosamente');
+      console.log('✅ Relación creada exitosamente:', data);
     } catch (error) {
-      console.error('Error en crearRelacionLugarResena:', error);
+      console.error('❌ Error en crearRelacionLugarResena:', error);
       throw error;
     }
   }
