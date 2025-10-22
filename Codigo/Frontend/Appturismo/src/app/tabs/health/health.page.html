@@ -11,15 +11,6 @@
     </div>
   </div>
 
-  <!-- DEBUG TEMPORAL -->
-  <div style="background: #ffeb3b; color: #333; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 12px; border-left: 4px solid #ff9800;">
-    <strong>DEBUG:</strong>
-    Lugar: {{lugarId}} - {{lugarNombre}} |
-    Reseñas totales: {{resenas.length}} |
-    Filtradas: {{resenasFiltradas.length}} |
-    Página: {{paginaActual}}/{{totalPaginas}}
-  </div>
-
   <!-- Botón flotante para agregar reseña -->
   <button
     *ngIf="!mostrarFormulario && !cargandoResenas"
