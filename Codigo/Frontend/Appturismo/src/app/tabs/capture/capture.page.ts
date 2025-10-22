@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
+import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
   IonItem, IonLabel, IonInput, IonList, IonTextarea, IonIcon, IonBadge,
@@ -11,14 +11,15 @@ import {
 } from '@ionic/angular/standalone';
 
 import { addIcons } from 'ionicons';
-import { 
+import {
   add, create, location, map, save, checkmark, close,
   time, trash, refresh, chatbubble, star, filter, search,
   business, school, leaf, water, eye, book, cart, restaurant,
   bed, informationCircle, calendar, chatbubbles
 } from 'ionicons/icons';
 
-import { supabase } from '../../supabase';
+// CORREGIR ESTA IMPORTACIÓN
+import { supabase } from '../../supabase'; // 👈 Asegúrate que la ruta sea correcta
 
 // Interfaces
 export interface Lugar {
@@ -33,13 +34,25 @@ export interface Lugar {
   ultimaResena?: string;
 }
 
+// Interface para relaciones
+interface RelacionResena {
+  id_resenas: number;
+}
+
+// Interface para reseñas
+interface ResenaStats {
+  puntuacion: number;
+  fecha: string;
+  texto: string;
+}
+
 @Component({
   selector: 'app-capture',
   templateUrl: './capture.page.html',
   styleUrls: ['./capture.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
     IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
@@ -74,11 +87,11 @@ export class CapturePage implements OnInit {
   isLoading = false;
 
   // Filtros
-  terminoBusqueda = '';
+  terminoBusqueda = "";
   categoriaFiltro = 'todos';
 
-  // Categorías disponibles
-  categorias = [
+  // Categorias disponibles
+  categories = [
     { valor: 'todos', label: 'Todos' },
     { valor: 'Monumento', label: 'Monumentos' },
     { valor: 'Museo', label: 'Museos' },
@@ -105,13 +118,12 @@ export class CapturePage implements OnInit {
     await this.cargarLugares();
   }
 
-  // 🔄 CARGAR LUGARES DESDE SUPABASE
+  // CARGAR LUGARES DESDE SUPABASE
   async cargarLugares() {
     this.isLoading = true;
-    
+
     try {
-      console.log('🔄 Cargando lugares desde Supabase...');
-      
+      console.log('Cargando lugares desde Supabase...');
       const { data, error } = await supabase
         .from('lugares')
         .select('*')
@@ -119,55 +131,60 @@ export class CapturePage implements OnInit {
 
       if (error) throw error;
 
-      // Calcular estadísticas para cada lugar
+      // Calcular estadisticas para cada lugar
       this.lugares = await Promise.all(
-        (data || []).map(async (lugar) => {
+        (data || []).map(async (lugar: any) => {
           const stats = await this.calcularEstadisticas(lugar.id_lugares!);
           return { ...lugar, ...stats };
         })
       );
 
       this.aplicarFiltros();
-      console.log('✅ Lugares cargados:', this.lugares.length);
-      
+      console.log('Lugares cargados:', this.lugares.length);
+
     } catch (error: any) {
-      console.error('❌ Error cargando lugares:', error);
+      console.error('Error cargando lugares:', error);
       this.mostrarError('Error al cargar lugares: ' + error.message);
     } finally {
       this.isLoading = false;
     }
   }
 
-  // 📊 CALCULAR ESTADÍSTICAS DE RESEÑAS PARA UN LUGAR
+  // CALCULAR ESTADISTICAS DE RESEÑAS PARA UN LUGAR
   async calcularEstadisticas(idLugar: number): Promise<{totalResenas: number, promedioRating: number, ultimaResena?: string}> {
     try {
       // Obtener reseñas relacionadas con este lugar
-      const { data: relaciones } = await supabase
+      const { data: relaciones, error } = await supabase
         .from('lugares_resenas')
         .select('id_resenas')
         .eq('id_lugares', idLugar);
+
+      if (error) {
+        console.error('Error obteniendo relaciones:', error);
+        return { totalResenas: 0, promedioRating: 0 };
+      }
 
       if (!relaciones || relaciones.length === 0) {
         return { totalResenas: 0, promedioRating: 0 };
       }
 
-      const idsResenas = relaciones.map(rel => rel.id_resenas);
-      
+      const idsResenas = relaciones.map((rel: RelacionResena) => rel.id_resenas);
+
       // Obtener las reseñas con información completa
-      const { data: resenas } = await supabase
+      const { data: resenas, error: errorResenas } = await supabase
         .from('resenas')
         .select('puntuacion, fecha, texto')
         .in('id_resenas', idsResenas)
         .order('fecha', { ascending: false });
 
-      if (!resenas || resenas.length === 0) {
+      if (errorResenas || !resenas || resenas.length === 0) {
         return { totalResenas: 0, promedioRating: 0 };
       }
 
       const totalResenas = resenas.length;
-      const sumaRatings = resenas.reduce((sum, resena) => sum + (resena.puntuacion || 0), 0);
+      const sumaRatings = resenas.reduce((sum: number, resena: ResenaStats) => sum + (resena.puntuacion || 0), 0);
       const promedioRating = totalResenas > 0 ? Number((sumaRatings / totalResenas).toFixed(1)) : 0;
-      
+
       // Obtener la última reseña
       const ultimaResena = resenas.length > 0 ? resenas[0].fecha : undefined;
 
@@ -178,23 +195,23 @@ export class CapturePage implements OnInit {
     }
   }
 
-  // 🔍 APLICAR FILTROS Y BÚSQUEDA
+  // APLICAR FILTROS Y BÚSQUEDA
   aplicarFiltros() {
     let resultados = [...this.lugares];
 
     // Filtrar por búsqueda
     if (this.terminoBusqueda.trim()) {
       const busqueda = this.terminoBusqueda.toLowerCase();
-      resultados = resultados.filter(lugar =>
+      resultados = resultados.filter((lugar: Lugar) =>
         lugar.nombre.toLowerCase().includes(busqueda) ||
         (lugar.descripcion && lugar.descripcion.toLowerCase().includes(busqueda)) ||
         lugar.categoria.toLowerCase().includes(busqueda)
       );
     }
 
-    // Filtrar por categoría
+    // Filtrar por categoria
     if (this.categoriaFiltro !== 'todos') {
-      resultados = resultados.filter(lugar => lugar.categoria === this.categoriaFiltro);
+      resultados = resultados.filter((lugar: Lugar) => lugar.categoria === this.categoriaFiltro);
     }
 
     this.lugaresFiltrados = resultados;
@@ -216,7 +233,7 @@ export class CapturePage implements OnInit {
     this.aplicarFiltros();
   }
 
-  // ➕ CREAR NUEVO LUGAR
+  // CREAR NUEVO LUGAR
   async crearLugar() {
     if (!this.nuevoLugar.nombre.trim() || !this.nuevoLugar.categoria.trim()) {
       this.mostrarError('Nombre y categoría son obligatorios');
@@ -245,7 +262,7 @@ export class CapturePage implements OnInit {
       this.limpiarFormulario();
       await this.cargarLugares();
       this.mostrarExito('¡Lugar creado exitosamente!');
-      
+
     } catch (error: any) {
       await this.loadingController.dismiss();
       console.error('Error creando lugar:', error);
@@ -253,7 +270,7 @@ export class CapturePage implements OnInit {
     }
   }
 
-  // ✏️ EDITAR LUGAR EXISTENTE
+  // EDITAR LUGAR EXISTENTE
   editarLugar(lugar: Lugar) {
     this.lugarEditando = { ...lugar };
     this.mostrarFormulario = true;
@@ -282,7 +299,7 @@ export class CapturePage implements OnInit {
       this.lugarEditando = null;
       await this.cargarLugares();
       this.mostrarExito('¡Lugar actualizado exitosamente!');
-      
+
     } catch (error: any) {
       await this.loadingController.dismiss();
       console.error('Error actualizando lugar:', error);
@@ -290,7 +307,7 @@ export class CapturePage implements OnInit {
     }
   }
 
-  // 🗑️ ELIMINAR LUGAR CON CONFIRMACIÓN
+  // ELIMINAR LUGAR CON CONFIRMACIÓN
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
       header: '¿Eliminar lugar?',
@@ -312,7 +329,7 @@ export class CapturePage implements OnInit {
 
               // Eliminar relaciones de reseñas
               await supabase.from('lugares_resenas').delete().eq('id_lugares', id);
-              
+
               // Luego eliminar el lugar
               const { error } = await supabase.from('lugares').delete().eq('id_lugares', id);
               if (error) throw error;
@@ -320,7 +337,7 @@ export class CapturePage implements OnInit {
               await loading.dismiss();
               await this.cargarLugares();
               this.mostrarExito('¡Lugar eliminado exitosamente!');
-              
+
             } catch (error: any) {
               await this.loadingController.dismiss();
               console.error('Error eliminando lugar:', error);
@@ -330,16 +347,19 @@ export class CapturePage implements OnInit {
         }
       ]
     });
+
     await alert.present();
   }
 
-  // 👁️ VER RESEÑAS DEL LUGAR (NAVEGA A HEALTH PAGE)
+  // ✅ VER RESEÑAS DEL LUGAR (NAVEGA A HEALTH PAGE) - ACTUALIZADA
   verResenas(lugar: Lugar) {
     if (!lugar.id_lugares) {
       this.mostrarError('No se puede acceder a las reseñas de este lugar');
       return;
     }
-    
+
+    console.log('Navegando a reseñas del lugar:', lugar);
+
     // Navegar a la página de reseñas con parámetros
     this.navCtrl.navigateForward('/tabs/health', {
       queryParams: {
@@ -352,7 +372,7 @@ export class CapturePage implements OnInit {
     });
   }
 
-  // 🎨 MÉTODOS DE UI
+  // 🔘 MÉTODOS DE UI
   abrirFormulario() {
     this.mostrarFormulario = true;
     this.lugarEditando = null;
@@ -377,11 +397,11 @@ export class CapturePage implements OnInit {
     };
   }
 
-  // 🎯 MÉTODOS DE AYUDA PARA LA UI
+  // MÉTODOS DE AYUDA PARA LA UI
   getCategoriaColor(categoria: string): string {
     const colores: { [key: string]: string } = {
       'Monumento': 'warning',
-      'Museo': 'tertiary', 
+      'Museo': 'tertiary',
       'Parque': 'success',
       'Playa': 'info',
       'Mirador': 'primary',
@@ -422,12 +442,12 @@ export class CapturePage implements OnInit {
 
   getRelativeTime(fecha: string): string {
     if (!fecha) return '';
-    
+
     const date = new Date(fecha);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 0) return 'Hoy';
     if (diffDays === 1) return 'Ayer';
     if (diffDays < 7) return `Hace ${diffDays} días`;
@@ -436,7 +456,7 @@ export class CapturePage implements OnInit {
   }
 
   getCategoriaLabel(valor: string): string {
-    const cat = this.categorias.find(c => c.valor === valor);
+    const cat = this.categories.find(c => c.valor === valor);
     return cat ? cat.label : valor;
   }
 
@@ -447,7 +467,7 @@ export class CapturePage implements OnInit {
   getPromedioGeneral(): string {
     const lugaresConRating = this.lugares.filter(l => l.promedioRating > 0);
     if (lugaresConRating.length === 0) return '0.0';
-    
+
     const promedio = lugaresConRating.reduce((sum, l) => sum + l.promedioRating, 0) / lugaresConRating.length;
     return promedio.toFixed(1);
   }
@@ -456,15 +476,15 @@ export class CapturePage implements OnInit {
     return lugar.id_lugares!;
   }
 
-  // 🔄 PULL TO REFRESH
+  // PULL TO REFRESH
   async doRefresh(event: any) {
     await this.cargarLugares();
     event.target.complete();
   }
 
-  // 💬 MENSAJES AL USUARIO
+  // MENSAJES AL USUARIO
   private async mostrarLoading(mensaje: string) {
-    const loading = await this.loadingController.create({ 
+    const loading = await this.loadingController.create({
       message: mensaje,
       spinner: 'crescent'
     });

@@ -19,7 +19,7 @@
     </ion-refresher-content>
   </ion-refresher>
 
-  <!-- BOTÓN PARA AGREGAR -->
+  <!-- BOTON PARA AGREGAR -->
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!mostrarFormulario">
     <ion-fab-button (click)="abrirFormulario()" color="primary">
       <ion-icon name="add"></ion-icon>
@@ -28,7 +28,7 @@
 
   <!-- BARRA DE BÚSQUEDA Y FILTROS -->
   <div *ngIf="!mostrarFormulario && lugares.length > 0" class="filters-section">
-    <ion-searchbar 
+    <ion-searchbar
       [(ngModel)]="terminoBusqueda"
       (ionInput)="onBuscarChange($event)"
       placeholder="Buscar lugares..."
@@ -40,8 +40,8 @@
     <div class="filters-container">
       <!-- Chips de categorías -->
       <div class="chips-scroll">
-        <ion-chip 
-          *ngFor="let cat of categorias" 
+        <ion-chip
+          *ngFor="let cat of categories"
           [color]="categoriaFiltro === cat.valor ? getCategoriaColor(cat.valor) : 'medium'"
           (click)="onCategoriaChange(cat.valor)"
           class="filter-chip"
@@ -54,13 +54,13 @@
       <!-- Información de resultados -->
       <div class="results-info">
         <span class="results-text">
-          {{ lugaresFiltrados.length }} {{ lugaresFiltrados.length === 1 ? 'lugar' : 'lugares' }} 
+          {{ lugaresFiltrados.length }} {{ lugaresFiltrados.length === 1 ? 'lugar' : 'lugares' }}
           de {{ lugares.length }} totales
         </span>
-        <ion-button 
-          *ngIf="terminoBusqueda || categoriaFiltro !== 'todos'" 
-          fill="clear" 
-          size="small" 
+        <ion-button
+          *ngIf="terminoBusqueda || categoriaFiltro !== 'todos'"
+          fill="clear"
+          size="small"
           (click)="limpiarFiltros()"
           class="clear-btn">
           <ion-icon name="close-circle" slot="start"></ion-icon>
@@ -77,7 +77,6 @@
         <ion-card-title>¡Bienvenido a tu Guía Turística!</ion-card-title>
         <ion-card-subtitle>Comienza agregando tu primer lugar turístico</ion-card-subtitle>
       </ion-card-header>
-      
       <ion-card-content>
         <div class="welcome-content">
           <div class="welcome-icon-container">
@@ -143,7 +142,7 @@
           <!-- Nombre -->
           <ion-item fill="outline" class="form-field">
             <ion-label position="stacked">Nombre del lugar *</ion-label>
-            <ion-input 
+            <ion-input
               [(ngModel)]="(lugarEditando || nuevoLugar).nombre"
               name="nombre"
               placeholder="Ej: Torre Eiffel, Playa Principal, Museo Nacional..."
@@ -153,25 +152,25 @@
             <ion-note slot="error">El nombre es obligatorio</ion-note>
           </ion-item>
 
-          <!-- Categoría -->
+          <!-- Categoria -->
           <ion-item fill="outline" class="form-field">
             <ion-label position="stacked">Categoría *</ion-label>
-            <ion-select 
-              [(ngModel)]="(lugarEditando || nuevoLugar).categoria" 
+            <ion-select
+              [(ngModel)]="(lugarEditando || nuevoLugar).categoria"
               name="categoria"
               placeholder="Selecciona una categoría"
               interface="action-sheet"
               required>
-              <ion-select-option value="Monumento">🏛️ Monumento</ion-select-option>
-              <ion-select-option value="Museo">🏛️ Museo</ion-select-option>
-              <ion-select-option value="Parque">🌳 Parque</ion-select-option>
-              <ion-select-option value="Playa">🏖️ Playa</ion-select-option>
-              <ion-select-option value="Mirador">🌄 Mirador</ion-select-option>
-              <ion-select-option value="Histórico">📜 Histórico</ion-select-option>
-              <ion-select-option value="Shopping">🛍️ Shopping</ion-select-option>
-              <ion-select-option value="Restaurante">🍽️ Restaurante</ion-select-option>
-              <ion-select-option value="Hotel">🏨 Hotel</ion-select-option>
-              <ion-select-option value="Otro">🔹 Otro</ion-select-option>
+              <ion-select-option value="Monumento">Monumento</ion-select-option>
+              <ion-select-option value="Museo">Museo</ion-select-option>
+              <ion-select-option value="Parque">Parque</ion-select-option>
+              <ion-select-option value="Playa">Playa</ion-select-option>
+              <ion-select-option value="Mirador">Mirador</ion-select-option>
+              <ion-select-option value="Histórico">Histórico</ion-select-option>
+              <ion-select-option value="Shopping">Shopping</ion-select-option>
+              <ion-select-option value="Restaurante">Restaurante</ion-select-option>
+              <ion-select-option value="Hotel">Hotel</ion-select-option>
+              <ion-select-option value="Otro">Otro</ion-select-option>
             </ion-select>
             <ion-note slot="error">La categoría es obligatoria</ion-note>
           </ion-item>
@@ -179,7 +178,7 @@
           <!-- Descripción -->
           <ion-item fill="outline" class="form-field">
             <ion-label position="stacked">Descripción</ion-label>
-            <ion-textarea 
+            <ion-textarea
               [(ngModel)]="(lugarEditando || nuevoLugar).descripcion"
               name="descripcion"
               placeholder="Describe el lugar, qué se puede hacer allí, características especiales..."
@@ -195,7 +194,7 @@
           <!-- Horario -->
           <ion-item fill="outline" class="form-field">
             <ion-label position="stacked">Horario</ion-label>
-            <ion-input 
+            <ion-input
               [(ngModel)]="(lugarEditando || nuevoLugar).horario"
               name="horario"
               placeholder="Ej: 9:00 - 18:00, 24 horas, Lunes a Viernes 8:00-20:00">
@@ -205,8 +204,8 @@
 
           <!-- Botones del formulario -->
           <div class="form-buttons">
-            <ion-button 
-              expand="block" 
+            <ion-button
+              expand="block"
               type="submit"
               [disabled]="!(lugarEditando || nuevoLugar).nombre.trim() || !(lugarEditando || nuevoLugar).categoria.trim()"
               color="primary"
@@ -214,11 +213,11 @@
               <ion-icon [name]="lugarEditando ? 'save' : 'add-circle'" slot="start"></ion-icon>
               {{ lugarEditando ? 'Guardar Cambios' : 'Crear Lugar' }}
             </ion-button>
-            
-            <ion-button 
-              expand="block" 
-              fill="outline" 
-              (click)="cerrarFormulario()" 
+
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="cerrarFormulario()"
               color="medium"
               class="cancel-btn">
               <ion-icon name="close" slot="start"></ion-icon>
@@ -235,7 +234,7 @@
     <div class="list-header">
       <h2 class="section-title">
         {{ lugaresFiltrados.length === lugares.length ? 'Todos los Lugares' : 'Lugares Encontrados' }}
-        <span class="counter">({{ lugaresFiltrados.length }})</span>
+        <span class="counter">{{ lugaresFiltrados.length }}</span>
       </h2>
       <ion-note class="last-update">
         Actualizado hace unos momentos
@@ -243,12 +242,12 @@
     </div>
 
     <ion-list lines="none" class="places-list">
-      <ion-item 
-        *ngFor="let lugar of lugaresFiltrados; trackBy: trackByLugar" 
+      <ion-item
+        *ngFor="let lugar of lugaresFiltrados; trackBy: trackByLugar"
         class="place-item"
         [class.featured]="lugar.promedioRating >= 4"
         detail="false">
-        
+
         <!-- Avatar del lugar -->
         <div slot="start" class="place-avatar" [class]="lugar.categoria.toLowerCase()">
           <ion-icon [name]="getCategoryIcon(lugar.categoria)"></ion-icon>
@@ -257,14 +256,16 @@
         <!-- Contenido principal -->
         <ion-label class="place-content">
           <h2 class="place-name">{{ lugar.nombre }}</h2>
-          
+
           <!-- Información principal -->
           <div class="place-main-info">
             <ion-badge [color]="getCategoriaColor(lugar.categoria)" class="category-badge">
               {{ lugar.categoria }}
             </ion-badge>
-            
-      
+            <ion-badge *ngIf="lugar.totalResenas > 0" color="success" class="rating-badge">
+              <ion-icon name="star" slot="start"></ion-icon>
+              {{ lugar.promedioRating }} ({{ lugar.totalResenas }})
+            </ion-badge>
           </div>
 
           <!-- Detalles secundarios -->
@@ -273,9 +274,12 @@
               <ion-icon name="time-outline"></ion-icon>
               {{ lugar.horario }}
             </span>
-       
+            <span class="detail" *ngIf="lugar.ultimaResena">
+              <ion-icon name="calendar-outline"></ion-icon>
+              {{ getRelativeTime(lugar.ultimaResena) }}
+            </span>
           </div>
-          
+
           <!-- Descripción -->
           <p class="place-description" *ngIf="lugar.descripcion">
             {{ lugar.descripcion }}
@@ -287,35 +291,34 @@
             Sin descripción disponible
           </p>
         </ion-label>
-        
+
         <!-- Acciones -->
         <div class="place-actions" slot="end">
           <!-- Botón de reseñas -->
           <ion-button 
-            fill="clear" 
-            color="primary" 
-            (click)="verResenas(lugar)" 
+            fill="clear"
+            color="primary"
+            (click)="verResenas(lugar)"
             size="small"
-            class="action-btn"
-            [disabled]="!lugar.id_lugares">
+            class="action-btn">
             <ion-icon name="chatbubbles" slot="icon-only"></ion-icon>
           </ion-button>
-          
+
           <!-- Botón de editar -->
-          <ion-button 
-            fill="clear" 
-            color="warning" 
-            (click)="editarLugar(lugar)" 
+          <ion-button
+            fill="clear"
+            color="warning"
+            (click)="editarLugar(lugar)"
             size="small"
             class="action-btn">
             <ion-icon name="create" slot="icon-only"></ion-icon>
           </ion-button>
-          
+
           <!-- Botón de eliminar -->
-          <ion-button 
-            fill="clear" 
-            color="danger" 
-            (click)="eliminarLugar(lugar.id_lugares!)" 
+          <ion-button
+            fill="clear"
+            color="danger"
+            (click)="eliminarLugar(lugar.id_lugares!)"
             size="small"
             class="action-btn">
             <ion-icon name="trash" slot="icon-only"></ion-icon>
@@ -352,7 +355,7 @@
         </div>
         <h3 class="empty-title">No se encontraron lugares</h3>
         <p class="empty-message">
-          No hay resultados para "{{ terminoBusqueda }}" 
+          No hay resultados para "{{ terminoBusqueda }}"
           <span *ngIf="categoriaFiltro !== 'todos'">en {{ getCategoriaLabel(categoriaFiltro) }}</span>
         </p>
         <ion-button expand="block" fill="outline" (click)="limpiarFiltros()" class="empty-action">
@@ -368,8 +371,8 @@
   </div>
 
   <!-- LOADING GLOBAL -->
-  <ion-loading 
-    [isOpen]="isLoading" 
+  <ion-loading
+    [isOpen]="isLoading"
     message="Cargando lugares..."
     spinner="crescent">
   </ion-loading>
