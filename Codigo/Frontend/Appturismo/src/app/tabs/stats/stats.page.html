@@ -1,45 +1,133 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="light">
+  <ion-toolbar>
     <ion-title>
-      <ion-icon name="calendar-outline" slot="start"></ion-icon>
+      <ion-icon name="calendar" slot="start"></ion-icon>
       Eventos
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cargarEventos()" fill="clear">
+        <ion-icon name="refresh" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 
-<ion-content class="light-theme ion-padding">
+<ion-content [fullscreen]="true">
 
 
-  <!-- 🔍 Buscador -->
-  <ion-searchbar
-    [(ngModel)]="filtro"
-    placeholder="Buscar eventos..."
-    show-clear-button="focus"
-    class="custom-searchbar">
-  </ion-searchbar>
-
-
-  <!-- 📋 Título -->
-  <h2 class="section-title">Explorá los próximos eventos</h2>
-
-
-  <!-- 🗓️ Lista de eventos -->
-  <div class="event-list">
-    <div *ngFor="let e of eventosFiltrados()" class="event-card">
-      <div class="icon" [ngClass]="getColor(e.tipo)">
-        <ion-icon [name]="getIcon(e.tipo)"></ion-icon>
-      </div>
-      <div class="info">
-        <h3>{{ e.nombre }}</h3>
-        <p class="date">{{ e.fecha }}</p>
-        <p class="place">{{ e.lugar }}</p>
-      </div>
-    </div>
+  <!-- Barra de búsqueda -->
+  <div *ngIf="!mostrarFormulario && eventos.length > 0" class="filters-section">
+    <ion-searchbar
+      [(ngModel)]="terminoBusqueda"
+      (ionInput)="onBuscarChange($event)"
+      placeholder="Buscar eventos por nombre o tipo..."
+      class="search-bar">
+    </ion-searchbar>
   </div>
 
 
+  <!-- Botón flotante -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="!mostrarFormulario">
+    <ion-fab-button (click)="abrirFormulario()" color="primary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+
+  <!-- Formulario -->
+  <div *ngIf="mostrarFormulario" class="form-section">
+    <ion-card class="form-card animate__animated animate__fadeInUp">
+      <ion-card-header>
+        <ion-card-title>{{ eventoEditando ? 'Editar Evento' : 'Nuevo Evento' }}</ion-card-title>
+      </ion-card-header>
+
+
+      <ion-card-content>
+        <ion-item fill="outline" class="form-field">
+          <ion-label position="stacked">Nombre del evento *</ion-label>
+          <ion-input [(ngModel)]="(eventoEditando || nuevoEvento).nombre" placeholder="Ej: Feria de Libros" required></ion-input>
+        </ion-item>
+
+
+        <ion-item fill="outline" class="form-field">
+          <ion-label position="stacked">Tipo de evento *</ion-label>
+          <ion-select [(ngModel)]="(eventoEditando || nuevoEvento).tipo_de_evento" placeholder="Selecciona un tipo">
+            <ion-select-option value="Música">Música</ion-select-option>
+            <ion-select-option value="Cultural">Cultural</ion-select-option>
+            <ion-select-option value="Gastronómico">Gastronómico</ion-select-option>
+            <ion-select-option value="Deportivo">Deportivo</ion-select-option>
+            <ion-select-option value="Feria">Feria</ion-select-option>
+            <ion-select-option value="Otro">Otro</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+
+        <ion-item fill="outline" class="form-field">
+          <ion-label position="stacked">Descripción</ion-label>
+          <ion-textarea [(ngModel)]="(eventoEditando || nuevoEvento).descripcion" placeholder="Describe el evento..." rows="3"></ion-textarea>
+        </ion-item>
+
+
+        <div class="date-grid">
+          <ion-item fill="outline" class="form-field">
+            <ion-label position="stacked">Fecha de inicio</ion-label>
+            <ion-datetime [(ngModel)]="(eventoEditando || nuevoEvento).fecha_de_inicio" presentation="date"></ion-datetime>
+          </ion-item>
+          <ion-item fill="outline" class="form-field">
+            <ion-label position="stacked">Fecha de fin</ion-label>
+            <ion-datetime [(ngModel)]="(eventoEditando || nuevoEvento).fecha_fin" presentation="date"></ion-datetime>
+          </ion-item>
+        </div>
+
+
+        <div class="form-buttons">
+          <ion-button expand="block" (click)="eventoEditando ? guardarEdicion() : crearEvento()" color="primary">
+            <ion-icon name="save" slot="start"></ion-icon>
+            {{ eventoEditando ? 'Guardar Cambios' : 'Guardar Evento' }}
+          </ion-button>
+          <ion-button expand="block" fill="outline" (click)="cerrarFormulario()">
+            <ion-icon name="close" slot="start"></ion-icon>
+            Cancelar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+
+  <!-- Lista de eventos -->
+  <div *ngIf="!mostrarFormulario && eventosFiltrados.length > 0" class="list-section">
+    <ion-card class="list-card">
+      <ion-card-header>
+        <ion-card-title>Eventos Registrados ({{ eventosFiltrados.length }})</ion-card-title>
+      </ion-card-header>
+
+
+      <ion-card-content>
+        <ion-list lines="none">
+          <ion-item *ngFor="let evento of eventosFiltrados" class="event-item">
+            <ion-icon [name]="getIcon(evento.tipo_de_evento)" slot="start" class="event-icon"></ion-icon>
+            <ion-label>
+              <h2>{{ evento.nombre }}</h2>
+              <p>{{ evento.tipo_de_evento }} — {{ evento.fecha_de_inicio | date:'dd/MM/yyyy' }}</p>
+              <p *ngIf="evento.descripcion">{{ evento.descripcion }}</p>
+            </ion-label>
+            <ion-button fill="clear" color="warning" (click)="editarEvento(evento)">
+              <ion-icon name="create"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" color="danger" (click)="eliminarEvento(evento.id_eventos)">
+              <ion-icon name="trash"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  </div>
 </ion-content>
+
+
+
 
 
 
