@@ -5,8 +5,8 @@ import {
   IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
   IonItem, IonLabel, IonInput, IonTextarea, IonIcon, IonFab, IonFabButton,
-  IonSelect, IonSelectOption, IonSearchbar, ToastController
-} from '@ionic/angular/standalone';
+  IonSelect, IonSelectOption, IonSearchbar, IonList, ToastController
+} from '@ionic/angular/standalone';  // 👈 Asegurate de incluir IonList acá también
 import { supabase } from '../../supabase';
 import { addIcons } from 'ionicons';
 import { add, create, trash, save, close, refresh, calendar } from 'ionicons/icons';
@@ -18,23 +18,23 @@ import { add, create, trash, save, close, refresh, calendar } from 'ionicons/ico
   styleUrls: ['./stats.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, FormsModule,
+    CommonModule,
+    FormsModule,
     IonContent, IonHeader, IonTitle, IonToolbar, IonButtons, IonButton,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
     IonItem, IonLabel, IonInput, IonTextarea, IonIcon, IonFab, IonFabButton,
-    IonSelect, IonSelectOption, IonSearchbar
+    IonSelect, IonSelectOption, IonSearchbar,
+    IonList  // 👈 agregalo acá también
   ]
 })
 export class StatsPage implements OnInit {
   private toast = inject(ToastController);
-
 
   eventos: any[] = [];
   eventosFiltrados: any[] = [];
   mostrarFormulario = false;
   terminoBusqueda = '';
   eventoEditando: any = null;
-
 
   nuevoEvento = {
     id_destino: 1,
@@ -45,19 +45,20 @@ export class StatsPage implements OnInit {
     tipo_de_evento: ''
   };
 
-
   constructor() {
     addIcons({ add, create, trash, save, close, refresh, calendar });
   }
-
 
   async ngOnInit() {
     await this.cargarEventos();
   }
 
-
   async cargarEventos() {
-    const { data, error } = await supabase.from('eventos').select('*').order('id_eventos', { ascending: false });
+    const { data, error } = await supabase
+      .from('eventos')
+      .select('*')
+      .order('id_eventos', { ascending: false });
+
     if (error) {
       this.mostrarToast('Error al cargar eventos', 'danger');
     } else {
@@ -66,31 +67,35 @@ export class StatsPage implements OnInit {
     }
   }
 
-
   aplicarFiltro() {
     const texto = this.terminoBusqueda.toLowerCase();
-    this.eventosFiltrados = this.eventos.filter(ev => ev.nombre.toLowerCase().includes(texto));
+    this.eventosFiltrados = this.eventos.filter(ev =>
+      ev.nombre.toLowerCase().includes(texto)
+    );
   }
-
 
   onBuscarChange(event: any) {
     this.terminoBusqueda = event.detail.value || '';
     this.aplicarFiltro();
   }
 
-
   abrirFormulario() {
     this.mostrarFormulario = true;
     this.eventoEditando = null;
   }
 
-
   cerrarFormulario() {
     this.mostrarFormulario = false;
     this.eventoEditando = null;
-    this.nuevoEvento = { id_destino: 1, nombre: '', descripcion: '', fecha_de_inicio: '', fecha_fin: '', tipo_de_evento: '' };
+    this.nuevoEvento = {
+      id_destino: 1,
+      nombre: '',
+      descripcion: '',
+      fecha_de_inicio: '',
+      fecha_fin: '',
+      tipo_de_evento: ''
+    };
   }
-
 
   async crearEvento() {
     const { error } = await supabase.from('eventos').insert([this.nuevoEvento]);
@@ -102,15 +107,16 @@ export class StatsPage implements OnInit {
     }
   }
 
-
   editarEvento(ev: any) {
     this.eventoEditando = { ...ev };
     this.mostrarFormulario = true;
   }
 
-
   async guardarEdicion() {
-    const { error } = await supabase.from('eventos').update(this.eventoEditando).eq('id_eventos', this.eventoEditando.id_eventos);
+    const { error } = await supabase
+      .from('eventos')
+      .update(this.eventoEditando)
+      .eq('id_eventos', this.eventoEditando.id_eventos);
     if (error) this.mostrarToast('Error al actualizar evento', 'danger');
     else {
       this.mostrarToast('Evento actualizado', 'success');
@@ -118,7 +124,6 @@ export class StatsPage implements OnInit {
       await this.cargarEventos();
     }
   }
-
 
   async eliminarEvento(id: number) {
     const { error } = await supabase.from('eventos').delete().eq('id_eventos', id);
@@ -128,7 +133,6 @@ export class StatsPage implements OnInit {
       await this.cargarEventos();
     }
   }
-
 
   getIcon(tipo: string): string {
     if (!tipo) return 'calendar';
@@ -140,13 +144,12 @@ export class StatsPage implements OnInit {
     return 'calendar';
   }
 
-
   private async mostrarToast(msg: string, color: string) {
     const toast = await this.toast.create({ message: msg, duration: 2000, color });
     await toast.present();
   }
-   
 }
+
 
 
 
