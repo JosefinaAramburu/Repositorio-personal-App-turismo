@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
+// ✅ USA TU ARCHIVO SUPABASE EXISTENTE
 import { supabase } from '../../supabase';
 
 interface Resena {
@@ -68,9 +69,7 @@ export class HealthPage implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router
-  ) {
-    // ✅ ELIMINADO: No crear otro cliente Supabase, usar el importado
-  }
+  ) {}
 
   async ngOnInit() {
     this.routeSub = this.route.queryParams.subscribe(async params => {
@@ -331,6 +330,7 @@ export class HealthPage implements OnInit, OnDestroy {
       if (this.lugarId && resenaCreada) {
         console.log(`🔗 Creando relación: lugar ${this.lugarId} - reseña ${resenaCreada.id_resenas}`);
 
+        // ✅ CORREGIDO: Usar los nombres de columna correctos según tu SQL
         const { error: errorRelacion } = await supabase
           .from('lugares_resenas')
           .insert([{
@@ -340,6 +340,7 @@ export class HealthPage implements OnInit, OnDestroy {
 
         if (errorRelacion) {
           console.error('❌ Error creando relación:', errorRelacion);
+          console.log('📋 Detalles del error:', errorRelacion);
           this.mostrarError('Error al vincular reseña con el lugar: ' + errorRelacion.message);
           return;
         } else {
