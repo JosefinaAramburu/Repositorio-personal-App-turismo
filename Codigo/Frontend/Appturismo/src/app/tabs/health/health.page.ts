@@ -136,6 +136,7 @@ export class HealthPage implements OnInit, OnDestroy {
     console.log(`🔍 Buscando reseñas EXCLUSIVAS para lugar ID: ${lugarId}`);
 
     try {
+      // 1. Obtener las relaciones lugar-reseña
       const { data: relaciones, error: errorRelaciones } = await this.supabase
         .from('lugares_resenas')
         .select('id_resenas')
@@ -144,7 +145,6 @@ export class HealthPage implements OnInit, OnDestroy {
       if (errorRelaciones) {
         console.error('❌ Error cargando relaciones:', errorRelaciones);
         this.resenas = [];
-        console.log('⚠️ No se pudieron cargar relaciones, mostrando 0 reseñas para este lugar');
         return;
       }
 
@@ -156,9 +156,11 @@ export class HealthPage implements OnInit, OnDestroy {
         return;
       }
 
+      // 2. Obtener los IDs de las reseñas
       const idsResenas = relaciones.map(rel => rel.id_resenas);
       console.log('📋 IDs de reseñas EXCLUSIVAS de este lugar:', idsResenas);
 
+      // 3. Obtener las reseñas completas
       const { data: resenas, error: errorResenas } = await this.supabase
         .from('resenas')
         .select('*')
@@ -335,8 +337,6 @@ export class HealthPage implements OnInit, OnDestroy {
 
         if (errorRelacion) {
           console.error('❌ Error creando relación:', errorRelacion);
-          console.error('   - Detalles:', errorRelacion.details);
-          console.error('   - Hint:', errorRelacion.hint);
           this.mostrarError('Error al vincular reseña con el lugar');
           return;
         } else {
@@ -385,6 +385,7 @@ export class HealthPage implements OnInit, OnDestroy {
     try {
       console.log('🗑️ Eliminando reseña:', this.resenaAEliminar.id_resenas);
 
+      // Primero eliminar las relaciones
       const { error: errorRelacion } = await this.supabase
         .from('lugares_resenas')
         .delete()
@@ -394,6 +395,7 @@ export class HealthPage implements OnInit, OnDestroy {
         console.error('⚠️ Error eliminando relación (continuando):', errorRelacion);
       }
 
+      // Luego eliminar la reseña
       const { error } = await this.supabase
         .from('resenas')
         .delete()
