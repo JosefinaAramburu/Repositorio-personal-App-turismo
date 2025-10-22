@@ -1,61 +1,50 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  IonContent,
-  IonHeader,
-  IonTitle,
-  IonToolbar,
-  IonItem,
-  IonInput,
-  IonCard,
-  IonIcon
-} from '@ionic/angular/standalone';
-import { FormsModule } from '@angular/forms';
-import { NavController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.page.html',
-  styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule,  
-    IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonItem,
-    IonInput,
-    IonCard,
-    IonIcon,
-    FormsModule
-  ]
+  imports: [CommonModule, IonicModule, ReactiveFormsModule],
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],          // 👈 NECESARIO para cargar tu SCSS
+  encapsulation: ViewEncapsulation.None
 })
 export class HomePage {
-  pais: string = '';
+  form: FormGroup;
 
-  constructor(private navCtrl: NavController) {}
-
-  buscarDestino() {
-    console.log('Destino buscado:', this.pais);
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+  ) {
+    this.form = this.fb.group({
+      destino: ['', Validators.required],
+    });
   }
 
-  irA(tab: string) {
-    console.log('🔍 Navegando a:', tab);
-    
+  buscar() {
+    const destino = this.form.value.destino?.trim();
+    if (!destino) return;
+
+    // Aquí haces lo que quieras con el destino (guardar en estado, query param, etc.)
+    // Ejemplo: enviar a eventos con el destino como query param
+    this.router.navigate(['/tabs', 'eventos'], { queryParams: { q: destino } });
+  }
+
+  goTo(tab: 'events' | 'places' | 'food') {
     switch (tab) {
-      case 'eventos':
-        console.log('Eventos → /tabs/stats');
-        this.navCtrl.navigateRoot('/tabs/stats');
+      case 'events':
+        this.router.navigate(['/tabs', 'eventos']);
         break;
-      case 'lugares':
-        console.log('Lugares → /tabs/capture');
-        this.navCtrl.navigateRoot('/tabs/capture');
+      case 'places':
+        // si tu ruta real es "capture" para lugares, déjalo así:
+        this.router.navigate(['/tabs', 'capture']);
         break;
-      case 'gastronomia':
-        console.log('Gastronomia → /tabs/gastronomia');
-        this.navCtrl.navigateRoot('/tabs/gastronomia');
+      case 'food':
+        this.router.navigate(['/tabs', 'gastronomia']);
         break;
-     }
-   }
+    }
+  }
 }

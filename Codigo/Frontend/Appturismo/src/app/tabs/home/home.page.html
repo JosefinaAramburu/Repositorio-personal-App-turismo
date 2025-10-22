@@ -1,57 +1,57 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>¿Qué hacer?</ion-title>
+    <ion-title>Qué hacer</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="home-content">
+<ion-content class="ion-padding home-page">
+  <!-- Buscador -->
+  <form [formGroup]="form" (ngSubmit)="buscar()">
+    <ion-searchbar
+      formControlName="destino"
+      placeholder="Ej: Barcelona, Paris, Roma..."
+      showCancelButton="never"
+      debounce="0"
+      class="search">
+    </ion-searchbar>
 
-  <!-- BUSCADOR DE DESTINO -->
-  <ion-item lines="none" class="buscador">
-    <ion-input
-      [(ngModel)]="pais"
-      placeholder="Buscar país o ciudad..."
-      (ionChange)="buscarDestino()"
-      clearInput>
-    </ion-input>
+    <ion-button expand="block" type="submit" [disabled]="form.invalid">
+      Buscar
+    </ion-button>
+  </form>
+
+  <h2 class="section-title">Recomendaciones</h2>
+
+  <!-- Solo ion-item como hijos directos del ion-list -->
+  <ion-list inset class="cards">
+  <ion-item button detail="true" (click)="goTo('events')" class="card">
+    <div slot="start" class="icon icon-events">
+      <ion-icon name="musical-notes"></ion-icon>
+    </div>
+    <ion-label>
+      <h3 class="title">Eventos</h3>
+      <p class="subtitle">Recitales, ferias, fiestas</p>
+    </ion-label>
   </ion-item>
 
-  <!-- Muestra el destino ingresado -->
-  <div *ngIf="pais" class="destino-seleccionado">
-    <ion-icon name="pin-outline"></ion-icon>
-    <span>{{ pais }}</span>
-  </div>
+  <ion-item button detail="true" (click)="goTo('places')" class="card">
+    <div slot="start" class="icon icon-places">
+      <ion-icon name="location"></ion-icon>
+    </div>
+    <ion-label>
+      <h3 class="title">Lugares</h3>
+      <p class="subtitle">Atracciones, paisajes, museos</p>
+    </ion-label>
+  </ion-item>
 
-  <h2 class="titulo-seccion">Recomendaciones</h2>
-
-  <div class="recomendaciones">
-
-    <!-- Eventos -->
-    <ion-card button (click)="irA('eventos')">
-      <ion-icon name="musical-notes-outline" color="danger"></ion-icon>
-      <div>
-        <h3>Eventos</h3>
-        <p>Recitales, ferias y festivales</p>
-      </div>
-    </ion-card>
-
-    <!-- Lugares -->
-    <ion-card button (click)="irA('lugares')">
-      <ion-icon name="location-outline" color="tertiary"></ion-icon>
-      <div>
-        <h3>Lugares</h3>
-        <p>Atracciones, paisajes y museos</p>
-      </div>
-    </ion-card>
-
-    <!-- Gastronomía -->
-    <ion-card button (click)="irA('gastronomia')">
-      <ion-icon name="restaurant-outline" color="success"></ion-icon>
-      <div>
-        <h3>Gastronomía</h3>
-        <p>Restaurantes y bares</p>
-      </div>
-    </ion-card>
-
-  </div>
+  <ion-item button detail="true" (click)="goTo('food')" class="card">
+    <div slot="start" class="icon icon-food">
+      <ion-icon name="restaurant"></ion-icon>
+    </div>
+    <ion-label>
+      <h3 class="title">Gastronomía</h3>
+      <p class="subtitle">Restaurantes, bares</p>
+    </ion-label>
+  </ion-item>
+</ion-list>
 </ion-content>
