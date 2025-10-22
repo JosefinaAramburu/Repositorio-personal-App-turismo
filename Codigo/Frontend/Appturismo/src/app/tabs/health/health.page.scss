@@ -35,6 +35,35 @@
   margin-bottom: 48px;
   padding: 0 20px;
 
+  .header-content {
+    position: relative;
+  }
+
+  .btn-volver {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--transition);
+    text-decoration: none;
+
+    &:hover {
+      background: var(--primary-hover);
+      transform: translateY(-50%) scale(1.05);
+    }
+  }
+
   .resenas-title {
     font-size: 2.5rem;
     font-weight: 700;
@@ -117,7 +146,7 @@
   overflow-y: auto;
   animation: modalAppear 0.3s ease-out;
 
-  &.confirmacion-modal {
+  &.confirmation-modal {
     max-width: 400px;
   }
 }
@@ -192,6 +221,7 @@
   font-size: 16px;
   transition: var(--transition);
   background: var(--card-bg);
+  color: var(--text-primary);
   box-sizing: border-box;
 
   &:focus {
@@ -315,6 +345,16 @@
 
   &:hover {
     color: var(--primary-hover);
+  }
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+
+  .btn {
+    flex: 1;
   }
 }
 
@@ -594,6 +634,7 @@
   cursor: pointer;
   transition: var(--transition);
   font-weight: 500;
+  color: var(--text-primary);
 
   &:hover:not(:disabled) {
     background: var(--primary-color);
@@ -650,6 +691,13 @@
     .resenas-title {
       font-size: 2rem;
     }
+
+    .btn-volver {
+      position: relative;
+      margin-bottom: 16px;
+      transform: none;
+      display: inline-flex;
+    }
   }
 
   .lista-header {
@@ -696,6 +744,10 @@
     flex-direction: column;
     gap: 16px;
   }
+
+  .form-actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -705,5 +757,11 @@
 
   .filtros {
     flex-direction: column;
+  }
+
+  .btn-flotante {
+    bottom: 20px;
+    right: 20px;
+    padding: 14px 20px;
   }
 }

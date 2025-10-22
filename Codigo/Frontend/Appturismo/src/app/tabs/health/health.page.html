@@ -4,7 +4,7 @@
     <div class="header-content">
       <button *ngIf="mostrarBotonVolver" (click)="volverALugares()" class="btn-volver">
         <span>←</span>
-        Volver a Lugares
+        Volver a lugares
       </button>
       <h1 class="resenas-title">{{ tituloPagina }}</h1>
       <p class="resenas-subtitle">{{ subtituloPagina }}</p>
@@ -16,8 +16,7 @@
     *ngIf="!mostrarFormulario"
     (click)="mostrarFormulario = true"
     class="btn-flotante"
-    aria-label="Agregar nueva reseña"
-  >
+    aria-label="Agregar nueva reseña">
     <span class="btn-flotante-icon">+</span>
     <span class="btn-flotante-text">Agregar Reseña</span>
   </button>
@@ -33,12 +32,11 @@
           (click)="cerrarModal()"
           class="btn-cerrar-modal"
           type="button"
-          aria-label="Cerrar formulario"
-        >
+          aria-label="Cerrar formulario">
           <span>×</span>
         </button>
       </div>
-      
+
       <form (ngSubmit)="probarAgregarResena()" class="resena-form">
         <!-- Título -->
         <div class="form-group">
@@ -51,8 +49,7 @@
             required
             class="form-input"
             placeholder="Ej: Excelente experiencia en la playa"
-            maxlength="60"
-          >
+            maxlength="60">
           <div class="char-counter">{{ nuevaResena.titulo.length }}/60</div>
         </div>
 
@@ -68,8 +65,7 @@
               (mouseleave)="estrellasHover = 0"
               class="estrella-btn"
               [class.active]="(estrellasHover || nuevaResena.calificacion) > i"
-              [class.selected]="nuevaResena.calificacion > i"
-            >
+              [class.selected]="nuevaResena.calificacion > i">
               ★
             </button>
           </div>
@@ -89,8 +85,8 @@
             rows="5"
             class="form-textarea"
             placeholder="Describe tu experiencia en este lugar... ¿Qué te gustó? ¿Qué mejorarías?"
-            maxlength="500"
-          ></textarea>
+            maxlength="500">
+          </textarea>
           <div class="char-counter">{{ nuevaResena.contenido.length }}/500</div>
         </div>
 
@@ -100,15 +96,13 @@
             type="button"
             (click)="cerrarModal()"
             class="btn btn-secondary"
-            [disabled]="cargando"
-          >
+            [disabled]="cargando">
             Cancelar
           </button>
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="cargando || !esFormularioValido()"
-          >
+            [disabled]="cargando || !esFormularioValido()">
             <span *ngIf="cargando" class="loading-spinner"></span>
             {{ cargando ? 'Publicando...' : 'Publicar Reseña' }}
           </button>
@@ -140,13 +134,13 @@
       <div class="filtros">
         <select [(ngModel)]="filtroCalificacion" (change)="aplicarFiltros()" class="filtro-select">
           <option value="0">Todas las calificaciones</option>
-          <option value="5">⭐ 5 estrellas</option>
-          <option value="4">⭐ 4 estrellas</option>
-          <option value="3">⭐ 3 estrellas</option>
-          <option value="2">⭐ 2 estrellas</option>
-          <option value="1">⭐ 1 estrella</option>
+          <option value="5">★ 5 estrellas</option>
+          <option value="4">★ 4 estrellas</option>
+          <option value="3">★ 3 estrellas</option>
+          <option value="2">★ 2 estrellas</option>
+          <option value="1">★ 1 estrella</option>
         </select>
-        
+
         <select [(ngModel)]="ordenamiento" (change)="aplicarFiltros()" class="filtro-select">
           <option value="fecha_desc">Más recientes primero</option>
           <option value="fecha_asc">Más antiguas primero</option>
@@ -164,33 +158,31 @@
 
     <!-- Sin reseñas - MEJORADO -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length === 0" class="sin-resenas">
-      <div class="sin-resenas-icon">📝</div>
-      
+      <div class="sin-resenas-icon">💬</div>
+
       <h3 *ngIf="lugarId">No hay reseñas para {{ lugarNombre }}</h3>
       <h3 *ngIf="!lugarId">No hay reseñas aún</h3>
-      
+
       <p *ngIf="lugarId">
         ¡Sé el primero en compartir tu experiencia sobre {{ lugarNombre }}!
       </p>
       <p *ngIf="!lugarId">
         ¡Sé el primero en compartir tu experiencia con la comunidad!
       </p>
-      
+
       <button
         (click)="mostrarFormulario = true"
-        class="btn btn-primary"
-      >
+        class="btn btn-primary">
         Agregar Primera Reseña
       </button>
     </div>
 
     <!-- Grid de reseñas -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length > 0" class="resenas-grid">
-      <div 
-        *ngFor="let resena of resenasPaginadas" 
+      <div
+        *ngFor="let resena of resenasPaginadas"
         class="resena-card"
-        [class.resena-destacada]="resena.puntuacion === 5"
-      >
+        [class.resena-destacada]="resena.puntuacion === 5">
         <div class="resena-header">
           <div class="resena-info">
             <h3 class="resena-titulo">{{ obtenerTitulo(resena) }}</h3>
@@ -199,7 +191,7 @@
                 <span class="estrellas" [title]="resena.puntuacion + ' estrellas'">
                   {{ '★'.repeat(resena.puntuacion) }}{{ '☆'.repeat(5 - resena.puntuacion) }}
                 </span>
-                <span class="puntuacion-numero">{{ resena.puntuacion }}/5</span>
+                <span class="puntuacion-numero">{{ resena.puntuacion }}</span>
               </div>
               <span class="fecha-resena">{{ resena.fecha | date:'dd/MM/yyyy' }}</span>
             </div>
@@ -207,16 +199,15 @@
           <button
             (click)="confirmarEliminacion(resena)"
             class="btn-eliminar-resena"
-            title="Eliminar reseña"
-          >
+            title="Eliminar reseña">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
             </svg>
           </button>
         </div>
-        
+
         <p class="contenido-resena">{{ obtenerContenido(resena) }}</p>
-        
+
         <div class="resena-footer">
           <span class="resena-id">#{{ resena.id_resenas }}</span>
           <span class="resena-calificacion-texto">
@@ -228,21 +219,19 @@
 
     <!-- Paginación -->
     <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="paginacion">
-      <button 
-        (click)="paginaAnterior()" 
+      <button
+        (click)="paginaAnterior()"
         [disabled]="paginaActual === 1"
-        class="btn-paginacion"
-      >
+        class="btn-paginacion">
         ← Anterior
       </button>
       <span class="info-paginacion">
         Página {{ paginaActual }} de {{ totalPaginas }}
       </span>
-      <button 
-        (click)="paginaSiguiente()" 
+      <button
+        (click)="paginaSiguiente()"
         [disabled]="paginaActual === totalPaginas"
-        class="btn-paginacion"
-      >
+        class="btn-paginacion">
         Siguiente →
       </button>
     </div>
@@ -250,7 +239,7 @@
 
   <!-- Modal de confirmación para eliminar -->
   <div *ngIf="mostrarConfirmacionEliminar" class="modal-overlay" (click)="cancelarEliminacion()">
-    <div class="modal-content confirmacion-modal" (click)="$event.stopPropagation()">
+    <div class="modal-content confirmation-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h2>Confirmar Eliminación</h2>
       </div>
@@ -268,4 +257,4 @@
       </div>
     </div>
   </div>
-</div>   
+</div>
