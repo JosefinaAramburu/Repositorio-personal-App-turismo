@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-// ✅ USA TU ARCHIVO SUPABASE EXISTENTE
 import { supabase } from '../../supabase';
 
 interface Resena {
@@ -33,7 +32,6 @@ export class HealthPage implements OnInit, OnDestroy {
   resenasFiltradas: Resena[] = [];
   cargando = false;
   cargandoResenas = false;
-  cargandoMasResenas = false;
   mostrarFormulario = false;
   mostrarConfirmacionEliminar = false;
   estrellasHover = 0;
@@ -55,11 +53,8 @@ export class HealthPage implements OnInit, OnDestroy {
   // Filtros y ordenamiento
   filtroCalificacion = '0';
   ordenamiento = 'fecha_desc';
-  
-  // Scroll infinito
+  paginaActual = 1;
   itemsPorPagina = 10;
-  resenasMostradas: Resena[] = [];
-  todasLasResenasCargadas = false;
 
   // Eliminacion
   resenaAEliminar: Resena | null = null;
@@ -107,57 +102,9 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // --- SCROLL INFINITO ---
-  @HostListener('window:scroll', ['$event'])
-  onWindowScroll() {
-    this.verificarScroll();
-  }
-
-  verificarScroll() {
-    if (this.cargandoMasResenas || this.todasLasResenasCargadas) return;
-
-    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-    const windowHeight = window.innerHeight;
-    const documentHeight = document.documentElement.scrollHeight;
-
-    // Cargar más cuando esté a 200px del final
-    if (scrollPosition + windowHeight >= documentHeight - 200) {
-      this.cargarMasResenas();
-    }
-  }
-
-  cargarMasResenas() {
-    if (this.cargandoMasResenas || this.todasLasResenasCargadas) return;
-
-    const inicio = this.resenasMostradas.length;
-    const fin = inicio + this.itemsPorPagina;
-    const nuevasResenas = this.resenasFiltradas.slice(inicio, fin);
-
-    if (nuevasResenas.length === 0) {
-      this.todasLasResenasCargadas = true;
-      return;
-    }
-
-    this.cargandoMasResenas = true;
-    
-    // Simular carga (puedes quitar esto)
-    setTimeout(() => {
-      this.resenasMostradas = [...this.resenasMostradas, ...nuevasResenas];
-      this.cargandoMasResenas = false;
-
-      // Verificar si ya cargamos todas
-      if (this.resenasMostradas.length >= this.resenasFiltradas.length) {
-        this.todasLasResenasCargadas = true;
-      }
-    }, 500);
-  }
-
   // --- CARGAR DATOS ---
   async cargarResenas() {
     this.cargandoResenas = true;
-    this.resenasMostradas = [];
-    this.todasLasResenasCargadas = false;
-    
     try {
       console.log('📥 Cargando resenas...');
       
@@ -294,10 +241,30 @@ export class HealthPage implements OnInit, OnDestroy {
     });
 
     this.resenasFiltradas = resenasFiltradas;
-    this.resenasMostradas = this.resenasFiltradas.slice(0, this.itemsPorPagina);
-    this.todasLasResenasCargadas = this.resenasMostradas.length >= this.resenasFiltradas.length;
-    
+    this.paginaActual = 1;
     console.log(`🔍 Filtros aplicados: ${this.resenasFiltradas.length} resenas`);
+  }
+
+  get totalPaginas(): number {
+    return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
+  }
+
+  get resenasPaginadas(): Resena[] {
+    const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
+    const endIndex = startIndex + this.itemsPorPagina;
+    return this.resenasFiltradas.slice(startIndex, endIndex);
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 1) {
+      this.paginaActual--;
+    }
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas) {
+      this.paginaActual++;
+    }
   }
 
   esFormularioValido(): boolean {
