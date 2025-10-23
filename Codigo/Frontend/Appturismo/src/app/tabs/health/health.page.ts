@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -33,6 +33,7 @@ export class HealthPage implements OnInit, OnDestroy {
   resenasFiltradas: Resena[] = [];
   cargando = false;
   cargandoResenas = false;
+  cargandoMasResenas = false;
   mostrarFormulario = false;
   mostrarConfirmacionEliminar = false;
   estrellasHover = 0;
@@ -54,8 +55,11 @@ export class HealthPage implements OnInit, OnDestroy {
   // Filtros y ordenamiento
   filtroCalificacion = '0';
   ordenamiento = 'fecha_desc';
-  paginaActual = 1;
+  
+  // Scroll infinito
   itemsPorPagina = 10;
+  resenasMostradas: Resena[] = [];
+  todasLasResenasCargadas = false;
 
   // Eliminacion
   resenaAEliminar: Resena | null = null;
@@ -63,10 +67,6 @@ export class HealthPage implements OnInit, OnDestroy {
   // Estadisticas
   promedioCalificacion = 0;
   distribucionCalificaciones: { [key: number]: number } = {};
-
-  // Variables para el gesto de deslizar
-  private swipeCoord?: [number, number];
-  private swipeTime?: number;
 
   private routeSub: any;
 
@@ -107,34 +107,57 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // --- GESTO DE DESLIZAR ---
-  onSwipeStart(event: TouchEvent) {
-    this.swipeCoord = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
-    this.swipeTime = new Date().getTime();
+  // --- SCROLL INFINITO ---
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll() {
+    this.verificarScroll();
   }
 
-  onSwipeEnd(event: TouchEvent) {
-    if (!this.swipeCoord || !this.swipeTime) return;
+  verificarScroll() {
+    if (this.cargandoMasResenas || this.todasLasResenasCargadas) return;
 
-    const coord: [number, number] = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
-    const time = new Date().getTime();
+    const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
 
-    const direction = [coord[0] - this.swipeCoord[0], coord[1] - this.swipeCoord[1]];
-    const duration = time - this.swipeTime;
-
-    // Verificar que sea un deslizamiento horizontal y rápido
-    if (duration < 1000 && Math.abs(direction[0]) > 50 && Math.abs(direction[0]) > Math.abs(direction[1] * 2)) {
-      if (direction[0] < 0) { // Deslizamiento hacia la izquierda - Siguiente
-        this.paginaSiguiente();
-      } else { // Deslizamiento hacia la derecha - Anterior
-        this.paginaAnterior();
-      }
+    // Cargar más cuando esté a 200px del final
+    if (scrollPosition + windowHeight >= documentHeight - 200) {
+      this.cargarMasResenas();
     }
+  }
+
+  cargarMasResenas() {
+    if (this.cargandoMasResenas || this.todasLasResenasCargadas) return;
+
+    const inicio = this.resenasMostradas.length;
+    const fin = inicio + this.itemsPorPagina;
+    const nuevasResenas = this.resenasFiltradas.slice(inicio, fin);
+
+    if (nuevasResenas.length === 0) {
+      this.todasLasResenasCargadas = true;
+      return;
+    }
+
+    this.cargandoMasResenas = true;
+    
+    // Simular carga (puedes quitar esto)
+    setTimeout(() => {
+      this.resenasMostradas = [...this.resenasMostradas, ...nuevasResenas];
+      this.cargandoMasResenas = false;
+
+      // Verificar si ya cargamos todas
+      if (this.resenasMostradas.length >= this.resenasFiltradas.length) {
+        this.todasLasResenasCargadas = true;
+      }
+    }, 500);
   }
 
   // --- CARGAR DATOS ---
   async cargarResenas() {
     this.cargandoResenas = true;
+    this.resenasMostradas = [];
+    this.todasLasResenasCargadas = false;
+    
     try {
       console.log('📥 Cargando resenas...');
       
@@ -271,30 +294,10 @@ export class HealthPage implements OnInit, OnDestroy {
     });
 
     this.resenasFiltradas = resenasFiltradas;
-    this.paginaActual = 1;
+    this.resenasMostradas = this.resenasFiltradas.slice(0, this.itemsPorPagina);
+    this.todasLasResenasCargadas = this.resenasMostradas.length >= this.resenasFiltradas.length;
+    
     console.log(`🔍 Filtros aplicados: ${this.resenasFiltradas.length} resenas`);
-  }
-
-  get totalPaginas(): number {
-    return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
-  }
-
-  get resenasPaginadas(): Resena[] {
-    const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
-    const endIndex = startIndex + this.itemsPorPagina;
-    return this.resenasFiltradas.slice(startIndex, endIndex);
-  }
-
-  paginaAnterior() {
-    if (this.paginaActual > 1) {
-      this.paginaActual--;
-    }
-  }
-
-  paginaSiguiente() {
-    if (this.paginaActual < this.totalPaginas) {
-      this.paginaActual++;
-    }
   }
 
   esFormularioValido(): boolean {

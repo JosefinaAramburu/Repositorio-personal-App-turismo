@@ -1,7 +1,4 @@
-<div class="resenas-container" 
-     (touchstart)="onSwipeStart($event)" 
-     (touchend)="onSwipeEnd($event)">
-  
+<div class="resenas-container">
   <!-- Header dinámico -->
   <div class="resenas-header">
     <div class="header-content">
@@ -14,11 +11,11 @@
     </div>
   </div>
 
-  <!-- Indicador de deslizamiento -->
-  <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="swipe-indicator">
-    <ion-icon name="chevron-back"></ion-icon>
-    <span>Desliza para navegar entre páginas</span>
-    <ion-icon name="chevron-forward"></ion-icon>
+  <!-- Indicador de scroll infinito -->
+  <div *ngIf="resenasFiltradas.length > itemsPorPagina && !todasLasResenasCargadas" class="scroll-indicator">
+    <ion-icon name="arrow-down"></ion-icon>
+    <span>Desliza hacia abajo para ver más reseñas</span>
+    <ion-icon name="arrow-down"></ion-icon>
   </div>
 
   <!-- Botón flotante para agregar resena -->
@@ -138,7 +135,7 @@
   </div>
 
   <!-- Lista de resenas -->
-  <div class="lista-resenas">
+  <div class="lista-resenas" [class.todas-cargadas]="todasLasResenasCargadas">
     <div class="lista-header">
       <h2>Reseñas de la Comunidad</h2>
       <div class="filtros">
@@ -160,7 +157,7 @@
       </div>
     </div>
 
-    <!-- Estado de carga -->
+    <!-- Estado de carga inicial -->
     <div *ngIf="cargandoResenas" class="estado-carga">
       <div class="loading-spinner large"></div>
       <p>Cargando reseñas...</p>
@@ -184,12 +181,13 @@
       </button>
     </div>
 
-    <!-- Grid de resenas -->
+    <!-- Grid de resenas con scroll infinito -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length > 0" class="resenas-grid">
       <div
-        *ngFor="let resena of resenasPaginadas"
+        *ngFor="let resena of resenasMostradas; trackBy: trackByResena"
         class="resena-card"
         [class.resena-destacada]="resena.puntuacion === 5">
+        
         <div class="resena-header">
           <div class="resena-info">
             <h3 class="resena-titulo">{{ obtenerTitulo(resena) }}</h3>
@@ -225,29 +223,20 @@
       </div>
     </div>
 
-    <!-- Paginación -->
-    <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="pagination">
-      <button
-        (click)="paginaAnterior()"
-        [disabled]="paginaActual === 1"
-        class="btn-paginacion">
-        ‹ Anterior
-      </button>
-      <span class="info-paginacion">
-        Página {{ paginaActual }} de {{ totalPaginas }}
-        ({{ resenasFiltradas.length }} reseñas)
-      </span>
-      <button
-        (click)="paginaSiguiente()"
-        [disabled]="paginaActual === totalPaginas"
-        class="btn-paginacion">
-        Siguiente ›
-      </button>
+    <!-- Cargando más resenas (scroll infinito) -->
+    <div *ngIf="cargandoMasResenas" class="cargando-mas">
+      <div class="loading-spinner"></div>
+      <p>Cargando más reseñas...</p>
     </div>
 
-    <!-- Información de paginación cuando hay pocas resenas -->
-    <div *ngIf="resenasFiltradas.length > 0 && resenasFiltradas.length <= itemsPorPagina" class="info-paginacion-simple">
-      Mostrando {{ resenasFiltradas.length }} reseñas
+    <!-- No hay más resenas -->
+    <div *ngIf="todasLasResenasCargadas && resenasFiltradas.length > itemsPorPagina" class="no-mas-resenas">
+      <p>🎉 ¡Has visto todas las reseñas!</p>
+    </div>
+
+    <!-- Información de cantidad -->
+    <div *ngIf="resenasFiltradas.length > 0" class="info-cantidad">
+      Mostrando {{ resenasMostradas.length }} de {{ resenasFiltradas.length }} reseñas
     </div>
   </div>
 

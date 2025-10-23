@@ -752,44 +752,58 @@
     padding: 14px 20px;
   }
 }
-// Indicador de deslizamiento
-.swipe-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+// Scroll infinito
+.cargando-mas {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  
+  .loading-spinner {
+    margin: 0 auto 16px auto;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+.no-mas-resenas {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+  border-top: 1px solid var(--border-color);
+  margin-top: 20px;
+  
+  p {
+    margin: 0;
+    font-size: 14px;
+  }
+}
+
+// Indicador de que se puede hacer scroll
+.lista-resenas::after {
+  content: "⬇️ Desliza hacia abajo para ver más reseñas";
+  display: block;
+  text-align: center;
   color: var(--text-muted);
   font-size: 14px;
-  margin: 20px 0;
-  padding: 16px;
-  background: rgba(var(--primary-color), 0.05);
-  border-radius: var(--border-radius);
-  border: 1px dashed var(--border-color);
-  
-  ion-icon {
-    font-size: 18px;
-    animation: bounce 2s infinite;
-  }
-  
-  &:first-child {
-    animation: bounce 2s infinite;
-  }
-  
-  &:last-child {
-    animation: bounce 2s infinite 0.5s;
-  }
+  padding: 20px;
+  opacity: 0.7;
+  animation: fadeInOut 3s infinite;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(5px); }
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
 
-// Efecto visual al deslizar
-.resenas-container {
-  transition: transform 0.2s ease;
-  
-  &:active {
-    transform: translateX(5px);
-  }
+// Solo mostrar el indicador cuando hay más reseñas por cargar
+.lista-resenas::after {
+  display: none;
+}
+
+.lista-resenas:not(.todas-cargadas)::after {
+  display: block;
 }
