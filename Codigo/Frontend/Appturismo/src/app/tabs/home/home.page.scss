@@ -1,51 +1,54 @@
 /* ====== HOME PAGE STYLES ====== */
 
+ion-content, body {
+  --background: #A9D9D6;
+  background-color: #A9D9D6;
+}
 
+/* Título de sección */
 .section-title {
- margin: 16px 0 8px;
- font-weight: 700;
+  margin: 16px 0 8px;
+  font-weight: 700;
 }
 
-
+/* Contenedor de tarjetas */
 .cards {
- margin-top: 4px;
+  margin-top: 4px;
 }
 
-
+/* Tarjetas */
 .card {
- border-radius: 14px;
- margin-bottom: 10px;
- --background: #A9D9D6;
- box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  border-radius: 14px;
+  margin-bottom: 10px;
+  --background: #e0e6e5;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
-
-/* círculo de color + ícono blanco */
+/* Círculo de color + ícono blanco */
 .icon {
- width: 42px;
- height: 42px;
- border-radius: 50%;
- display: grid;
- place-items: center;
- font-size: 20px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
 }
+
 .icon ion-icon {
- color: #fff;
+  color: #fff;
 }
-.icon-events { background: #f6874b; }  /* naranja   */
-.icon-places { background: #7c4dff; }  /* violeta   */
-.icon-food   { background: #4caf50; }  /* verde     */
 
+.icon-events { background: #f6874b; } /* naranja */
+.icon-places { background: #7c4dff; } /* violeta */
+.icon-food   { background: #4caf50; } /* verde */
 
+/* Títulos y subtítulos */
 .title {
- font-size: 16px;
- font-weight: 700;
+  font-size: 16px;
+  font-weight: 700;
 }
-
 
 .subtitle {
- margin-top: 2px;
- color: var(--ion-color-medium);
+  margin-top: 2px;
+  color: var(--ion-color-medium);
 }
-
-
