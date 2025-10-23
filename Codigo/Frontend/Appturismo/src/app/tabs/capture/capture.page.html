@@ -327,23 +327,6 @@
       </ion-item>
     </ion-list>
 
-    <!-- Estadisticas rapidas -->
-    <ion-card *ngIf="lugares.length > 0" class="stats-card">
-      <ion-card-content class="stats-content">
-        <div class="stat-item">
-          <div class="stat-value">{{ lugares.length }}</div>
-          <div class="stat-label">Lugares totales</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ getLugaresConResenas() }}</div>
-          <div class="stat-label">Con resenas</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ getPromedioGeneral() }}</div>
-          <div class="stat-label">Rating promedio</div>
-        </div>
-      </ion-card-content>
-    </ion-card>
   </div>
 
   <!-- SIN RESULTADOS CON FILTROS -->
