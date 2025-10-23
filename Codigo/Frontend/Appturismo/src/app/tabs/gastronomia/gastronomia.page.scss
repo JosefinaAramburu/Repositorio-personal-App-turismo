@@ -1,6 +1,55 @@
-.titulo { margin: 16px; font-size: 26px; font-weight: 800; }
-.buscador { margin: 0 16px 8px; }
-.seccion { margin: 12px 16px 8px; font-weight: 700; font-size: 18px; }
+/* ===== GASTRONOMÍA ===== */
+
+
+/* FONDO PRINCIPAL - CELESTE */
+ion-content {
+ background: #b2e2f2 !important;   // igual que en capture
+}
+
+
+/* HEADER CON FONDO CELESTE */
+ion-header {
+ ion-toolbar {
+   background: #b2e2f2 !important;
+   color: #000000;
+
+
+   ion-title {
+     color: #000000 !important;
+     font-weight: 600;
+
+
+     ion-icon {
+       color: #000000 !important;
+     }
+   }
+
+
+   ion-button {
+     color: #000000 !important;
+   }
+ }
+}
+
+
+/* ---------- ESTILOS DE GASTRONOMÍA ---------- */
+.titulo {
+ margin: 16px;
+ font-size: 26px;
+ font-weight: 800;
+}
+
+
+.buscador {
+ margin: 0 16px 8px;
+}
+
+
+.seccion {
+ margin: 12px 16px 8px;
+ font-weight: 700;
+ font-size: 18px;
+}
 
 
 .grid-gastro {
@@ -70,14 +119,12 @@
  vertical-align: middle;
 
 
- /* versión con <ion-icon> (si usás ion-icon en la lista principal) */
  ion-icon {
    font-size: 18px;
    color: #f59e0b;        /* dorado */
  }
 
 
- /* versión fallback con <span> (usada en reseñas) */
  span {
    font-size: 16px;
    color: #cbd5e1;        /* gris: vacía */
@@ -88,7 +135,11 @@
 }
 
 
-.reviews-count { color:#6b7280; margin-left:4px; font-weight: 500; }
+.reviews-count {
+ color:#6b7280;
+ margin-left:4px;
+ font-weight: 500;
+}
 
 
 /* Cabecera de cada reseña (estrellas + fecha) */
@@ -100,8 +151,27 @@
 }
 
 
-/* Estrella individual si alguna vez la necesitás suelta */
-.star { font-size: 18px; color: #f59e0b; }
+/* Estrella individual */
+.star {
+ font-size: 18px;
+ color: #f59e0b;
+}
+
+
+:host {
+ ion-content {
+   --background: #b2e2f2 !important; // mismo celeste que capture
+ }
+}
+
+
+.btn-gastro {
+ --background: #87ceeb !important;
+ --color: #000 !important;
+ font-weight: 600;
+ border-radius: 12px;
+ box-shadow: 0 4px 8px rgba(0,0,0,.1);
+}
 
 
 

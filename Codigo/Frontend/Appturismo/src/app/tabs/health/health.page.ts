@@ -2,454 +2,420 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
 import { supabase } from '../../supabase';
 
+
 interface Resena {
-  id_resenas: number;
-  texto: string;
-  puntuacion: number;
-  fecha: string;
-  id_usuario: number | null;
+ id_resenas: number;
+ texto: string;
+ puntuacion: number;
+ fecha: string;
+ id_usuario: number | null;
 }
+
 
 interface NuevaResena {
-  titulo: string;
-  contenido: string;
-  calificacion: number;
+ titulo: string;
+ contenido: string;
+ calificacion: number;
 }
+
+
+type TipoEntidad = 'lugar' | 'restaurante';
+
 
 @Component({
-  selector: 'app-health',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './health.page.html',
-  styleUrls: ['./health.page.scss']
+ selector: 'app-health',
+ standalone: true,
+ imports: [CommonModule, FormsModule],
+ templateUrl: './health.page.html',
+ styleUrls: ['./health.page.scss']
 })
 export class HealthPage implements OnInit, OnDestroy {
-  // Estado de la aplicación
-  resenas: Resena[] = [];
-  resenasFiltradas: Resena[] = [];
-  cargando = false;
-  cargandoResenas = false;
-  mostrarFormulario = false;
-  mostrarConfirmacionEliminar = false;
-  estrellasHover = 0;
-
-  // Información del lugar (si viene desde capture)
-  lugarId: number | null = null;
-  lugarNombre: string = "";
-  lugarCategoria: string = "";
-  totalResenasLugar: number = 0;
-  promedioRatingLugar: number = 0;
-
-  // Formulario
-  nuevaResena: NuevaResena = {
-    titulo: "",
-    contenido: "",
-    calificacion: 5
-  };
-
-  // Filtros y ordenamiento
-  filtroCalificacion = '0';
-  ordenamiento = 'fecha_desc';
-  paginaActual = 1;
-  itemsPorPagina = 10;
-
-  // Eliminacion
-  resenaAEliminar: Resena | null = null;
-
-  // Estadisticas
-  promedioCalificacion = 0;
-  distribucionCalificaciones: { [key: number]: number } = {};
-
-  private routeSub: any;
-
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
-
-  async ngOnInit() {
-    this.routeSub = this.route.queryParams.subscribe(async params => {
-      console.log('🔍 Parámetros recibidos en Health:', params);
-
-      if (params['lugarId']) {
-        this.lugarId = parseInt(params['lugarId']);
-        this.lugarNombre = params['lugarNombre'] || 'Lugar Desconocido';
-        this.lugarCategoria = params['lugarCategoria'] || '';
-        this.totalResenasLugar = parseInt(params['totalResenas']) || 0;
-        this.promedioRatingLugar = parseFloat(params['promedioRating']) || 0;
-
-        console.log('📍 Modo Lugar Específico:', {
-          lugarId: this.lugarId,
-          lugarNombre: this.lugarNombre,
-          categoria: this.lugarCategoria
-        });
-      } else {
-        this.lugarId = null;
-        this.lugarNombre = '';
-        console.log('🌐 Modo Todas las Resenas');
-      }
-
-      await this.cargarResenas();
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
-  }
-
-  // --- CARGAR DATOS ---
-  async cargarResenas() {
-    this.cargandoResenas = true;
-    try {
-      console.log('📥 Cargando resenas...');
-      
-      if (this.lugarId) {
-        await this.cargarResenasDeLugar(this.lugarId);
-      } else {
-        await this.cargarTodasLasResenas();
-      }
-
-      this.calcularEstadisticas();
-      this.aplicarFiltros();
-      console.log('✅ Resenas cargadas:', this.resenas.length);
-
-    } catch (error) {
-      console.error('❌ Error cargando resenas:', error);
-      this.mostrarError('Error al cargar las resenas');
-    } finally {
-      this.cargandoResenas = false;
-    }
-  }
-
-  // Cargar resenas de un lugar específico
-  private async cargarResenasDeLugar(lugarId: number) {
-    console.log(`🔍 Buscando resenas para lugar ID: ${lugarId}`);
-
-    try {
-      const { data: relaciones, error: errorRelaciones } = await supabase
-        .from('lugares_resenas')
-        .select('id_resenas')
-        .eq('id_lugares', lugarId);
-
-      if (errorRelaciones) {
-        console.error('❌ Error cargando relaciones:', errorRelaciones);
-        this.resenas = [];
-        return;
-      }
-
-      console.log('📋 Relaciones encontradas:', relaciones);
-
-      if (!relaciones || relaciones.length === 0) {
-        console.log('ℹ️ No hay resenas específicas para este lugar');
-        this.resenas = [];
-        return;
-      }
-
-      const idsResenas = relaciones.map(rel => rel.id_resenas);
-      console.log('🆔 IDs de resenas:', idsResenas);
-
-      const { data: resenas, error: errorResenas } = await supabase
-        .from('resenas')
-        .select('*')
-        .in('id_resenas', idsResenas)
-        .order('fecha', { ascending: false });
-
-      if (errorResenas) {
-        console.error('❌ Error cargando resenas:', errorResenas);
-        throw errorResenas;
-      }
-
-      this.resenas = resenas || [];
-      console.log(`✅ ${this.resenas.length} resenas cargadas para lugar ${lugarId}`);
-
-    } catch (error) {
-      console.error('❌ Error en cargarResenasDeLugar:', error);
-      this.resenas = [];
-    }
-  }
-
-  private async cargarTodasLasResenas() {
-    try {
-      console.log('🌐 Cargando TODAS las resenas...');
-      const { data, error } = await supabase
-        .from('resenas')
-        .select('*')
-        .order('fecha', { ascending: false });
-
-      if (error) {
-        console.error('❌ Error cargando todas las resenas:', error);
-        throw error;
-      }
-
-      this.resenas = data || [];
-      console.log(`✅ ${this.resenas.length} resenas cargadas (todas)`);
-    } catch (error) {
-      console.error('❌ Error en cargarTodasLasResenas:', error);
-      this.resenas = [];
-    }
-  }
-
-  private calcularEstadisticas() {
-    if (this.resenas.length === 0) {
-      this.promedioCalificacion = 0;
-      this.distribucionCalificaciones = {};
-      return;
-    }
-
-    const suma = this.resenas.reduce((acc, resena) => acc + resena.puntuacion, 0);
-    this.promedioCalificacion = suma / this.resenas.length;
-
-    this.distribucionCalificaciones = {};
-    for (let i = 1; i <= 5; i++) {
-      this.distribucionCalificaciones[i] = this.resenas.filter(r => r.puntuacion === i).length;
-    }
-
-    console.log('📊 Estadísticas calculadas:', {
-      promedio: this.promedioCalificacion,
-      distribucion: this.distribucionCalificaciones
-    });
-  }
-
-  aplicarFiltros() {
-    let resenasFiltradas = [...this.resenas];
-
-    if (this.filtroCalificacion !== '0') {
-      const calificacion = parseInt(this.filtroCalificacion);
-      resenasFiltradas = resenasFiltradas.filter(
-        resena => resena.puntuacion === calificacion
-      );
-    }
-
-    resenasFiltradas.sort((a, b) => {
-      switch (this.ordenamiento) {
-        case 'fecha_desc':
-          return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
-        case 'fecha_asc':
-          return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
-        case 'calificacion_desc':
-          return b.puntuacion - a.puntuacion;
-        case 'calificacion_asc':
-          return a.puntuacion - b.puntuacion;
-        default:
-          return 0;
-      }
-    });
-
-    this.resenasFiltradas = resenasFiltradas;
-    this.paginaActual = 1;
-    console.log(`🔍 Filtros aplicados: ${this.resenasFiltradas.length} resenas`);
-  }
-
-  get totalPaginas(): number {
-    return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
-  }
-
-  get resenasPaginadas(): Resena[] {
-    const startIndex = (this.paginaActual - 1) * this.itemsPorPagina;
-    const endIndex = startIndex + this.itemsPorPagina;
-    return this.resenasFiltradas.slice(startIndex, endIndex);
-  }
-
-  paginaAnterior() {
-    if (this.paginaActual > 1) {
-      this.paginaActual--;
-    }
-  }
-
-  paginaSiguiente() {
-    if (this.paginaActual < this.totalPaginas) {
-      this.paginaActual++;
-    }
-  }
-
-  esFormularioValido(): boolean {
-    return this.nuevaResena.titulo.trim().length > 0 &&
-      this.nuevaResena.contenido.trim().length > 0 &&
-      this.nuevaResena.calificacion >= 1 &&
-      this.nuevaResena.calificacion <= 5;
-  }
-
-  async probarAgregarResena() {
-    if (this.cargando || !this.esFormularioValido()) {
-      return;
-    }
-
-    this.cargando = true;
-    await this.agregarResena();
-  }
-
-  async agregarResena() {
-    try {
-      console.log('🚀 Iniciando agregarResena...');
-      
-      const textoCompleto = `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`;
-
-      const datosParaSupabase = {
-        texto: textoCompleto,
-        puntuacion: this.nuevaResena.calificacion,
-        fecha: new Date().toISOString().split('T')[0],
-        id_usuario: null
-      };
-
-      const { data: resenaCreada, error: errorResena } = await supabase
-        .from('resenas')
-        .insert([datosParaSupabase])
-        .select()
-        .single();
-
-      if (errorResena) {
-        console.error('❌ Error creando resena:', errorResena);
-        this.mostrarError('Error al crear resena: ' + errorResena.message);
-        return;
-      }
-
-      console.log('✅ Resena creada:', resenaCreada);
-
-      if (this.lugarId && resenaCreada) {
-        console.log(`🔗 Creando relación: lugar ${this.lugarId} - resena ${resenaCreada.id_resenas}`);
-
-        const { error: errorRelacion } = await supabase
-          .from('lugares_resenas')
-          .insert([{
-            id_lugares: this.lugarId,
-            id_resenas: resenaCreada.id_resenas
-          }]);
-
-        if (errorRelacion) {
-          console.error('❌ Error creando relación:', errorRelacion);
-          this.mostrarError('Error al vincular resena con el lugar: ' + errorRelacion.message);
-          return;
-        }
-      }
-
-      await this.cargarResenas();
-
-      this.resetearFormulario();
-      this.cerrarModal();
-      this.mostrarExito('¡Reseña agregada correctamente!');
-
-    } catch (error: any) {
-      console.error('❌ Error general:', error);
-      this.mostrarError('Error inesperado al agregar resena: ' + error.message);
-    } finally {
-      this.cargando = false;
-    }
-  }
-
-  private resetearFormulario() {
-    this.nuevaResena = {
-      titulo: '',
-      contenido: '',
-      calificacion: 5
-    };
-    this.estrellasHover = 0;
-  }
-
-  confirmarEliminacion(resena: Resena) {
-    this.resenaAEliminar = resena;
-    this.mostrarConfirmacionEliminar = true;
-  }
-
-  cancelarEliminacion() {
-    this.resenaAEliminar = null;
-    this.mostrarConfirmacionEliminar = false;
-  }
-
-  async eliminarResenaConfirmada() {
-    if (!this.resenaAEliminar) return;
-
-    try {
-      console.log('🗑️ Eliminando resena:', this.resenaAEliminar.id_resenas);
-
-      const { error: errorRelacion } = await supabase
-        .from('lugares_resenas')
-        .delete()
-        .eq('id_resenas', this.resenaAEliminar.id_resenas);
-
-      if (errorRelacion) {
-        console.error('⚠️ Error eliminando relación:', errorRelacion);
-      }
-
-      const { error } = await supabase
-        .from('resenas')
-        .delete()
-        .eq('id_resenas', this.resenaAEliminar.id_resenas);
-
-      if (error) {
-        console.error('❌ Error eliminando resena:', error);
-        this.mostrarError('Error al eliminar resena');
-        return;
-      }
-
-      console.log('✅ Resena eliminada exitosamente');
-      await this.cargarResenas();
-      this.mostrarExito('Reseña eliminada correctamente');
-
-    } catch (error: any) {
-      console.error('❌ Error general eliminando:', error);
-      this.mostrarError('Error inesperado al eliminar resena: ' + error.message);
-    } finally {
-      this.cancelarEliminacion();
-    }
-  }
-
-  obtenerTitulo(resena: Resena): string {
-    if (!resena.texto) return 'Sin título';
-    const partes = resena.texto.split(':');
-    return partes[0] || 'Sin título';
-  }
-
-  obtenerContenido(resena: Resena): string {
-    if (!resena.texto) return 'Sin contenido';
-    const partes = resena.texto.split(':');
-    return partes.slice(1).join(':').trim() || 'Sin contenido';
-  }
-
-  getTextoCalificacion(calificacion: number): string {
-    const textos: { [key: number]: string } = {
-      1: 'Muy mala',
-      2: 'Mala',
-      3: 'Regular',
-      4: 'Buena',
-      5: 'Excelente'
-    };
-    return textos[calificacion] || 'Sin calificar';
-  }
-
-  cerrarModal() {
-    this.mostrarFormulario = false;
-    this.resetearFormulario();
-  }
-
-  volverALugares() {
-    this.router.navigate(['/tabs/capture']);
-  }
-
-  private mostrarError(mensaje: string) {
-    alert(`❌ ${mensaje}`);
-  }
-
-  private mostrarExito(mensaje: string) {
-    alert(`✅ ${mensaje}`);
-  }
-
-  get tituloPagina(): string {
-    return this.lugarId ? `Reseñas de ${this.lugarNombre}` : 'Todas las Reseñas';
-  }
-
-  get subtituloPagina(): string {
-    if (this.lugarId) {
-      return `${this.lugarCategoria} • ${this.resenas.length} reseñas • ${this.promedioCalificacion.toFixed(1)}/5`;
-    }
-    return 'Comparte tu experiencia con la comunidad';
-  }
-
-  get mostrarBotonVolver(): boolean {
-    return !!this.lugarId;
-  }
+ // Estado
+ resenas: Resena[] = [];
+ resenasFiltradas: Resena[] = [];
+ cargando = false;
+ cargandoResenas = false;
+ mostrarFormulario = false;
+ mostrarConfirmacionEliminar = false;
+ estrellasHover = 0;
+
+
+ // Contexto / navegación
+ tipo: TipoEntidad = 'lugar';
+ lugarId: number | null = null;
+ lugarNombre = '';
+ lugarCategoria = '';
+ totalResenasLugar = 0;
+ promedioRatingLugar = 0;
+
+
+ // “Volver” dinámico
+ private fromTab: string | null = null;
+ private backTarget = '/tabs/capture';
+
+
+ // Form
+ nuevaResena: NuevaResena = { titulo: '', contenido: '', calificacion: 5 };
+
+
+ // Filtros y paginación
+ filtroCalificacion = '0';
+ ordenamiento = 'fecha_desc';
+ paginaActual = 1;
+ itemsPorPagina = 10;
+
+
+ // Eliminación
+ resenaAEliminar: Resena | null = null;
+
+
+ // Estadísticas
+ promedioCalificacion = 0;
+ distribucionCalificaciones: { [key: number]: number } = {};
+
+
+ private routeSub: any;
+
+
+ constructor(private route: ActivatedRoute, private router: Router) {}
+
+
+ async ngOnInit() {
+   this.routeSub = this.route.queryParams.subscribe(async (params) => {
+     // Tipo de entidad
+     const tipoParam = (params['tipo'] || '').toString().toLowerCase();
+     this.tipo = tipoParam === 'restaurante' ? 'restaurante' : 'lugar';
+
+
+     // IDs y nombres (acepta tanto params nuevos como viejos)
+     if (params['lugarId']) {
+       this.lugarId = parseInt(params['lugarId'], 10);
+     } else if (params['id']) {
+       this.lugarId = parseInt(params['id'], 10);
+     } else {
+       this.lugarId = null;
+     }
+     this.lugarNombre = params['lugarNombre'] || params['nombre'] || '';
+     this.lugarCategoria = params['lugarCategoria'] || '';
+
+
+     // Extras opcionales
+     this.totalResenasLugar = parseInt(params['totalResenas'] || '0', 10) || 0;
+     this.promedioRatingLugar = parseFloat(params['promedioRating'] || '0') || 0;
+
+
+     // Back target dinámico
+     this.fromTab = params['from'] ?? null;
+     this.backTarget = this.fromTab === 'gastronomia' ? '/tabs/gastronomia' : '/tabs/capture';
+
+
+     await this.cargarResenas();
+   });
+ }
+
+
+ ngOnDestroy() {
+   this.routeSub?.unsubscribe?.();
+ }
+
+
+ // ================= CARGA =================
+ async cargarResenas() {
+   this.cargandoResenas = true;
+   try {
+     if (this.lugarId) {
+       await this.cargarResenasDeEntidad(this.tipo, this.lugarId);
+     } else {
+       await this.cargarTodasLasResenas();
+     }
+     this.calcularEstadisticas();
+     this.aplicarFiltros();
+   } catch (error) {
+     console.error('Error cargando reseñas:', error);
+     this.mostrarError('Error al cargar las reseñas');
+   } finally {
+     this.cargandoResenas = false;
+   }
+ }
+
+
+ private async cargarResenasDeEntidad(tipo: TipoEntidad, idEntidad: number) {
+   const meta =
+     tipo === 'restaurante'
+       ? { puente: 'restaurantes_resenas', colEntidad: 'id_gastronomia' } // usa tu PK real para restaurantes
+       : { puente: 'lugares_resenas',      colEntidad: 'id_lugares'       };
+
+
+   // 1) IDs de reseñas desde la tabla puente
+   const { data: rels, error: eRel } = await supabase
+     .from(meta.puente)
+     .select('id_resenas')
+     .eq(meta.colEntidad, idEntidad);
+
+
+   if (eRel) {
+     console.error('Error cargando relaciones:', eRel);
+     this.resenas = [];
+     return;
+   }
+
+
+   const ids = (rels || []).map((r: any) => r.id_resenas).filter((x: any) => x != null);
+   if (!ids.length) { this.resenas = []; return; }
+
+
+   // 2) Reseñas por IDs
+   const { data: res, error: eRes } = await supabase
+     .from('resenas')
+     .select('*')
+     .in('id_resenas', ids)
+     .order('fecha', { ascending: false });
+
+
+   if (eRes) {
+     console.error('Error cargando reseñas:', eRes);
+     this.resenas = [];
+     return;
+   }
+   this.resenas = res || [];
+ }
+
+
+ private async cargarTodasLasResenas() {
+   const { data, error } = await supabase
+     .from('resenas')
+     .select('*')
+     .order('fecha', { ascending: false });
+   if (error) throw error;
+   this.resenas = data || [];
+ }
+
+
+ // =============== ESTADÍSTICAS / FILTROS / PÁGINA ===============
+ private calcularEstadisticas() {
+   if (!this.resenas.length) {
+     this.promedioCalificacion = 0;
+     this.distribucionCalificaciones = {};
+     return;
+   }
+   const suma = this.resenas.reduce((acc, r) => acc + (r.puntuacion || 0), 0);
+   this.promedioCalificacion = suma / this.resenas.length;
+
+
+   this.distribucionCalificaciones = {};
+   for (let i = 1; i <= 5; i++) {
+     this.distribucionCalificaciones[i] = this.resenas.filter((r) => r.puntuacion === i).length;
+   }
+ }
+
+
+ aplicarFiltros() {
+   let arr = [...this.resenas];
+
+
+   if (this.filtroCalificacion !== '0') {
+     const c = parseInt(this.filtroCalificacion, 10);
+     arr = arr.filter((r) => r.puntuacion === c);
+   }
+
+
+   arr.sort((a, b) => {
+     switch (this.ordenamiento) {
+       case 'fecha_desc':         return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+       case 'fecha_asc':          return new Date(a.fecha).getTime() - new Date(b.fecha).getTime();
+       case 'calificacion_desc':  return b.puntuacion - a.puntuacion;
+       case 'calificacion_asc':   return a.puntuacion - b.puntuacion;
+       default:                   return 0;
+     }
+   });
+
+
+   this.resenasFiltradas = arr;
+   this.paginaActual = 1;
+ }
+
+
+ get totalPaginas(): number {
+   return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
+ }
+ get resenasPaginadas(): Resena[] {
+   const start = (this.paginaActual - 1) * this.itemsPorPagina;
+   return this.resenasFiltradas.slice(start, start + this.itemsPorPagina);
+ }
+ paginaAnterior() { if (this.paginaActual > 1) this.paginaActual--; }
+ paginaSiguiente() { if (this.paginaActual < this.totalPaginas) this.paginaActual++; }
+
+
+ // ================= CREAR RESEÑA =================
+ esFormularioValido(): boolean {
+   return (
+     this.nuevaResena.titulo.trim().length > 0 &&
+     this.nuevaResena.contenido.trim().length > 0 &&
+     this.nuevaResena.calificacion >= 1 &&
+     this.nuevaResena.calificacion <= 5
+   );
+ }
+
+
+ async probarAgregarResena() {
+   if (this.cargando || !this.esFormularioValido()) return;
+   this.cargando = true;
+   await this.agregarResena();
+ }
+
+
+ private async agregarResena() {
+   try {
+     const textoCompleto = `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`;
+     const payload = {
+       texto: textoCompleto,
+       puntuacion: this.nuevaResena.calificacion,
+       fecha: new Date().toISOString().split('T')[0], // DATE
+       id_usuario: null, // evitar conflicto UUID vs INT
+     };
+
+
+     // 1) Crear reseña
+     const { data: nueva, error: e1 } = await supabase
+       .from('resenas')
+       .insert([payload])
+       .select('id_resenas')
+       .single();
+     if (e1) throw e1;
+
+
+     // 2) Vincular a entidad si corresponde
+     if (this.lugarId && nueva?.id_resenas) {
+       const puente     = this.tipo === 'restaurante' ? 'restaurantes_resenas' : 'lugares_resenas';
+       const colEntidad = this.tipo === 'restaurante' ? 'id_gastronomia'     : 'id_lugares'; // usa tu PK real
+       const rel: any = { id_resenas: nueva.id_resenas };
+       rel[colEntidad] = this.lugarId;
+
+
+       const { error: e2 } = await supabase.from(puente).insert([rel]);
+       if (e2) throw e2;
+     }
+
+
+     await this.cargarResenas();
+     this.resetearFormulario();
+     this.cerrarModal();
+     this.mostrarExito('¡Reseña agregada correctamente!');
+   } catch (error: any) {
+     console.error('Error agregando reseña:', error);
+     this.mostrarError('No se pudo agregar la reseña: ' + (error?.message || ''));
+   } finally {
+     this.cargando = false;
+   }
+ }
+
+
+ private resetearFormulario() {
+   this.nuevaResena = { titulo: '', contenido: '', calificacion: 5 };
+   this.estrellasHover = 0;
+ }
+
+
+ // ================= ELIMINAR =================
+ confirmarEliminacion(resena: Resena) {
+   this.resenaAEliminar = resena;
+   this.mostrarConfirmacionEliminar = true;
+ }
+ cancelarEliminacion() {
+   this.resenaAEliminar = null;
+   this.mostrarConfirmacionEliminar = false;
+ }
+
+
+ async eliminarResenaConfirmada() {
+   if (!this.resenaAEliminar) return;
+   try {
+     // Borrar vínculo en la tabla puente correcta (si estamos en una entidad)
+     if (this.lugarId) {
+       const puente = this.tipo === 'restaurante' ? 'restaurantes_resenas' : 'lugares_resenas';
+       const { error: eRel } = await supabase
+         .from(puente)
+         .delete()
+         .eq('id_resenas', this.resenaAEliminar.id_resenas);
+       if (eRel) console.warn('Error borrando relación:', eRel);
+     }
+
+
+     // Borrar la reseña
+     const { error } = await supabase
+       .from('resenas')
+       .delete()
+       .eq('id_resenas', this.resenaAEliminar.id_resenas);
+     if (error) throw error;
+
+
+     await this.cargarResenas();
+     this.mostrarExito('Reseña eliminada correctamente');
+   } catch (error: any) {
+     console.error('Error eliminando reseña:', error);
+     this.mostrarError('No se pudo eliminar la reseña');
+   } finally {
+     this.cancelarEliminacion();
+   }
+ }
+
+
+ // ================= UTILIDADES / UI =================
+ obtenerTitulo(r: Resena): string {
+   if (!r.texto) return 'Sin título';
+   const p = r.texto.split(':');
+   return p[0] || 'Sin título';
+ }
+ obtenerContenido(r: Resena): string {
+   if (!r.texto) return 'Sin contenido';
+   const p = r.texto.split(':');
+   return p.slice(1).join(':').trim() || 'Sin contenido';
+ }
+ getTextoCalificacion(c: number): string {
+   const t: any = { 1: 'Muy mala', 2: 'Mala', 3: 'Regular', 4: 'Buena', 5: 'Excelente' };
+   return t[c] || 'Sin calificar';
+ }
+
+
+ cerrarModal() {
+   this.mostrarFormulario = false;
+   this.resetearFormulario();
+ }
+
+
+ // Back dinámico (Gastronomía si venís de ahí, si no Lugares)
+ volverALugares() {
+ this.router.navigate([this.backTarget]);
 }
+
+
+get mostrarBotonVolver(): boolean {
+ return !!this.fromTab || !!this.lugarId;
+}
+
+
+get backLabel(): string {
+ return this.fromTab === 'gastronomia'
+   ? 'Volver a Gastronomía'
+   : 'Volver a Lugares';
+}
+
+
+ private mostrarError(msg: string) { alert(`❌ ${msg}`); }
+ private mostrarExito(msg: string) { alert(`✅ ${msg}`); }
+
+
+ get tituloPagina(): string {
+   return this.lugarId ? `Reseñas de ${this.lugarNombre}` : 'Todas las Reseñas';
+ }
+ get subtituloPagina(): string {
+   if (this.lugarId) {
+     return `${this.lugarCategoria} • ${this.resenas.length} reseñas • ${this.promedioCalificacion.toFixed(1)}/5`;
+   }
+   return 'Comparte tu experiencia con la comunidad';
+ }
+}
+
+

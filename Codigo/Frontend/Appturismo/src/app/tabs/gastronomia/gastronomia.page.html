@@ -1,250 +1,186 @@
-<h1 class="titulo">Qué hacer</h1>
+<ion-header>
+ <ion-toolbar>
+   <ion-title>Qué hacer</ion-title>
+ </ion-toolbar>
+</ion-header>
 
 
-<ion-searchbar
- placeholder="Buscar…"
- [(ngModel)]="q"
- (ionInput)="applyFilters()"
- class="buscador">
-</ion-searchbar>
+<ion-content class="ion-padding">
 
 
-<h2 class="seccion">Gastronomía</h2>
+ <!-- Buscador local (filtra en memoria con applyFilters) -->
+ <ion-searchbar
+   placeholder="Buscar…"
+   [(ngModel)]="q"
+   (ionInput)="applyFilters()">
+ </ion-searchbar>
 
 
-<div class="grid-gastro">
- <!-- Restaurantes -->
- <button class="card-gastro" (click)="goToCategoria('restaurante')">
-   <div class="icono icono--rest">
-     <ion-icon name="restaurant-outline"></ion-icon>
-   </div>
-   <div class="texto">
-     <div class="titulo-card">Restaurantes</div>
-     <div class="subtitulo-card">Restaurantes y cafeterías</div>
-   </div>
-   <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
- </button>
+ <h2 class="seccion">Gastronomía</h2>
 
 
- <!-- Bares -->
- <button class="card-gastro" (click)="goToCategoria('bar')">
-   <div class="icono icono--bar">
-     <ion-icon name="beer-outline"></ion-icon>
-   </div>
-   <div class="texto">
-     <div class="titulo-card">Bares</div>
-     <div class="subtitulo-card">Bares y tascas</div>
-   </div>
-   <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
- </button>
+ <!-- Accesos rápidos por categoría -->
+ <div class="grid-gastro">
+   <button class="card-gastro" (click)="goToCategoria('restaurante')">
+     <div class="icono icono--rest"><ion-icon name="restaurant-outline"></ion-icon></div>
+     <div class="texto">
+       <div class="titulo-card">Restaurantes</div>
+       <div class="subtitulo-card">Restaurantes y cafeterías</div>
+     </div>
+     <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
+   </button>
 
 
- <!-- Cocina local -->
- <button class="card-gastro" (click)="goToCategoria('cocina_local')">
-   <div class="icono icono--local">
-     <ion-icon name="nutrition-outline"></ion-icon>
-   </div>
-   <div class="texto">
-     <div class="titulo-card">Cocina local</div>
-     <div class="subtitulo-card">Tapas y platos típicos</div>
-   </div>
-   <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
- </button>
+   <button class="card-gastro" (click)="goToCategoria('bar')">
+     <div class="icono icono--bar"><ion-icon name="beer-outline"></ion-icon></div>
+     <div class="texto">
+       <div class="titulo-card">Bares</div>
+       <div class="subtitulo-card">Bares y tascas</div>
+     </div>
+     <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
+   </button>
 
 
- <!-- Heladerías -->
- <button class="card-gastro" (click)="goToCategoria('heladeria')">
-   <div class="icono icono--ice">
-     <ion-icon name="ice-cream-outline"></ion-icon>
-   </div>
-   <div class="texto">
-     <div class="titulo-card">Heladerías</div>
-     <div class="subtitulo-card">Helados y sorbetes</div>
-   </div>
-   <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
- </button>
-</div>
+   <button class="card-gastro" (click)="goToCategoria('cocina_local')">
+     <div class="icono icono--local"><ion-icon name="nutrition-outline"></ion-icon></div>
+     <div class="texto">
+       <div class="titulo-card">Cocina local</div>
+       <div class="subtitulo-card">Tapas y platos típicos</div>
+     </div>
+     <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
+   </button>
 
 
-<div class="acciones">
- <ion-button expand="block" (click)="openForm()">Agregar restaurante</ion-button>
-</div>
+   <button class="card-gastro" (click)="goToCategoria('heladeria')">
+     <div class="icono icono--ice"><ion-icon name="ice-cream-outline"></ion-icon></div>
+     <div class="texto">
+       <div class="titulo-card">Heladerías</div>
+       <div class="subtitulo-card">Helados y sorbetes</div>
+     </div>
+     <ion-icon class="chev" name="chevron-forward-outline"></ion-icon>
+   </button>
+ </div>
 
 
-<ion-refresher slot="fixed" (ionRefresh)="load($event)">
- <ion-refresher-content></ion-refresher-content>
-</ion-refresher>
+ <div class="acciones">
+   <ion-button expand="block" class="btn-gastro" (click)="openForm()">
+     Agregar restaurante
+   </ion-button>
+ </div>
 
 
-<!-- Lista filtrada -->
-<ng-container *ngIf="!loading && filtered.length">
- <ion-list class="lista">
-   <ion-item-sliding *ngFor="let r of filtered">
-     <ion-item button detail="true" (click)="openReviews(r)">
-       <ion-label>
-         <h3>{{ r.nombre }}</h3>
-         <p *ngIf="r.descripcion">{{ r.descripcion }}</p>
-         <p class="meta">
-           {{ r.categoria | titlecase }}
-           •
-           <ng-container *ngIf="r.cantidad; else sinRese">
-             ⭐ {{ r.promedio || 0 }} ({{ r.cantidad }})
-           </ng-container>
-           <ng-template #sinRese>Sin reseñas</ng-template>
-           <span *ngIf="r.horario"> • {{ r.horario }}</span>
-         </p>
-       </ion-label>
-     </ion-item>
+ <ion-refresher slot="fixed" (ionRefresh)="load($event)">
+   <ion-refresher-content></ion-refresher-content>
+ </ion-refresher>
 
 
-     <ion-item-options side="end">
-       <ion-item-option color="medium" (click)="openForm(r)">Editar</ion-item-option>
-       <ion-item-option color="danger" (click)="confirmDelete(r)">Eliminar</ion-item-option>
-     </ion-item-options>
-   </ion-item-sliding>
- </ion-list>
-</ng-container>
-
-
-<!-- Empty / Loading -->
-<div *ngIf="!loading && !filtered.length" class="empty">
- No hay lugares para “{{ categoria || 'todas las categorías' }}”.
-</div>
-<div *ngIf="loading" class="loading">
- <ion-spinner name="dots"></ion-spinner>
-</div>
-
-
-<!-- MODAL: Crear / Editar restaurante -->
-<ion-modal [isOpen]="showForm" (didDismiss)="closeForm()">
- <ng-template>
-   <ion-header>
-     <ion-toolbar>
-       <ion-title>{{ editing ? 'Editar' : 'Nuevo' }} restaurante</ion-title>
-       <ion-buttons slot="end">
-         <ion-button (click)="closeForm()">Cerrar</ion-button>
-       </ion-buttons>
-     </ion-toolbar>
-   </ion-header>
-
-
-   <ion-content class="ion-padding">
-     <form (ngSubmit)="save()">
-       <ion-item>
-         <ion-label position="stacked">Nombre</ion-label>
-         <ion-input [(ngModel)]="form.nombre" name="nombre" required></ion-input>
-       </ion-item>
-
-
-       <ion-item>
-         <ion-label position="stacked">Categoría</ion-label>
-         <ion-select [(ngModel)]="form.categoria" name="categoria" interface="popover">
-           <ion-select-option value="restaurante">Restaurante</ion-select-option>
-           <ion-select-option value="bar">Bar</ion-select-option>
-           <ion-select-option value="cocina_local">Cocina local</ion-select-option>
-           <ion-select-option value="heladeria">Heladería</ion-select-option>
-         </ion-select>
-       </ion-item>
-
-
-       <ion-item>
-         <ion-label position="stacked">Descripción</ion-label>
-         <ion-textarea [(ngModel)]="form.descripcion" name="descripcion" autoGrow="true"></ion-textarea>
-       </ion-item>
-
-
-       <ion-item>
-         <ion-label position="stacked">Horario</ion-label>
-         <ion-input [(ngModel)]="form.horario" name="horario" placeholder="9–18"></ion-input>
-       </ion-item>
-
-
-       <ion-button class="mt" type="submit" expand="block" [disabled]="saving">
-         <ion-spinner *ngIf="saving" name="dots"></ion-spinner>
-         <span *ngIf="!saving">{{ editing ? 'Guardar cambios' : 'Crear' }}</span>
-       </ion-button>
-     </form>
-   </ion-content>
- </ng-template>
-</ion-modal>
-
-
-<!-- =============================== -->
-<!-- MODAL: Reseñas por restaurante  -->
-<!-- =============================== -->
-<ion-modal [isOpen]="showReviews" (didDismiss)="closeReviews()">
- <ng-template>
-   <ion-header>
-     <ion-toolbar>
-       <ion-title>Reseñas — {{ currentItem?.nombre }}</ion-title>
-       <ion-buttons slot="end">
-         <ion-button (click)="closeReviews()">Cerrar</ion-button>
-       </ion-buttons>
-     </ion-toolbar>
-   </ion-header>
-
-
-   <ion-content class="ion-padding">
-     <!-- Formulario para agregar reseña -->
-     <form (ngSubmit)="enviarResena()" class="form-resena">
-       <ion-item>
-         <ion-label position="stacked">Puntuación (1–5)</ion-label>
-         <ion-segment [(ngModel)]="newReview.puntuacion" name="puntaje" mode="md">
-           <ion-segment-button *ngFor="let n of [1,2,3,4,5]" [value]="n">
-             {{ n }}
-           </ion-segment-button>
-         </ion-segment>
-       </ion-item>
-
-
-       <ion-item>
-         <ion-label position="stacked">Tu opinión</ion-label>
-         <ion-textarea
-           [(ngModel)]="newReview.texto"
-           name="texto"
-           placeholder="¿Qué te pareció?"
-           autoGrow="true"
-           rows="3">
-         </ion-textarea>
-       </ion-item>
-
-
-       <ion-button expand="block" type="submit" [disabled]="savingReview">
-         <ion-spinner *ngIf="savingReview" name="dots"></ion-spinner>
-         <span *ngIf="!savingReview">Publicar reseña</span>
-       </ion-button>
-     </form>
-
-
-     <h3 class="mt">Reseñas</h3>
-
-
-     <!-- Lista de reseñas (con estrellas) -->
-     <ion-list *ngIf="reviewsForCurrent.length; else noReviews">
-       <ion-item *ngFor="let rv of reviewsForCurrent">
+ <!-- Lista filtrada -->
+ <ng-container *ngIf="!loading && filtered.length">
+   <ion-list class="lista">
+     <ion-item-sliding *ngFor="let r of filtered">
+       <!-- Ahora el tap en el item te lleva al tab de Reseñas -->
+       <ion-item button detail="true" (click)="goToHealth(r)">
          <ion-label>
-           <h3 class="rowStars">
-             <span class="stars">
-               <ng-container *ngFor="let _ of getStars(rv.puntuacion)">
-                 <ion-icon name="star" color="warning"></ion-icon>
-               </ng-container>
-               <ng-container *ngFor="let _ of getEmptyStars(rv.puntuacion)">
-                 <ion-icon name="star-outline" color="medium"></ion-icon>
-               </ng-container>
-             </span>
-             <span class="fecha">— {{ rv.fecha | date:'mediumDate' }}</span>
-           </h3>
-           <p>{{ rv.texto }}</p>
+           <h3>{{ r.nombre }}</h3>
+           <p *ngIf="r.descripcion">{{ r.descripcion }}</p>
+           <p class="meta">
+             {{ r.categoria || 'Restaurante' }}
+             <span *ngIf="r.horario"> • {{ r.horario }}</span>
+           </p>
          </ion-label>
+
+
+         <!-- Botón explícito para ir a Reseñas (opcional) -->
+         <ion-button fill="clear" slot="end" (click)="goToHealth(r); $event.stopPropagation()">
+           <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+         </ion-button>
        </ion-item>
-     </ion-list>
 
 
-     <ng-template #noReviews>
-       <div class="empty">Aún no hay reseñas para este lugar.</div>
-     </ng-template>
-   </ion-content>
- </ng-template>
-</ion-modal>
+       <ion-item-options side="end">
+         <ion-item-option color="primary" (click)="goToHealth(r)">
+           <ion-icon slot="icon-only" name="chatbubble-ellipses-outline"></ion-icon>
+         </ion-item-option>
+         <ion-item-option color="medium" (click)="openForm(r)">
+           <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+         </ion-item-option>
+         <ion-item-option color="danger" (click)="confirmDelete(r)">
+           <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+         </ion-item-option>
+       </ion-item-options>
+     </ion-item-sliding>
+   </ion-list>
+ </ng-container>
+
+
+ <!-- Empty / Loading -->
+ <div *ngIf="!loading && !filtered.length" class="empty">
+   No hay lugares para “{{ categoria || 'todas las categorías' }}”.
+ </div>
+ <div *ngIf="loading" class="loading">
+   <ion-spinner name="dots"></ion-spinner>
+ </div>
+
+
+ <!-- MODAL: Crear / Editar restaurante -->
+ <ion-modal [isOpen]="showForm" (didDismiss)="closeForm()">
+   <ng-template>
+     <ion-header>
+       <ion-toolbar>
+         <ion-title>{{ editing ? 'Editar' : 'Nuevo' }} restaurante</ion-title>
+         <ion-buttons slot="end">
+           <ion-button (click)="closeForm()">Cerrar</ion-button>
+         </ion-buttons>
+       </ion-toolbar>
+     </ion-header>
+
+
+     <ion-content class="ion-padding">
+       <form (ngSubmit)="save()">
+         <ion-item>
+           <ion-label position="stacked">Nombre</ion-label>
+           <ion-input [(ngModel)]="form.nombre" name="nombre" required></ion-input>
+         </ion-item>
+
+
+         <ion-item>
+           <ion-label position="stacked">Categoría</ion-label>
+           <ion-select [(ngModel)]="form.categoria" name="categoria" interface="popover">
+             <ion-select-option value="restaurante">Restaurante</ion-select-option>
+             <ion-select-option value="bar">Bar</ion-select-option>
+             <ion-select-option value="cocina_local">Cocina local</ion-select-option>
+             <ion-select-option value="heladeria">Heladería</ion-select-option>
+           </ion-select>
+         </ion-item>
+
+
+         <ion-item>
+           <ion-label position="stacked">Descripción</ion-label>
+           <ion-textarea [(ngModel)]="form.descripcion" name="descripcion" autoGrow="true"></ion-textarea>
+         </ion-item>
+
+
+         <ion-item>
+           <ion-label position="stacked">Horario</ion-label>
+           <ion-input [(ngModel)]="form.horario" name="horario" placeholder="9–18"></ion-input>
+         </ion-item>
+
+
+         <ion-button class="mt" type="submit" expand="block" [disabled]="saving">
+           <ion-spinner *ngIf="saving" name="dots"></ion-spinner>
+           <span *ngIf="!saving">{{ editing ? 'Guardar cambios' : 'Crear' }}</span>
+         </ion-button>
+       </form>
+     </ion-content>
+   </ng-template>
+ </ion-modal>
+
+
+ <!-- (El modal de reseñas locales fue eliminado a propósito) -->
+
+
+</ion-content>
+
+
 
 

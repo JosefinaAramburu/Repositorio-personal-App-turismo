@@ -1,52 +1,32 @@
-// src/app/tabs/profile/profile.page.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
-
-// Ionic standalone imports
 import {
  IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonButton, IonIcon,
  IonModal, IonHeader, IonToolbar, IonTitle, IonTextarea, IonInput, IonSelect,
  IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
- IonRefresher, IonRefresherContent, IonSpinner, IonSegment, IonSegmentButton,
- IonButtons
+ IonRefresher, IonRefresherContent, IonSpinner, IonButtons
 } from '@ionic/angular/standalone';
+import { Router } from '@angular/router';
 
 
 import { supabase } from '../../supabase';
-
-
-// >>>>> Ionicons: registrar íconos que usas en el HTML
 import { addIcons } from 'ionicons';
 import {
- restaurantOutline,
- beerOutline,
- nutritionOutline,
- iceCreamOutline,
- chevronForwardOutline,
- star,
- starOutline
+ restaurantOutline, beerOutline, nutritionOutline,
+ iceCreamOutline, chevronForwardOutline, chatbubbleEllipsesOutline
 } from 'ionicons/icons';
 
 
 type RestauranteVM = {
- id: number;               // viene de la vista v_restaurantes_rating
+ id_gastronomia: number;              // ⚠️ Si tu PK real es id_restaurantes, cambiala acá y en las consultas.
+ id_destino?: number | null;
  nombre: string;
- categoria: string | null;
- descripcion: string | null;
- horario: string | null;
- promedio: number;         // calculado en la vista
- cantidad: number;         // calculado en la vista
-};
-
-
-type ResenaVM = {
- id_resena: number;
- id_usuario: number | null;
- texto: string | null;
- puntuacion: number;
- fecha: string;            // ISO date
+ categoria?: string | null;
+ descripcion?: string | null;
+ horario?: string | null;
+ promedio?: number | null;
+ cantidad?: number | null;
 };
 
 
@@ -60,12 +40,11 @@ type ResenaVM = {
    IonContent, IonSearchbar, IonList, IonItem, IonLabel, IonButton, IonIcon,
    IonModal, IonHeader, IonToolbar, IonTitle, IonTextarea, IonInput, IonSelect,
    IonSelectOption, IonItemSliding, IonItemOptions, IonItemOption,
-   IonRefresher, IonRefresherContent, IonSpinner, IonSegment, IonSegmentButton,
-   IonButtons
+   IonRefresher, IonRefresherContent, IonSpinner, IonButtons
  ]
 })
 export class GastronomiaPage {
- // Filtros / búsqueda
+ // Filtros/búsqueda
  q = '';
  categoria: string | null = null;
 
@@ -77,7 +56,7 @@ export class GastronomiaPage {
  editing = false;
 
 
- // Lista y filtro
+ // Datos
  items: RestauranteVM[] = [];
  filtered: RestauranteVM[] = [];
 
@@ -87,70 +66,82 @@ export class GastronomiaPage {
    nombre: '',
    categoria: 'restaurante',
    descripcion: '',
-   horario: ''
- } as { nombre: string; categoria: string; descripcion: string; horario: string; };
+   horario: '',
+   id_destino: null as number | null
+ };
 
 
- // Reseñas (modal)
- showReviews = false;
+ // Edición
  currentItem: RestauranteVM | null = null;
- reviewsForCurrent: ResenaVM[] = [];
- newReview = { puntuacion: 5, texto: '' };
- savingReview = false;
 
 
- constructor() {
-   // Registrar íconos para que <ion-icon name="..."> funcione
+ constructor(private router: Router) {
    addIcons({
      'restaurant-outline': restaurantOutline,
      'beer-outline': beerOutline,
      'nutrition-outline': nutritionOutline,
      'ice-cream-outline': iceCreamOutline,
      'chevron-forward-outline': chevronForwardOutline,
-     'star': star,
-     'star-outline': starOutline,
+     'chatbubble-ellipses-outline': chatbubbleEllipsesOutline
    });
  }
 
 
- // Lifecycle
  async ionViewWillEnter() {
    await this.load();
  }
 
 
- // Cargar lista principal (desde la vista v_restaurantes_rating)
+ // ============ Cargar restaurantes ============
  async load(evt?: CustomEvent) {
    this.loading = true;
    try {
-     const { data, error } = await supabase
-       .from('v_restaurantes_rating')
-       .select('*')
-       .order('promedio', { ascending: false });
+     let { data, error } = await supabase
+       .from('restaurantes')
+       .select('id_gastronomia, id_destino, nombre, categoria, descripcion, horario') // ⚠️ cambia a id_restaurantes si aplica
+       .order('id_gastronomia', { ascending: false });
 
 
-     if (error) throw error;
-     this.items = (data || []) as RestauranteVM[];
-     this.applyFilters();
+     if (error) {
+       // fallback sin order por si el proyecto no permite order en esa columna
+       const retry = await supabase
+         .from('restaurantes')
+         .select('id_gastronomia, id_destino, nombre, categoria, descripcion, horario');
+       if (retry.error) throw retry.error;
+       data = retry.data || [];
+     }
+
+
+     this.items = (data || []).map((r: any) => ({
+       ...r,
+       promedio: 0,
+       cantidad: 0,
+     })) as RestauranteVM[];
+
+
+     this.filtered = [...this.items];
    } catch (e) {
      console.error('Error al cargar restaurantes:', e);
+     alert('No se pudieron cargar los restaurantes.');
    } finally {
      this.loading = false;
-     if (evt && (evt.target as any)?.complete) {
-       (evt.target as any).complete();
-     }
+     (evt as any)?.target?.complete?.();
    }
  }
 
 
- // Filtros
+ // ============ Filtros ============
  applyFilters() {
-   const q = this.q.trim().toLowerCase();
+   const q = (this.q || '').trim().toLowerCase();
+   const wantedCat = (this.categoria || '').trim().toLowerCase();
+
+
    this.filtered = this.items.filter(r => {
-     const passText = !q || r.nombre.toLowerCase().includes(q) ||
-       (r.categoria || '').toLowerCase().includes(q) ||
-       (r.descripcion || '').toLowerCase().includes(q);
-     const passCat = !this.categoria || (r.categoria || '') === this.categoria;
+     const nombre = (r.nombre || '').toLowerCase();
+     const cat    = (r.categoria || '').toLowerCase();
+     const desc   = (r.descripcion || '').toLowerCase();
+     const passText = !q || nombre.includes(q) || cat.includes(q) || desc.includes(q);
+     const passCat  = !wantedCat || cat === wantedCat;
      return passText && passCat;
    });
  }
@@ -162,24 +153,29 @@ export class GastronomiaPage {
  }
 
 
- // -------- CRUD Restaurante --------
+ clearFilters() {
+   this.q = '';
+   this.categoria = null;
+   this.filtered = [...this.items];
+ }
+
+
+ // ============ CRUD restaurante ============
  openForm(r?: RestauranteVM) {
    this.showForm = true;
    this.editing = !!r;
+   this.form = r
+     ? {
+         nombre: r.nombre,
+         categoria: r.categoria || 'restaurante',
+         descripcion: r.descripcion || '',
+         horario: r.horario || '',
+         id_destino: (r.id_destino ?? null)
+       }
+     : { nombre: '', categoria: 'restaurante', descripcion: '', horario: '', id_destino: null };
 
 
-   if (r) {
-     this.form = {
-       nombre: r.nombre || '',
-       categoria: (r.categoria || 'restaurante'),
-       descripcion: (r.descripcion || ''),
-       horario: (r.horario || '')
-     };
-     this.currentItem = r;
-   } else {
-     this.form = { nombre: '', categoria: 'restaurante', descripcion: '', horario: '' };
-     this.currentItem = null;
-   }
+   this.currentItem = r || null;
  }
 
 
@@ -194,32 +190,30 @@ export class GastronomiaPage {
    if (!this.form.nombre?.trim()) return;
    this.saving = true;
    try {
+     const payload = {
+       nombre: this.form.nombre.trim(),
+       categoria: this.form.categoria,
+       descripcion: this.form.descripcion || null,
+       horario: this.form.horario || null,
+       id_destino: this.form.id_destino,
+     };
+
+
      if (this.editing && this.currentItem) {
-       const { error } = await supabase
+       await supabase
          .from('restaurantes')
-         .update({
-           nombre: this.form.nombre.trim(),
-           categoria: this.form.categoria,
-           descripcion: this.form.descripcion || null,
-           horario: this.form.horario || null
-         })
-         .eq('id_restaurantes', this.currentItem.id);
-       if (error) throw error;
+         .update(payload)
+         .eq('id_gastronomia', this.currentItem.id_gastronomia); // ⚠️ cambia a id_restaurantes si aplica
      } else {
-       const { error } = await supabase
-         .from('restaurantes')
-         .insert({
-           nombre: this.form.nombre.trim(),
-           categoria: this.form.categoria,
-           descripcion: this.form.descripcion || null,
-           horario: this.form.horario || null
-         });
-       if (error) throw error;
+       await supabase.from('restaurantes').insert(payload);
      }
+
+
      await this.load();
      this.closeForm();
    } catch (e) {
      console.error('Error guardando restaurante:', e);
+     alert('No se pudo guardar.');
    } finally {
      this.saving = false;
    }
@@ -227,109 +221,31 @@ export class GastronomiaPage {
 
 
  async confirmDelete(r: RestauranteVM) {
-   const ok = confirm(`¿Eliminar "${r.nombre}"? Esta acción no se puede deshacer.`);
+   const ok = confirm(`¿Eliminar "${r.nombre}"?`);
    if (!ok) return;
    try {
-     const { error } = await supabase
+     await supabase
        .from('restaurantes')
        .delete()
-       .eq('id_restaurantes', r.id);
-     if (error) throw error;
+       .eq('id_gastronomia', r.id_gastronomia); // ⚠️ cambia a id_restaurantes si aplica
      await this.load();
    } catch (e) {
      console.error('Error eliminando restaurante:', e);
+     alert('No se pudo eliminar.');
    }
  }
 
 
- // -------- Reseñas --------
- async openReviews(r: RestauranteVM) {
-   this.currentItem = r;
-   this.newReview = { puntuacion: 5, texto: '' };
-   await this.loadReviews(r.id);
-   this.showReviews = true;
- }
-
-
- closeReviews() {
-   this.showReviews = false;
-   this.currentItem = null;
-   this.reviewsForCurrent = [];
-   this.newReview = { puntuacion: 5, texto: '' };
- }
-
-
- private async loadReviews(idRestaurante: number) {
-   try {
-     const { data, error } = await supabase
-       .from('v_resenas_por_restaurantes')
-       .select('*')
-       .eq('id_restaurantes', idRestaurante)
-       .order('fecha', { ascending: false });
-     if (error) throw error;
-     this.reviewsForCurrent = (data || []).map((r: any) => ({
-       id_resena: r.id_reseñas,
-       id_usuario: r.id_usuario,
-       texto: r.texto,
-       puntuacion: r.puntuacion,
-       fecha: r.fecha
-     })) as ResenaVM[];
-   } catch (e) {
-     console.error('Error obteniendo reseñas:', e);
-     this.reviewsForCurrent = [];
-   }
- }
-
-
- async enviarResena() {
-   if (!this.currentItem) return;
-   const punt = +this.newReview.puntuacion;
-   const text = (this.newReview.texto || '').trim();
-   if (!punt || punt < 1 || punt > 5) return;
-   if (!text) return;
-
-
-   this.savingReview = true;
-   try {
-     const { data: nueva, error: e1 } = await supabase
-       .from('reseñas')
-       .insert({
-         texto: text,
-         puntuacion: punt,
-         id_usuario: null
-       })
-       .select('id_reseñas')
-       .single();
-     if (e1) throw e1;
-     const idResena = (nueva as any).id_reseñas as number;
-
-
-     const { error: e2 } = await supabase
-       .from('restaurantes_reseñas')
-       .insert({
-         id_restaurantes: this.currentItem.id,
-         id_reseñas: idResena
-       });
-     if (e2) throw e2;
-
-
-     await this.loadReviews(this.currentItem.id);
-     await this.load();
-     this.newReview = { puntuacion: 5, texto: '' };
-   } catch (e) {
-     console.error('Error enviando reseña:', e);
-   } finally {
-     this.savingReview = false;
-   }
- }
-
-
- // ==== Helpers estrellas ====
- getStars(count: number): number[] {
-   return Array(count).fill(0).map((_, i) => i);
- }
- getEmptyStars(count: number): number[] {
-   return Array(5 - count).fill(0).map((_, i) => i);
+ // ============ Navegar al TAB de Reseñas (HEALTH) ============
+ goToHealth(r: RestauranteVM) {
+   this.router.navigate(['/tabs/health'], {
+     queryParams: {
+       from: 'gastronomia',
+       tipo: 'restaurante',   // Health usará esto para decidir la tabla puente
+       id: r.id_gastronomia,  // ⚠️ si tu PK real es id_restaurantes, mandá ese campo
+       nombre: r.nombre
+     }
+   });
  }
 }
 

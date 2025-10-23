@@ -1,57 +1,46 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Qué hacer</ion-title>
-  </ion-toolbar>
+ <ion-toolbar>
+   <ion-title>Qué hacer</ion-title>
+ </ion-toolbar>
 </ion-header>
 
+
 <ion-content class="ion-padding home-page">
-  <!-- Buscador -->
-  <form [formGroup]="form" (ngSubmit)="buscar()">
-    <ion-searchbar
-      formControlName="destino"
-      placeholder="Ej: Barcelona, Paris, Roma..."
-      showCancelButton="never"
-      debounce="0"
-      class="search">
-    </ion-searchbar>
+ <h2 class="section-title">Recomendaciones</h2>
 
-    <ion-button expand="block" type="submit" [disabled]="form.invalid">
-      Buscar
-    </ion-button>
-  </form>
 
-  <h2 class="section-title">Recomendaciones</h2>
+ <ion-list inset class="cards">
+   <ion-item button detail="true" (click)="goTo('events')" class="card">
+     <div slot="start" class="icon icon-events">
+       <ion-icon name="musical-notes"></ion-icon>
+     </div>
+     <ion-label>
+       <h3 class="title">Eventos</h3>
+       <p class="subtitle">Recitales, ferias, fiestas</p>
+     </ion-label>
+   </ion-item>
 
-  <!-- Solo ion-item como hijos directos del ion-list -->
-  <ion-list inset class="cards">
-  <ion-item button detail="true" (click)="goTo('events')" class="card">
-    <div slot="start" class="icon icon-events">
-      <ion-icon name="musical-notes"></ion-icon>
-    </div>
-    <ion-label>
-      <h3 class="title">Eventos</h3>
-      <p class="subtitle">Recitales, ferias, fiestas</p>
-    </ion-label>
-  </ion-item>
 
-  <ion-item button detail="true" (click)="goTo('places')" class="card">
-    <div slot="start" class="icon icon-places">
-      <ion-icon name="location"></ion-icon>
-    </div>
-    <ion-label>
-      <h3 class="title">Lugares</h3>
-      <p class="subtitle">Atracciones, paisajes, museos</p>
-    </ion-label>
-  </ion-item>
+   <ion-item button detail="true" (click)="goTo('places')" class="card">
+     <div slot="start" class="icon icon-places">
+       <ion-icon name="location"></ion-icon>
+     </div>
+     <ion-label>
+       <h3 class="title">Lugares</h3>
+       <p class="subtitle">Atracciones, paisajes, museos</p>
+     </ion-label>
+   </ion-item>
 
-  <ion-item button detail="true" (click)="goTo('food')" class="card">
-    <div slot="start" class="icon icon-food">
-      <ion-icon name="restaurant"></ion-icon>
-    </div>
-    <ion-label>
-      <h3 class="title">Gastronomía</h3>
-      <p class="subtitle">Restaurantes, bares</p>
-    </ion-label>
-  </ion-item>
-</ion-list>
+
+   <ion-item button detail="true" (click)="goTo('food')" class="card">
+     <div slot="start" class="icon icon-food">
+       <ion-icon name="restaurant"></ion-icon>
+     </div>
+     <ion-label>
+       <h3 class="title">Gastronomía</h3>
+       <p class="subtitle">Restaurantes, bares</p>
+     </ion-label>
+   </ion-item>
+ </ion-list>
 </ion-content>
+
