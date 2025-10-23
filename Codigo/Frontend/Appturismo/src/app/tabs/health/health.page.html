@@ -1,4 +1,7 @@
-<div class="resenas-container">
+<div class="resenas-container" 
+     (touchstart)="onSwipeStart($event)" 
+     (touchend)="onSwipeEnd($event)">
+  
   <!-- Header dinámico -->
   <div class="resenas-header">
     <div class="header-content">
@@ -9,6 +12,13 @@
       <h1 class="resenas-title">{{ tituloPagina }}</h1>
       <p class="resenas-subtitle">{{ subtituloPagina }}</p>
     </div>
+  </div>
+
+  <!-- Indicador de deslizamiento -->
+  <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="swipe-indicator">
+    <ion-icon name="chevron-back"></ion-icon>
+    <span>Desliza para navegar entre páginas</span>
+    <ion-icon name="chevron-forward"></ion-icon>
   </div>
 
   <!-- Botón flotante para agregar resena -->

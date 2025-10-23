@@ -64,6 +64,10 @@ export class HealthPage implements OnInit, OnDestroy {
   promedioCalificacion = 0;
   distribucionCalificaciones: { [key: number]: number } = {};
 
+  // Variables para el gesto de deslizar
+  private swipeCoord?: [number, number];
+  private swipeTime?: number;
+
   private routeSub: any;
 
   constructor(
@@ -100,6 +104,31 @@ export class HealthPage implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.routeSub) {
       this.routeSub.unsubscribe();
+    }
+  }
+
+  // --- GESTO DE DESLIZAR ---
+  onSwipeStart(event: TouchEvent) {
+    this.swipeCoord = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
+    this.swipeTime = new Date().getTime();
+  }
+
+  onSwipeEnd(event: TouchEvent) {
+    if (!this.swipeCoord || !this.swipeTime) return;
+
+    const coord: [number, number] = [event.changedTouches[0].clientX, event.changedTouches[0].clientY];
+    const time = new Date().getTime();
+
+    const direction = [coord[0] - this.swipeCoord[0], coord[1] - this.swipeCoord[1]];
+    const duration = time - this.swipeTime;
+
+    // Verificar que sea un deslizamiento horizontal y rápido
+    if (duration < 1000 && Math.abs(direction[0]) > 50 && Math.abs(direction[0]) > Math.abs(direction[1] * 2)) {
+      if (direction[0] < 0) { // Deslizamiento hacia la izquierda - Siguiente
+        this.paginaSiguiente();
+      } else { // Deslizamiento hacia la derecha - Anterior
+        this.paginaAnterior();
+      }
     }
   }
 
