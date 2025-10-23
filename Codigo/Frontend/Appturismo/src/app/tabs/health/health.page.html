@@ -11,12 +11,12 @@
     </div>
   </div>
 
-  <!-- Botón flotante para agregar reseña -->
+  <!-- Botón flotante para agregar resena -->
   <button
     *ngIf="!mostrarFormulario && !cargandoResenas"
     (click)="mostrarFormulario = true"
     class="btn-flotante"
-    aria-label="Agregar nueva reseña">
+    aria-label="Agregar nueva resena">
     <span class="btn-flotante-icon">+</span>
     <span class="btn-flotante-text">Agregar Reseña</span>
   </button>
@@ -127,7 +127,7 @@
     </div>
   </div>
 
-  <!-- Lista de reseñas -->
+  <!-- Lista de resenas -->
   <div class="lista-resenas">
     <div class="lista-header">
       <h2>Reseñas de la Comunidad</h2>
@@ -156,7 +156,7 @@
       <p>Cargando reseñas...</p>
     </div>
 
-    <!-- Sin reseñas -->
+    <!-- Sin resenas -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length === 0" class="sin-resenas">
       <div class="sin-resenas-icon">💬</div>
       <h3 *ngIf="lugarId">No hay reseñas para {{ lugarNombre }}</h3>
@@ -174,7 +174,7 @@
       </button>
     </div>
 
-    <!-- Grid de reseñas -->
+    <!-- Grid de resenas -->
     <div *ngIf="!cargandoResenas && resenasFiltradas.length > 0" class="resenas-grid">
       <div
         *ngFor="let resena of resenasPaginadas"
@@ -197,7 +197,7 @@
           <button
             (click)="confirmarEliminacion(resena)"
             class="btn-eliminar-resena"
-            title="Eliminar reseña">
+            title="Eliminar resena">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
             </svg>
@@ -215,7 +215,7 @@
       </div>
     </div>
 
-    <!-- Paginacion -->
+    <!-- Paginación -->
     <div *ngIf="resenasFiltradas.length > itemsPorPagina" class="pagination">
       <button
         (click)="paginaAnterior()"
@@ -235,13 +235,13 @@
       </button>
     </div>
 
-    <!-- Información de paginacion cuando hay pocas reseñas -->
+    <!-- Información de paginación cuando hay pocas resenas -->
     <div *ngIf="resenasFiltradas.length > 0 && resenasFiltradas.length <= itemsPorPagina" class="info-paginacion-simple">
       Mostrando {{ resenasFiltradas.length }} reseñas
     </div>
   </div>
 
-  <!-- Modal de confirmacion para eliminar -->
+  <!-- Modal de confirmación para eliminar -->
   <div *ngIf="mostrarConfirmacionEliminar" class="modal-overlay" (click)="cancelarEliminacion()">
     <div class="modal-content confirmation-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">

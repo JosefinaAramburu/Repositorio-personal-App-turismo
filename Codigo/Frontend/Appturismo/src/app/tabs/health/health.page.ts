@@ -90,7 +90,7 @@ export class HealthPage implements OnInit, OnDestroy {
       } else {
         this.lugarId = null;
         this.lugarNombre = '';
-        console.log('🌐 Modo Todas las Reseñas');
+        console.log('🌐 Modo Todas las Resenas');
       }
 
       await this.cargarResenas();
@@ -107,7 +107,7 @@ export class HealthPage implements OnInit, OnDestroy {
   async cargarResenas() {
     this.cargandoResenas = true;
     try {
-      console.log('📥 Cargando reseñas...');
+      console.log('📥 Cargando resenas...');
       
       if (this.lugarId) {
         await this.cargarResenasDeLugar(this.lugarId);
@@ -117,22 +117,21 @@ export class HealthPage implements OnInit, OnDestroy {
 
       this.calcularEstadisticas();
       this.aplicarFiltros();
-      console.log('✅ Reseñas cargadas:', this.resenas.length);
+      console.log('✅ Resenas cargadas:', this.resenas.length);
 
     } catch (error) {
-      console.error('❌ Error cargando reseñas:', error);
-      this.mostrarError('Error al cargar las reseñas');
+      console.error('❌ Error cargando resenas:', error);
+      this.mostrarError('Error al cargar las resenas');
     } finally {
       this.cargandoResenas = false;
     }
   }
 
-  // Cargar reseñas de un lugar específico
+  // Cargar resenas de un lugar específico
   private async cargarResenasDeLugar(lugarId: number) {
-    console.log(`🔍 Buscando reseñas para lugar ID: ${lugarId}`);
+    console.log(`🔍 Buscando resenas para lugar ID: ${lugarId}`);
 
     try {
-      // PRIMERO: Verificar si existen relaciones para este lugar
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('lugares_resenas')
         .select('id_resenas')
@@ -147,16 +146,14 @@ export class HealthPage implements OnInit, OnDestroy {
       console.log('📋 Relaciones encontradas:', relaciones);
 
       if (!relaciones || relaciones.length === 0) {
-        console.log('ℹ️ No hay reseñas específicas para este lugar');
+        console.log('ℹ️ No hay resenas específicas para este lugar');
         this.resenas = [];
         return;
       }
 
-      // SEGUNDO: Obtener los IDs de las reseñas
       const idsResenas = relaciones.map(rel => rel.id_resenas);
-      console.log('🆔 IDs de reseñas:', idsResenas);
+      console.log('🆔 IDs de resenas:', idsResenas);
 
-      // TERCERO: Obtener las reseñas completas
       const { data: resenas, error: errorResenas } = await supabase
         .from('resenas')
         .select('*')
@@ -164,12 +161,12 @@ export class HealthPage implements OnInit, OnDestroy {
         .order('fecha', { ascending: false });
 
       if (errorResenas) {
-        console.error('❌ Error cargando reseñas:', errorResenas);
+        console.error('❌ Error cargando resenas:', errorResenas);
         throw errorResenas;
       }
 
       this.resenas = resenas || [];
-      console.log(`✅ ${this.resenas.length} reseñas cargadas para lugar ${lugarId}`);
+      console.log(`✅ ${this.resenas.length} resenas cargadas para lugar ${lugarId}`);
 
     } catch (error) {
       console.error('❌ Error en cargarResenasDeLugar:', error);
@@ -177,29 +174,27 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // Cargar todas las reseñas
   private async cargarTodasLasResenas() {
     try {
-      console.log('🌐 Cargando TODAS las reseñas...');
+      console.log('🌐 Cargando TODAS las resenas...');
       const { data, error } = await supabase
         .from('resenas')
         .select('*')
         .order('fecha', { ascending: false });
 
       if (error) {
-        console.error('❌ Error cargando todas las reseñas:', error);
+        console.error('❌ Error cargando todas las resenas:', error);
         throw error;
       }
 
       this.resenas = data || [];
-      console.log(`✅ ${this.resenas.length} reseñas cargadas (todas)`);
+      console.log(`✅ ${this.resenas.length} resenas cargadas (todas)`);
     } catch (error) {
       console.error('❌ Error en cargarTodasLasResenas:', error);
       this.resenas = [];
     }
   }
 
-  // ESTADÍSTICAS
   private calcularEstadisticas() {
     if (this.resenas.length === 0) {
       this.promedioCalificacion = 0;
@@ -210,7 +205,6 @@ export class HealthPage implements OnInit, OnDestroy {
     const suma = this.resenas.reduce((acc, resena) => acc + resena.puntuacion, 0);
     this.promedioCalificacion = suma / this.resenas.length;
 
-    // Calcular distribución
     this.distribucionCalificaciones = {};
     for (let i = 1; i <= 5; i++) {
       this.distribucionCalificaciones[i] = this.resenas.filter(r => r.puntuacion === i).length;
@@ -222,11 +216,9 @@ export class HealthPage implements OnInit, OnDestroy {
     });
   }
 
-  // ========== FILTROS Y ORDENAMIENTO ========
   aplicarFiltros() {
     let resenasFiltradas = [...this.resenas];
 
-    // Filtrar por calificación
     if (this.filtroCalificacion !== '0') {
       const calificacion = parseInt(this.filtroCalificacion);
       resenasFiltradas = resenasFiltradas.filter(
@@ -234,7 +226,6 @@ export class HealthPage implements OnInit, OnDestroy {
       );
     }
 
-    // Ordenar
     resenasFiltradas.sort((a, b) => {
       switch (this.ordenamiento) {
         case 'fecha_desc':
@@ -252,10 +243,9 @@ export class HealthPage implements OnInit, OnDestroy {
 
     this.resenasFiltradas = resenasFiltradas;
     this.paginaActual = 1;
-    console.log(`🔍 Filtros aplicados: ${this.resenasFiltradas.length} reseñas`);
+    console.log(`🔍 Filtros aplicados: ${this.resenasFiltradas.length} resenas`);
   }
 
-  // --- PAGINACION ---
   get totalPaginas(): number {
     return Math.ceil(this.resenasFiltradas.length / this.itemsPorPagina);
   }
@@ -278,7 +268,6 @@ export class HealthPage implements OnInit, OnDestroy {
     }
   }
 
-  // =============================== FORMULARIO ===============================
   esFormularioValido(): boolean {
     return this.nuevaResena.titulo.trim().length > 0 &&
       this.nuevaResena.contenido.trim().length > 0 &&
@@ -299,7 +288,6 @@ export class HealthPage implements OnInit, OnDestroy {
     try {
       console.log('🚀 Iniciando agregarResena...');
       
-      // Combinar título y contenido
       const textoCompleto = `${this.nuevaResena.titulo}: ${this.nuevaResena.contenido}`;
 
       const datosParaSupabase = {
@@ -309,9 +297,6 @@ export class HealthPage implements OnInit, OnDestroy {
         id_usuario: null
       };
 
-      console.log('📤 Enviando a Supabase:', datosParaSupabase);
-
-      // PRIMERO: Crear la reseña
       const { data: resenaCreada, error: errorResena } = await supabase
         .from('resenas')
         .insert([datosParaSupabase])
@@ -319,18 +304,16 @@ export class HealthPage implements OnInit, OnDestroy {
         .single();
 
       if (errorResena) {
-        console.error('❌ Error creando reseña:', errorResena);
-        this.mostrarError('Error al crear reseña: ' + errorResena.message);
+        console.error('❌ Error creando resena:', errorResena);
+        this.mostrarError('Error al crear resena: ' + errorResena.message);
         return;
       }
 
-      console.log('✅ Reseña creada:', resenaCreada);
+      console.log('✅ Resena creada:', resenaCreada);
 
-      // SEGUNDO: Si estamos en modo lugar específico, crear la relación
       if (this.lugarId && resenaCreada) {
-        console.log(`🔗 Creando relación: lugar ${this.lugarId} - reseña ${resenaCreada.id_resenas}`);
+        console.log(`🔗 Creando relación: lugar ${this.lugarId} - resena ${resenaCreada.id_resenas}`);
 
-        // ✅ CORREGIDO: Usar los nombres de columna correctos según tu SQL
         const { error: errorRelacion } = await supabase
           .from('lugares_resenas')
           .insert([{
@@ -340,16 +323,11 @@ export class HealthPage implements OnInit, OnDestroy {
 
         if (errorRelacion) {
           console.error('❌ Error creando relación:', errorRelacion);
-          console.log('📋 Detalles del error:', errorRelacion);
-          this.mostrarError('Error al vincular reseña con el lugar: ' + errorRelacion.message);
+          this.mostrarError('Error al vincular resena con el lugar: ' + errorRelacion.message);
           return;
-        } else {
-          console.log('✅ Relación creada exitosamente');
         }
       }
 
-      // RECARGAR Y LIMPIAR
-      console.log('🔄 Recargando reseñas...');
       await this.cargarResenas();
 
       this.resetearFormulario();
@@ -358,7 +336,7 @@ export class HealthPage implements OnInit, OnDestroy {
 
     } catch (error: any) {
       console.error('❌ Error general:', error);
-      this.mostrarError('Error inesperado al agregar reseña: ' + error.message);
+      this.mostrarError('Error inesperado al agregar resena: ' + error.message);
     } finally {
       this.cargando = false;
     }
@@ -373,7 +351,6 @@ export class HealthPage implements OnInit, OnDestroy {
     this.estrellasHover = 0;
   }
 
-  // --- ELIMINACION ---
   confirmarEliminacion(resena: Resena) {
     this.resenaAEliminar = resena;
     this.mostrarConfirmacionEliminar = true;
@@ -388,9 +365,8 @@ export class HealthPage implements OnInit, OnDestroy {
     if (!this.resenaAEliminar) return;
 
     try {
-      console.log('🗑️ Eliminando reseña:', this.resenaAEliminar.id_resenas);
+      console.log('🗑️ Eliminando resena:', this.resenaAEliminar.id_resenas);
 
-      // Primero eliminar las relaciones
       const { error: errorRelacion } = await supabase
         .from('lugares_resenas')
         .delete()
@@ -400,31 +376,29 @@ export class HealthPage implements OnInit, OnDestroy {
         console.error('⚠️ Error eliminando relación:', errorRelacion);
       }
 
-      // Luego eliminar la reseña
       const { error } = await supabase
         .from('resenas')
         .delete()
         .eq('id_resenas', this.resenaAEliminar.id_resenas);
 
       if (error) {
-        console.error('❌ Error eliminando reseña:', error);
-        this.mostrarError('Error al eliminar reseña');
+        console.error('❌ Error eliminando resena:', error);
+        this.mostrarError('Error al eliminar resena');
         return;
       }
 
-      console.log('✅ Reseña eliminada exitosamente');
+      console.log('✅ Resena eliminada exitosamente');
       await this.cargarResenas();
       this.mostrarExito('Reseña eliminada correctamente');
 
     } catch (error: any) {
       console.error('❌ Error general eliminando:', error);
-      this.mostrarError('Error inesperado al eliminar reseña: ' + error.message);
+      this.mostrarError('Error inesperado al eliminar resena: ' + error.message);
     } finally {
       this.cancelarEliminacion();
     }
   }
 
-  // --- UTILIDADES ---
   obtenerTitulo(resena: Resena): string {
     if (!resena.texto) return 'Sin título';
     const partes = resena.texto.split(':');
@@ -448,18 +422,15 @@ export class HealthPage implements OnInit, OnDestroy {
     return textos[calificacion] || 'Sin calificar';
   }
 
-  // --- MODALES ---
   cerrarModal() {
     this.mostrarFormulario = false;
     this.resetearFormulario();
   }
 
-  // --- NAVEGACION ---
   volverALugares() {
     this.router.navigate(['/tabs/capture']);
   }
 
-  // --- NOTIFICACIONES ---
   private mostrarError(mensaje: string) {
     alert(`❌ ${mensaje}`);
   }
@@ -468,7 +439,6 @@ export class HealthPage implements OnInit, OnDestroy {
     alert(`✅ ${mensaje}`);
   }
 
-  // --- GETTERS PARA LA VISTA ---
   get tituloPagina(): string {
     return this.lugarId ? `Reseñas de ${this.lugarNombre}` : 'Todas las Reseñas';
   }

@@ -19,7 +19,7 @@ import {
 } from 'ionicons/icons';
 
 // CORREGIR ESTA IMPORTACIÓN
-import { supabase } from '../../supabase'; // 👈 Asegúrate que la ruta sea correcta
+import { supabase } from '../../supabase'; 
 
 // Interfaces
 export interface Lugar {
@@ -39,7 +39,7 @@ interface RelacionResena {
   id_resenas: number;
 }
 
-// Interface para reseñas
+// Interface para resenas
 interface ResenaStats {
   puntuacion: number;
   fecha: string;
@@ -98,7 +98,7 @@ export class CapturePage implements OnInit {
     { valor: 'Parque', label: 'Parques' },
     { valor: 'Playa', label: 'Playas' },
     { valor: 'Mirador', label: 'Miradores' },
-    { valor: 'Histórico', label: 'Históricos' },
+    { valor: 'Historico', label: 'Historicos' },
     { valor: 'Shopping', label: 'Shopping' },
     { valor: 'Restaurante', label: 'Restaurantes' },
     { valor: 'Hotel', label: 'Hoteles' },
@@ -150,10 +150,10 @@ export class CapturePage implements OnInit {
     }
   }
 
-  // CALCULAR ESTADISTICAS DE RESEÑAS PARA UN LUGAR
+  // CALCULAR ESTADISTICAS DE RESENAS PARA UN LUGAR
   async calcularEstadisticas(idLugar: number): Promise<{totalResenas: number, promedioRating: number, ultimaResena?: string}> {
     try {
-      // Obtener reseñas relacionadas con este lugar
+      // Obtener resenas relacionadas con este lugar
       const { data: relaciones, error } = await supabase
         .from('lugares_resenas')
         .select('id_resenas')
@@ -170,7 +170,7 @@ export class CapturePage implements OnInit {
 
       const idsResenas = relaciones.map((rel: RelacionResena) => rel.id_resenas);
 
-      // Obtener las reseñas con información completa
+      // Obtener las resenas con informacion completa
       const { data: resenas, error: errorResenas } = await supabase
         .from('resenas')
         .select('puntuacion, fecha, texto')
@@ -185,21 +185,21 @@ export class CapturePage implements OnInit {
       const sumaRatings = resenas.reduce((sum: number, resena: ResenaStats) => sum + (resena.puntuacion || 0), 0);
       const promedioRating = totalResenas > 0 ? Number((sumaRatings / totalResenas).toFixed(1)) : 0;
 
-      // Obtener la última reseña
+      // Obtener la ultima resena
       const ultimaResena = resenas.length > 0 ? resenas[0].fecha : undefined;
 
       return { totalResenas, promedioRating, ultimaResena };
     } catch (error) {
-      console.error('Error calculando estadísticas:', error);
+      console.error('Error calculando estadisticas:', error);
       return { totalResenas: 0, promedioRating: 0 };
     }
   }
 
-  // APLICAR FILTROS Y BÚSQUEDA
+  // APLICAR FILTROS Y BUSQUEDA
   aplicarFiltros() {
     let resultados = [...this.lugares];
 
-    // Filtrar por búsqueda
+    // Filtrar por busqueda
     if (this.terminoBusqueda.trim()) {
       const busqueda = this.terminoBusqueda.toLowerCase();
       resultados = resultados.filter((lugar: Lugar) =>
@@ -236,7 +236,7 @@ export class CapturePage implements OnInit {
   // CREAR NUEVO LUGAR
   async crearLugar() {
     if (!this.nuevoLugar.nombre.trim() || !this.nuevoLugar.categoria.trim()) {
-      this.mostrarError('Nombre y categoría son obligatorios');
+      this.mostrarError('Nombre y categoria son obligatorios');
       return;
     }
 
@@ -307,11 +307,11 @@ export class CapturePage implements OnInit {
     }
   }
 
-  // ELIMINAR LUGAR CON CONFIRMACIÓN
+  // ELIMINAR LUGAR CON CONFIRMACION
   async eliminarLugar(id: number) {
     const alert = await this.alertController.create({
       header: '¿Eliminar lugar?',
-      message: 'Se eliminarán también todas las reseñas asociadas. Esta acción no se puede deshacer.',
+      message: 'Se eliminaran tambien todas las resenas asociadas. Esta accion no se puede deshacer.',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -321,13 +321,13 @@ export class CapturePage implements OnInit {
             try {
               const loading = await this.mostrarLoading('Eliminando lugar...');
               
-              // Primero obtener las reseñas relacionadas
+              // Primero obtener las resenas relacionadas
               const { data: relaciones } = await supabase
                 .from('lugares_resenas')
                 .select('id_resenas')
                 .eq('id_lugares', id);
 
-              // Eliminar relaciones de reseñas
+              // Eliminar relaciones de resenas
               await supabase.from('lugares_resenas').delete().eq('id_lugares', id);
 
               // Luego eliminar el lugar
@@ -351,16 +351,16 @@ export class CapturePage implements OnInit {
     await alert.present();
   }
 
-  // ✅ VER RESEÑAS DEL LUGAR (NAVEGA A HEALTH PAGE) - ACTUALIZADA
+  // ✅ VER RESENAS DEL LUGAR (NAVEGA A HEALTH PAGE) - ACTUALIZADA
   verResenas(lugar: Lugar) {
     if (!lugar.id_lugares) {
-      this.mostrarError('No se puede acceder a las reseñas de este lugar');
+      this.mostrarError('No se puede acceder a las resenas de este lugar');
       return;
     }
 
-    console.log('Navegando a reseñas del lugar:', lugar);
+    console.log('Navegando a resenas del lugar:', lugar);
 
-    // Navegar a la página de reseñas con parámetros
+    // Navegar a la pagina de resenas con parametros
     this.navCtrl.navigateForward('/tabs/health', {
       queryParams: {
         lugarId: lugar.id_lugares,
@@ -372,7 +372,7 @@ export class CapturePage implements OnInit {
     });
   }
 
-  // 🔘 MÉTODOS DE UI
+  // 🔘 METODOS DE UI
   abrirFormulario() {
     this.mostrarFormulario = true;
     this.lugarEditando = null;
@@ -397,7 +397,7 @@ export class CapturePage implements OnInit {
     };
   }
 
-  // MÉTODOS DE AYUDA PARA LA UI
+  // METODOS DE AYUDA PARA LA UI
   getCategoriaColor(categoria: string): string {
     const colores: { [key: string]: string } = {
       'Monumento': 'warning',
@@ -405,7 +405,7 @@ export class CapturePage implements OnInit {
       'Parque': 'success',
       'Playa': 'info',
       'Mirador': 'primary',
-      'Histórico': 'medium',
+      'Historico': 'medium',
       'Shopping': 'pink',
       'Restaurante': 'danger',
       'Hotel': 'dark',
@@ -421,7 +421,7 @@ export class CapturePage implements OnInit {
       'Parque': 'leaf',
       'Playa': 'water',
       'Mirador': 'eye',
-      'Histórico': 'book',
+      'Historico': 'book',
       'Shopping': 'cart',
       'Restaurante': 'restaurant',
       'Hotel': 'bed',
@@ -450,7 +450,7 @@ export class CapturePage implements OnInit {
 
     if (diffDays === 0) return 'Hoy';
     if (diffDays === 1) return 'Ayer';
-    if (diffDays < 7) return `Hace ${diffDays} días`;
+    if (diffDays < 7) return `Hace ${diffDays} dias`;
     if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semana${Math.floor(diffDays / 7) > 1 ? 's' : ''}`;
     return `Hace ${Math.floor(diffDays / 30)} mes${Math.floor(diffDays / 30) > 1 ? 'es' : ''}`;
   }
